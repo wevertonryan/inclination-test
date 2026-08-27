@@ -1,126 +1,142 @@
-# Plano de Projeto Ágil — Inclination Test
+# Plano de Projeto Ágil de Software — Inclination Test
 
-**Data de revisão:** 23/08/2026
-**Prazo real de entrega (disciplina ISW-036):** app, documentação e slides prontos até 20/11/2026 (buffer de 1 semana antes do prazo formal de 23/11/2026)
-**Meta interna do time:** projeto substancialmente concluído até 13/11/2026, deixando a última semana livre para imprevistos
-**Orçamento:** R$ 0,00
-**Metodologia:** Kanban
+## 1. Introdução
 
-> **Legenda:** 🟨 = ainda depende de confirmação do Professor ou de informação que falta. Tudo que não está marcado já foi definido pelo time.
+O **Inclination Test** é um aplicativo móvel para automatizar a Prova de Inclinação e a Prova de Mar de embarcações, hoje realizadas manualmente com pêndulo e mangueira de nível. O app usa os sensores nativos do celular (acelerômetro, giroscópio, magnetômetro) para medir o ângulo de inclinação da embarcação, comparando o resultado com o método tradicional para validar sua precisão.
 
----
+Este documento formaliza o projeto ágil de software referente ao Projeto Integrador do 5º semestre, descrevendo a solução, seu contexto, a arquitetura básica, o planejamento de atividades, responsabilidades e os marcos de entrega do semestre. O foco será exclusivamente para a entrega do MVP, com menção sobre planos futuros, mas que ainda não está definido.
 
-## 1. Contexto do projeto
+### Contexto de negócio
+
+Este projeto está sendo desenvolvido como Projeto Integrador da Fatec, tendo o professor Alex Prado como stakeholder envolvido.
+
+**Canvas do Modelo de Negócio:**
+
+| Bloco | Conteúdo |
+|---|---|
+| Segmentos de Clientes | Engenheiros Navais e Arquitetos Navais Autônomos |
+| Proposta de Valor | Medir inclinação (Prova de Inclinação / Prova de Mar) de forma prática e confiavel, usando o celular em vez métodos manuais, como pêndulo e mangueira de nível |
+| Canais | Divulgação acadêmica pelo professor da Naval Alex Prado; distribuição via Google Play; Escola de Inovadores (Analisando se vamos realmente fazer); |
+| Relacionamento com Clientes | Suporte direto/comunidade acadêmica nesta fase; uso self-service pelo app |
+| Fontes de Receita | Não definido neste estágio |
+| Recursos Principais | Equipe de desenvolvimento (2 pessoas), conhecimento de domínio do Professor, ferramentas de desenvolvimento |
+| Atividades-Chave | Desenvolvimento do app de maneira continua |
+| Parcerias Principais | Professor Alex Prado; Fatec Jahu |
+| Estrutura de Custos | Custo hora de 2 desenvolvedores "Juniors" - R$30,00/h |
+
+### Contexto do aplicativo móvel
+
+O app é isolado/standalone nesta fase do MVP: toda a medição, cálculo e armazenamento acontecem localmente no dispositivo, pois é uma aplicação para ser utilizada para fins de medição na própria embarcação.
+
+Ele não faz parte de um ecossistema maior hoje, mas foi desenhado prevendo evolução futura (fora do escopo deste MVP) para integrar uma plataforma com transmissão de dados em tempo real e login de usuário.
+
+### Motivação
+
+O processo atual de Prova de Inclinação depende de instrumentos analógicos (pêndulo, mangueira de nível) e leitura manual, sujeita a erro humano e a um setup mais lento. A motivação do projeto é simplificar esse processo usando uma ferramenta que qualquer engenheiro naval já tem em mãos — o celular — tornando a medição mais rápida sem abrir mão da precisão exigida pela prática profissional.
+
+### Identificação do grupo de trabalho
+O trabalho da equipe será distribuido conforme a demanda for aparecendo, não terá papeis fixos para cada membro
 
 | Campo | Informação |
 |---|---|
-| Nome do projeto | Inclination Test |
-| Problema | Prova de Inclinação e Prova de Mar em barcos hoje são feitas manualmente com pêndulo e mangueira de nível — processo lento e sujeito a erro humano. |
-| Objetivo principal | Simplificar esse processo de medição usando uma ferramenta que qualquer um já tem: o celular. Automatizar a medição e a geração dos dados da Prova de Inclinação e da Prova de Mar usando os sensores nativos do aparelho. |
-| Público-alvo | Engenheiros Navais e Arquitetos Navais Autônomos. |
-| Stakeholder / Product Owner | Professor da Escola Naval. |
-| Equipe | Weverton Ryan e Pedro Mineo |
-| Plataforma | Android apenas, por enquanto. |
-| Tecnologia | React Native com Expo. |
-| Login/contas de usuário | Não terá, nesta fase — é uma aplicação apenas de medição. Login só seria necessário para recursos futuros, como transmissão de dados em tempo real. |
+| Nome da equipe | JLY |
+| Weverton Ryan (Porta Voz) | HTML, CSS, JS, React, C#, Node.js, MongoDB, C#, Docker, Lógica de Programação, Estrutura de Dados, Big Data, Gestão de Projetos |
+| Pedro Mineo | HTML, CSS, JS, React, C#, Node.js, SQL, MongoDB, PHP, Habilidades de Comunicação |
+### Repositório
+
+Link do Repositório: [https://github.com/wevertonryan/inclination-test](https://github.com/wevertonryan/inclination-test)
 
 ---
 
-## 2. Metodologia
+## 2. Aplicativo para Dispositivo Móvel
 
-**Kanban.**
+### Visão do produto
 
-A escolha é exclusivamente por preferência do time: como somos apenas duas pessoas, a comunicação entre nós já é fluida no dia a dia, então não há necessidade das cerimônias formais do Scrum. O que realmente precisamos é de um quadro Kanban para gerenciar as atividades e deixar claro o que cada um está fazendo — evitando retrabalho e mantendo visibilidade do progresso.
+Ser a ferramenta de referência para Engenheiros e Arquitetos Navais realizarem Provas de Inclinação e de Mar de forma digital, prática e confiável, substituindo o pêndulo e a mangueira pelos sensores do próprio celular. Quando completamente pronto e validado, o app deve ser aceito como método equivalente ao tradicional para uso real em campo.
 
-Colunas sugeridas do quadro: `A Fazer` → `Em andamento` → `Em validação/teste` → `Concluído`.
+### Objetivos do desenvolvimento do app
 
-> ⚠️ A disciplina organiza as entregas em "Sprints" semanais e "Epics" — usamos essa nomenclatura no cronograma (Seção 7) só para bater com o calendário oficial da disciplina, mas o gerenciamento do dia a dia do time é via Kanban, não Scrum.
+O app deve ser desenvolvido para simplificar o processo de medição da Prova de Inclinação e da Prova de Mar, hoje manual e dependente de instrumentos físicos específicos. Ele servirá para captar os dados dos sensores do celular, calibrá-los, calcular o ângulo de inclinação com precisão próxima à do método tradicional (pêndulo) e apresentar/registrar esse resultado — servindo tanto para uso prático em campo quanto como estudo acadêmico de viabilidade do uso de sensores de smartphone para esse fim.
+
+### Arquitetura básica
+
+O app é organizado em três camadas, todas rodando localmente no dispositivo (sem backend no MVP):
+
+1. **Camada de Apresentação** (React Native/Expo): telas de Calibração, Medição, Prova de Mar e Resultado/Relatório.
+2. **Núcleo de Processamento**: módulo de acesso aos sensores nativos (acelerômetro, giroscópio, magnetômetro), módulo de filtragem de ruído e módulo de cálculo do ângulo de inclinação.
+3. **Persistência local**: armazenamento no próprio dispositivo, sem sincronização em nuvem nesta fase.
+
+O fluxo é: os sensores nativos alimentam o módulo de sensores → os dados passam pelo filtro de ruído → o módulo de cálculo determina o ângulo → o resultado é exibido nas telas de Medição/Prova de Mar e gravado localmente → a tela de Resultado lê os dados salvos para gerar o relatório.
+
+![Diagrama de Arquitetura](arquitetura.png)
+
+### Metas e restrições da arquitetura
+
+| Item | Definição | Justificativa |
+|---|---|---|
+| Tipo de app | Híbrido (React Native + Expo) | Time já tem experiência com Node.js/React, reduzindo a curva de aprendizado e acelerando o desenvolvimento dentro do prazo do semestre |
+| Plataforma | Apenas Android nesta fase | Precisão dos sensores precisa ser validada por dispositivo; restringir a plataforma reduz a variável de hardware desconhecido. iOS pode ser reavaliado se a limitação de acesso a sensores não se confirmar um problema |
+| Acesso a sensores | `expo-sensors`, com possível necessidade de acesso mais direto ao hardware 🟨 | A ser confirmado por spike técnico (Sprint 01) — a aplicação exige alta precisão, e ainda não se sabe se a camada de abstração do Expo é suficiente |
+| Backend/nuvem | Nenhum no MVP | Escopo do MVP é validar a medição local; sincronização em nuvem é recurso futuro |
+| Autenticação | Nenhuma no MVP | App é apenas de medição; login só seria necessário para recursos futuros como transmissão em tempo real |
+| Orçamento de infraestrutura | R$ 0,00 — GitHub e camada gratuita do Expo EAS Build | Restrição de orçamento do projeto acadêmico |
 
 ---
 
-## 3. Visão, objetivos e critérios de sucesso
+## 3. Projeto Ágil de Software
 
-**Visão do produto:** ser a ferramenta de referência para Engenheiros e Arquitetos Navais realizarem Provas de Inclinação e de Mar de forma digital, prática e confiável, substituindo o pêndulo e a mangueira pelos sensores do próprio celular.
-
-**Objetivo de negócio:** o objetivo real não é provar que sensores de celular têm precisão para uso profissional (embora isso esteja embutido no processo) — é simplificar o processo de medição usando uma ferramenta acessível a qualquer engenheiro. A validação técnica dos sensores é o caminho, não o fim.
-
-### Critérios de sucesso
-
-O sucesso do projeto tem dois horizontes:
-
-- **Visão de longo prazo (fora do escopo do MVP):** a aplicação ser aprovada por algum órgão oficial e passar a ser usada de fato por Engenheiros Navais em situações reais.
-- **Para o MVP (o que define sucesso agora):**
-  - Erro de medição do ângulo de inclinação até **5%** de imprecisão comparado ao método do pêndulo 🟨 *(valor sugerido pelo time como aceitável para esta primeira instância; falta confirmar com o Professor se é esse o número que ele espera)*.
-  - Dados gerados pelo app aprovados pelo Professor como equivalentes ao método tradicional.
-  - App testado em pelo menos 1 embarcação real antes do prazo final.
-  - O Professor aprovar a aplicação como adequada.
-
----
-
-## 4. Escopo e MVP
+### Escopo
 
 **Dentro do escopo do MVP:**
-- Captura de dados dos sensores nativos (acelerômetro, giroscópio, magnetômetro) para cálculo do ângulo de inclinação.
+- Captura de dados dos sensores nativos para cálculo do ângulo de inclinação.
 - Calibração do sensor em 1 clique, ou automaticamente antes de cada medição.
 - Cálculo do ângulo de banda (Prova de Inclinação) e registro de série temporal (Prova de Mar).
 - Registro do valor medido manualmente (pêndulo) ao lado do valor do app, para comparação de precisão.
-- Geração dos dados/relatório da prova 🟨 *(ainda não decidimos se isso é um documento exportável ou só uma tela de resultados no próprio app — ver Seção 13)*.
-- Interface simples para uso em campo (no convés).
+- Geração dos dados/relatório da prova 🟨 *(ainda não decidido se será documento exportável ou apenas tela de resultado no app)*.
+- Interface para uso em campo (convés).
 
 **Fora do escopo do MVP:**
-- Visualização remota em tempo real para terceiros fora do barco.
-- Armazenamento em nuvem / sincronização automática (ex. Supabase).
-- Contas de usuário / login (só necessário quando tivermos transmissão em tempo real).
-- iOS — por enquanto restringimos a alguns dispositivos Android, pois precisamos confirmar se os sensores desses aparelhos são realmente adequados para medições de alta precisão. Se isso for confirmado como não sendo um problema, a restrição de plataforma pode ser reavaliada.
-- Certificação oficial junto a órgãos marítimos — processo separado, não é entregável de software.
+- Visualização remota em tempo real para terceiros.
+- Armazenamento em nuvem / sincronização automática.
+- Contas de usuário / login.
+- iOS (ver restrições de arquitetura).
+- Certificação oficial junto a órgãos marítimos.
 
-**Premissas:**
-- Teremos acesso a pelo menos um celular Android para testes de sensores.
-- Teremos acesso a uma embarcação real para o teste de campo antes do prazo final.
-- O Professor atua como avaliador técnico/validador do método, além de Product Owner.
+Não é o app completo da visão de produto: é o subconjunto necessário para validar, em ambiente real, se sensores de smartphone atingem precisão aceitável para a Prova de Inclinação — a evolução para produto completo (login, tempo real, nuvem) é trabalho futuro fora deste semestre.
 
-**Dependências críticas:**
-- Validar com o Professor as fórmulas/método de cálculo da Prova de Inclinação — conhecimento de domínio que o time de dev não tem.
-- Confirmar se o `expo-sensors` é preciso e configurável o suficiente para o que precisamos, ou se será necessário acesso mais direto aos sensores nativos (com pouca ou nenhuma camada de abstração). Isso pode exigir calibração e testes específicos por dispositivo.
-- Agendar com o Professor o acesso à embarcação real para teste de campo.
+### Papéis e responsabilidades
 
----
+Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da aplicação juntos, dividindo tarefas específicas conforme a demanda aparece — não há papéis fixos e estanques no dia a dia. Ainda assim, para fins de responsabilização formal:
 
-## 5. Equipe
+| Papel | Responsável | Responsabilidades principais |
+|---|---|---|
+| Product Owner (PO) | Professor da disciplina | Prioriza o backlog, valida entregas de cada marco (EP2/EP3/EF), aprova a precisão obtida |
+| Dev (Mobile Fullstack) | Membro 1 e Membro 2 | Implementação de todas as camadas do app (sensores, cálculo, UI, persistência) |
+| Levantamento de requisitos / Gestão de projeto | Membro 1 | Organização do cronograma, levantamento de requisitos junto ao Professor |
+| 🟨 Papel adicional | Membro 2 | A definir conforme os conhecimentos técnicos do Membro 2 (Seção 1) |
+| QA (testes de precisão) | Membro 1 e Membro 2 | Validação cruzada dos resultados do app contra o método manual (pêndulo) |
+| UX (usabilidade de campo) | Membro 1 e Membro 2 | Ajustes de legibilidade/usabilidade para uso no convés |
 
-Ambos os membros desenvolvem todas as etapas da aplicação juntos; a divisão de tarefas específica é combinada conforme a demanda for aparecendo, sem papéis fixos.
+### Backlog do produto
 
-| Membro | Conhecimentos |
-|---|---|
-| Membro 1 | Node.js, MongoDB, C#, Docker, lógica de programação, estrutura de dados, big data, levantamento de requisitos, gestão de projetos |
-| Membro 2 | 🟨 **Pendente** — Peter, preencha aqui seus conhecimentos técnicos (pode incluir os mesmos que o Membro 1 já tem, se for o caso) |
-
-**Product Owner:** o Professor da Escola Naval.
-
----
-
-## 6. Backlog do produto (Épicos e histórias)
-
-> Estimativas em Story Points são iniciais (Fibonacci: 1,2,3,5,8,13) e serão recalibradas depois do primeiro Sprint, já que não temos velocity histórica.
+> Estimativas em Story Points (Fibonacci: 1,2,3,5,8,13), a recalibrar após o primeiro Sprint.
 
 | ID | Épico | História de usuário | Prioridade | SP |
 |---|---|---|---|---|
-| US-01 | Épico 1 — Fundação | Como dev, quero configurar o projeto React Native/Expo com acesso aos sensores nativos, para ter a base técnica do app. | P0 | 5 |
-| US-02 | Épico 1 — Fundação | Como engenheiro naval, quero calibrar o sensor (em 1 clique ou automaticamente antes da medição), para garantir que o ponto zero esteja correto. | P0 | 8 |
-| US-03 | Épico 1 — Fundação | Como engenheiro naval, quero medir o ângulo de inclinação em tempo real na tela, para acompanhar a Prova de Inclinação. | P0 | 8 |
-| US-04 | Épico 1 — Fundação | Como engenheiro naval, quero que o app filtre o ruído dos dados do sensor, para reduzir erro de leitura. | P0 | 8 |
-| US-07 | Épico 2 — Confiabilidade | Como PO, quero registrar o valor medido manualmente (pêndulo) ao lado do valor do app, para comparar precisão. | P0 | 5 |
-| US-05 | Épico 2 — Confiabilidade | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 | 8 |
-| US-06 | Épico 2 — Confiabilidade | Como engenheiro naval, quero que os dados coletados e o ângulo calculado sejam documentados/exportados, para formalizar a prova. | P1 | 5 |
-| US-09 | Épico 2 — Confiabilidade | Como engenheiro naval, quero que os dados fiquem salvos no celular após a medição, para não perder o resultado se o app fechar. | P1 | 5 |
-| US-10 | Épico 2 — Confiabilidade | Como engenheiro naval, quero usar o app sem internet, pois embarcações costumam não ter sinal. | P1 | 3 |
-| US-08 | Épico 3 — Campo e fechamento | Como engenheiro naval, quero uma interface legível sob luz solar/no convés, para operar o app em condições reais. | P1 | 3 |
+| US-01 | Épico 1 | Como dev, quero configurar o projeto React Native/Expo com acesso aos sensores nativos, para ter a base técnica do app. | P0 | 5 |
+| US-02 | Épico 1 | Como engenheiro naval, quero calibrar o sensor (em 1 clique ou automaticamente antes da medição), para garantir que o ponto zero esteja correto. | P0 | 8 |
+| US-03 | Épico 1 | Como engenheiro naval, quero medir o ângulo de inclinação em tempo real na tela, para acompanhar a Prova de Inclinação. | P0 | 8 |
+| US-04 | Épico 1 | Como engenheiro naval, quero que o app filtre o ruído dos dados do sensor, para reduzir erro de leitura. | P0 | 8 |
+| US-07 | Épico 2 | Como PO, quero registrar o valor medido manualmente (pêndulo) ao lado do valor do app, para comparar precisão. | P0 | 5 |
+| US-05 | Épico 2 | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 | 8 |
+| US-06 | Épico 2 | Como engenheiro naval, quero que os dados coletados e o ângulo calculado sejam documentados/exportados, para formalizar a prova. | P1 | 5 |
+| US-09 | Épico 2 | Como engenheiro naval, quero que os dados fiquem salvos no celular após a medição, para não perder o resultado se o app fechar. | P1 | 5 |
+| US-10 | Épico 2 | Como engenheiro naval, quero usar o app sem internet, pois embarcações costumam não ter sinal. | P1 | 3 |
+| US-08 | Épico 3 | Como engenheiro naval, quero uma interface legível sob luz solar/no convés, para operar o app em condições reais. | P1 | 3 |
 | US-11 (futuro) | Pós-MVP | Como stakeholder fora do barco, quero visualizar os dados em tempo real remotamente. | P2 | 13 |
 | US-12 (futuro) | Pós-MVP | Como dono dos dados, quero que as medições sejam enviadas automaticamente para um servidor. | P2 | 8 |
 
-🟨 A divisão em "Épico 1 / 2 / 3" acima é uma proposta do time para bater com os 3 marcos (EP1/EP2/EP3) da disciplina — ainda falta confirmar com as informações que a disciplina passou sobre como cada marco deve ser entregue (ver Seção 13).
-
-**Exemplo de critério de aceitação (US-07, crítica para o projeto):**
+**Exemplo de critério de aceitação (US-07):**
 ```
 Dado que uma medição manual (pêndulo) foi registrada como referência,
 Quando o usuário insere esse valor no app junto à medição do sensor,
@@ -128,107 +144,55 @@ Então o app deve calcular e exibir a diferença percentual entre os dois valore
 E esse dado deve constar no resultado final para fins de validação.
 ```
 
----
+### Divisão do trabalho em grandes fases (marcos)
 
-## 7. Cronograma e Sprints
+| Marco | Entrega | Data prevista |
+|---|---|---|
+| **EP2** | Pitch do 1º marco — Épico 1 completo (setup, calibração, medição em tempo real, filtragem de ruído) + entrega de documentação | Semana de 28/09 a 04/10/2026 🟨 *(dia exato a confirmar)* |
+| **EP3** | Pitch do 2º marco — Épico 2 completo (comparação com pêndulo, Prova de Mar, geração de relatório, persistência local e modo offline) + entrega de documentação | Semana de 02 a 08/11/2026 🟨 *(dia exato a confirmar)* |
+| **EF** | Entrega Final — Épico 3 concluído (usabilidade de campo, teste em embarcação real) + envio de todos os entregáveis (App, Documentação, Slides) | Até 20/11/2026 (meta interna: 13/11/2026), prazo formal da disciplina em 22/11/2026 |
 
-Cronograma alinhado ao calendário oficial da disciplina (sprints semanais). Estamos entrando agora na **Semana 04**.
+### Planejamento de Sprints
 
-| Semana | Data | O que a disciplina pede | O que o time entrega |
+| Mês/Épico | Sprint Nº | Foco/Objetivo da Sprint | Entregáveis/Histórias |
 |---|---|---|---|
-| 04 | 24–30/08 | **EP1** — Canvas de Modelo de Negócio + Plano de Projeto | Finalizar este plano e o Canvas |
-| 05 (Sprint 01) | 31/08–06/09 | Sprint 01 | Setup do projeto (US-01) + spike técnico: verificar se `expo-sensors` atende à precisão necessária + confirmar com o Professor: fórmulas de cálculo, norma de referência, formato do relatório, data para teste em embarcação |
-| 06 (Sprint 02) | 07–13/09 | Sprint 02 | Calibração do sensor (US-02) |
-| 07 (Sprint 03) | 14–20/09 | Sprint 03 | Medição de ângulo em tempo real (US-03) |
-| 08 (Sprint 04) | 21–27/09 | Sprint 04 | Filtragem de ruído (US-04) |
-| 09 | 28/09–04/10 | **EP2** — Pitch 1º marco (Épico 1) + Documentação | Demonstrar Épico 1 completo (setup → calibração → medição → filtragem) |
-| 10 (Sprint 05) | 05–11/10 | Sprint 05 | Comparação com pêndulo (US-07) |
-| 11 (Sprint 06) ⚠️ feriado | 12–18/10 | Sprint 06 | Prova de Mar — série temporal (US-05) |
-| 12 (Sprint 07) | 19–25/10 | Sprint 07 | Geração dos dados/relatório da prova (US-06) |
-| 13 (Sprint 08) | 26/10–01/11 | Sprint 08 | Persistência local (US-09) + modo offline (US-10) |
-| 14 | 02–08/11 | **EP3** — Pitch 2º marco (Épico 2) + Documentação | Demonstrar Épico 2 completo (confiabilidade + Prova de Mar + relatório + offline) |
-| 15 (Sprint 09) | 09–15/11 | Sprint 09 + IV Congresso de Tecnologia | Usabilidade de campo (US-08) + início do teste real em embarcação — **meta interna: tudo pronto até 13/11** |
-| 16 (Sprint 10) ⚠️ feriado | 16–22/11 | Sprint 10 + **EF — Entrega Final** | Ajustes finais, aprovação do Professor, empacotamento de entregáveis (App + Doc + Slides) — **pronto até 20/11** |
-| 17 | 23–27/11 | Semana do Projeto Integrador de DSM | Semana de reserva/contingência (prazo formal da disciplina) |
+| Ago-Set / Épico 1 | Sprint 01 (31/08–06/09) | Base técnica do app + validar viabilidade dos sensores | Setup do projeto (US-01); spike técnico de precisão do `expo-sensors`; confirmar com o Professor fórmulas de cálculo, norma de referência, formato do relatório e data de teste em embarcação |
+| Set / Épico 1 | Sprint 02 (07–13/09) | Calibração | Calibração do sensor (US-02) |
+| Set / Épico 1 | Sprint 03 (14–20/09) | Medição em tempo real | Ângulo de inclinação em tempo real (US-03) |
+| Set / Épico 1 | Sprint 04 (21–27/09) | Confiabilidade do dado bruto | Filtragem de ruído (US-04) |
+| — | **EP2** (28/09–04/10) | Marco 1 | Demonstração do Épico 1 completo + documentação |
+| Out / Épico 2 | Sprint 05 (05–11/10) | Validação de precisão | Comparação com pêndulo (US-07) |
+| Out / Épico 2 | Sprint 06 (12–18/10) ⚠️ feriado | Prova de Mar | Série temporal de inclinação (US-05) |
+| Out / Épico 2 | Sprint 07 (19–25/10) | Formalização dos dados | Geração do relatório/dados da prova (US-06) |
+| Out-Nov / Épico 2 | Sprint 08 (26/10–01/11) | Robustez de uso em campo | Persistência local (US-09) + modo offline (US-10) |
+| — | **EP3** (02–08/11) | Marco 2 | Demonstração do Épico 2 completo + documentação |
+| Nov / Épico 3 | Sprint 09 (09–15/11) | Usabilidade e teste real | Interface para uso em campo (US-08); início do teste em embarcação real; IV Congresso de Tecnologia — meta interna: tudo pronto até 13/11 |
+| Nov / Épico 3 | Sprint 10 (16–22/11) ⚠️ feriado | Fechamento | Ajustes finais, aprovação do Professor, empacotamento dos entregáveis (App + Doc + Slides) — pronto até 20/11 |
+| — | **EF** (até 22/11) | Marco 3 / Entrega Final | Conclusão do Épico 3 e envio de todos os entregáveis |
 
-> ⚠️ **Risco de cronograma:** o teste real em embarcação (dependência externa) está planejado para a Semana 15, mas ainda não tem data confirmada com o Professor. Se ele revelar problemas de precisão, o buffer é curto. Recomendo agendar essa data o quanto antes (ver Sprint 01).
+> Semana de 23 a 27/11 é reserva de contingência da disciplina (Semana do Projeto Integrador de DSM), sem tarefas de sprint alocadas.
 
----
+### Definição de preparada (Definition of Ready)
 
-## 8. Definition of Ready / Definition of Done
-
-**Pronto para entrar no fluxo (DoR):**
 - História no formato "Como... quero... para...", com critério de aceitação Given/When/Then.
 - Dependências técnicas identificadas.
-- Quando aplicável, fórmula/método naval validado com o Professor.
+- Quando envolver conhecimento naval (fórmulas, normas), validado previamente com o Professor.
 
-**Concluído (DoD):**
+### Definição de pronta (Definition of Done)
+
 - Código funcionando no dispositivo Android de teste.
 - Critério de aceitação validado manualmente.
 - Sem bugs bloqueantes conhecidos.
-- Código versionado (Git).
-- Validado com dado de referência manual, quando envolver precisão de medição.
+- Código versionado no repositório Git.
+- Quando envolver precisão de medição: validado com dado de referência manual (pêndulo).
 
----
+### Gestão de riscos
 
-## 9. Qualidade e testes
-
-| Tipo de teste | Estratégia | Prioridade |
-|---|---|---|
-| Testes unitários | Funções de cálculo de ângulo e filtragem de ruído | Alta |
-| Testes funcionais | Fluxo completo: calibrar → medir → gerar dados | Alta |
-| Testes de precisão | Comparação sistemática entre valor do app e valor do pêndulo, em múltiplas condições | **Crítica** |
-| Testes de regressão | Reexecutar comparação de precisão a cada mudança na lógica de cálculo | Alta |
-| Testes de campo | Local, por enquanto; teste em embarcação real depende de agenda com o Professor | Alta |
-| Testes de desempenho | Latência de atualização do ângulo em tela (meta: <500ms) | Média |
-
-**Critério central:** nenhuma funcionalidade de medição é considerada pronta sem comparação documentada com o método manual.
-
----
-
-## 10. Arquitetura e aspectos técnicos
-
-- App em **React Native + Expo** — escolhido pela experiência prévia do time com Node.js e React.
-- Módulo de captura de sensores (acelerômetro, giroscópio, magnetômetro) — 🟨 usando `expo-sensors` provisoriamente; a confirmar se atende à precisão/controle necessários ou se será preciso acesso mais direto ao hardware (com calibração e testes específicos por dispositivo).
-- Módulo de filtragem de ruído (ex. filtro complementar ou Kalman simples).
-- Módulo de cálculo do ângulo de inclinação.
-- Persistência local no dispositivo — sem backend/nuvem no MVP.
-- Infraestrutura gratuita: GitHub para versionamento, Expo EAS Build (camada gratuita) para gerar o APK de teste.
-
----
-
-## 11. Gestão de riscos
-
-| Risco | Impacto | Mitigação |
-|---|---|---|
-| Sensores do celular não atingem precisão suficiente | Crítico | Testar precisão desde o Sprint 01; comparar sistematicamente com o pêndulo |
-| `expo-sensors` não dar controle/precisão suficiente | Alto | Spike técnico no Sprint 01; alternativa é acesso mais direto ao hardware |
-| Falta de acesso a embarcação real para teste | Alto | Agendar com o Professor já no Sprint 01, não deixar para a Semana 15 |
-| Conhecimentos do Membro 2 ainda não mapeados | Médio | Preencher a Seção 5 e redistribuir tarefas conforme necessário |
-| Orçamento zero limita ferramentas | Médio | Usar apenas camadas gratuitas (Expo, GitHub) |
-
----
-
-## 12. Comunicação e entregáveis
-
-**Comunicação:** por ser um time de 2 pessoas, a comunicação do dia a dia é direta (sem cerimônias formais); o quadro Kanban é o ponto único de verdade sobre o andamento. Reunião com o Professor ao final de cada marco (EP1/EP2/EP3) para validação técnica.
-
-**O que precisa ser entregue até o prazo final:**
-- Aplicação funcionando.
-- Documentação (inclui modelo de negócio Canvas e arquitetura).
-- Apresentação em slides.
-
----
-
-## 13. Pendências — o que falta confirmar
-
-**Com o Professor:**
-1. O valor de X% de erro aceitável é 5%, como o time sugeriu, ou o Professor tem outro número em mente?
-2. Fórmulas/método de cálculo da Prova de Inclinação e da Prova de Mar.
-3. Existe uma norma específica (IMO, NORMAM, ISO) que a prova precisa seguir?
-4. Data e embarcação disponíveis para o teste de campo real.
-5. Formato do relatório/dados finais — documento exportável ou só tela no app?
-
-**Internas, do time:**
-6. Conhecimentos técnicos do Membro 2 (Seção 5).
-7. Informações sobre como os 3 marcos (EP1/EP2/EP3 → Épicos 1/2/3) devem ser entregues, conforme passado pela disciplina — a proposta da Seção 6/7 é uma hipótese do time até isso ser confirmado.
+| Risco | Probabilidade | Impacto | Mitigação |
+|---|---|---|---|
+| Sensores do celular não atingem precisão suficiente | Média | Crítico | Testar precisão desde o Sprint 01; comparar sistematicamente com o pêndulo |
+| `expo-sensors` não oferecer controle/precisão suficiente | Média | Alto | Spike técnico no Sprint 01; alternativa é acesso mais direto ao hardware |
+| Falta de acesso a embarcação real para teste | Média | Alto | Agendar com o Professor já no Sprint 01, não deixar para a Sprint 09 |
+| Conhecimentos do Membro 2 ainda não mapeados | Alta | Médio | Preencher a Seção 1 e redistribuir tarefas conforme necessário |
+| Orçamento zero limita ferramentas | Baixa | Médio | Usar apenas camadas gratuitas (Expo, GitHub) |
+| Atraso por dependência do Professor (fórmulas, normas, agenda) | Média | Alto | Levar essas perguntas já para a Sprint 01, com prazo de resposta combinado |
