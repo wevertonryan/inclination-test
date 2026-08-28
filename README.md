@@ -35,8 +35,6 @@ Ele não faz parte de um ecossistema maior hoje, mas foi desenhado prevendo evol
 O processo atual de Prova de Inclinação depende de instrumentos analógicos (pêndulo, mangueira de nível) e leitura manual, sujeita a erro humano e a um setup mais lento. A motivação do projeto é simplificar esse processo usando uma ferramenta que qualquer engenheiro naval já tem em mãos — o celular — tornando a medição mais rápida sem abrir mão da precisão exigida pela prática profissional.
 
 ### Identificação do grupo de trabalho
-O trabalho da equipe será distribuido conforme a demanda for aparecendo, não terá papeis fixos para cada membro
-
 | Campo | Informação |
 |---|---|
 | Nome da equipe | JLY |
@@ -66,9 +64,11 @@ O app é organizado em três camadas, todas rodando localmente no dispositivo (s
 2. **Núcleo de Processamento**: módulo de acesso aos sensores nativos (acelerômetro, giroscópio, magnetômetro), módulo de filtragem de ruído e módulo de cálculo do ângulo de inclinação.
 3. **Persistência local**: armazenamento no próprio dispositivo, sem sincronização em nuvem nesta fase.
 
-O fluxo é: os sensores nativos alimentam o módulo de sensores → os dados passam pelo filtro de ruído → o módulo de cálculo determina o ângulo → o resultado é exibido nas telas de Medição/Prova de Mar e gravado localmente → a tela de Resultado lê os dados salvos para gerar o relatório.
+O fluxo é: os sensores nativos alimentam o módulo de sensores → os dados passam pelo filtro de ruído → o módulo de cálculo determina o ângulo → o resultado é exibido nas telas de Medição/Prova de Mar e gravado localmente → a tela de Resultado lê os dados salvos para gerar o relatório. 
 
-![Diagrama de Arquitetura](arquitetura.png)
+![Diagrama de Arquitetura](./assets/arquitetura.png)
+
+OBS: Ainda para análisar sobre esse fluxo se será desse jeito mesmo
 
 ### Metas e restrições da arquitetura
 
@@ -90,12 +90,12 @@ O fluxo é: os sensores nativos alimentam o módulo de sensores → os dados pas
 **Dentro do escopo do MVP:**
 - Captura de dados dos sensores nativos para cálculo do ângulo de inclinação.
 - Calibração do sensor em 1 clique, ou automaticamente antes de cada medição.
-- Cálculo do ângulo de banda (Prova de Inclinação) e registro de série temporal (Prova de Mar).
-- Registro do valor medido manualmente (pêndulo) ao lado do valor do app, para comparação de precisão.
-- Geração dos dados/relatório da prova 🟨 *(ainda não decidido se será documento exportável ou apenas tela de resultado no app)*.
+- Cálculo do ângulo de banda (Prova de Inclinação).
+- Geração dos dados/relatório da prova.
 - Interface para uso em campo (convés).
 
 **Fora do escopo do MVP:**
+- Registro de série temporal (Prova de Mar).
 - Visualização remota em tempo real para terceiros.
 - Armazenamento em nuvem / sincronização automática.
 - Contas de usuário / login.
@@ -110,11 +110,10 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 
 | Papel | Responsável | Responsabilidades principais |
 |---|---|---|
-| Product Owner (PO) | Professor da disciplina | Prioriza o backlog, valida entregas de cada marco (EP2/EP3/EF), aprova a precisão obtida |
+| Product Owner (PO) | Professor da disciplina | Fornece Ideiais e Insights, fornece conhecimento técnico na área, Valida entregas de cada marco (EP2/EP3/EF), aprova a precisão obtida |
 | Dev (Mobile Fullstack) | Membro 1 e Membro 2 | Implementação de todas as camadas do app (sensores, cálculo, UI, persistência) |
 | Levantamento de requisitos / Gestão de projeto | Membro 1 | Organização do cronograma, levantamento de requisitos junto ao Professor |
-| 🟨 Papel adicional | Membro 2 | A definir conforme os conhecimentos técnicos do Membro 2 (Seção 1) |
-| QA (testes de precisão) | Membro 1 e Membro 2 | Validação cruzada dos resultados do app contra o método manual (pêndulo) |
+| QA (testes de precisão) | Membro 2 | Criação e execução dos testes da aplicação |
 | UX (usabilidade de campo) | Membro 1 e Membro 2 | Ajustes de legibilidade/usabilidade para uso no convés |
 
 ### Backlog do produto
@@ -128,21 +127,13 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 | US-03 | Épico 1 | Como engenheiro naval, quero medir o ângulo de inclinação em tempo real na tela, para acompanhar a Prova de Inclinação. | P0 | 8 |
 | US-04 | Épico 1 | Como engenheiro naval, quero que o app filtre o ruído dos dados do sensor, para reduzir erro de leitura. | P0 | 8 |
 | US-07 | Épico 2 | Como PO, quero registrar o valor medido manualmente (pêndulo) ao lado do valor do app, para comparar precisão. | P0 | 5 |
-| US-05 | Épico 2 | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 | 8 |
+| US-05 (futuro) | Épico 2 | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 | 8 |
 | US-06 | Épico 2 | Como engenheiro naval, quero que os dados coletados e o ângulo calculado sejam documentados/exportados, para formalizar a prova. | P1 | 5 |
 | US-09 | Épico 2 | Como engenheiro naval, quero que os dados fiquem salvos no celular após a medição, para não perder o resultado se o app fechar. | P1 | 5 |
 | US-10 | Épico 2 | Como engenheiro naval, quero usar o app sem internet, pois embarcações costumam não ter sinal. | P1 | 3 |
 | US-08 | Épico 3 | Como engenheiro naval, quero uma interface legível sob luz solar/no convés, para operar o app em condições reais. | P1 | 3 |
 | US-11 (futuro) | Pós-MVP | Como stakeholder fora do barco, quero visualizar os dados em tempo real remotamente. | P2 | 13 |
 | US-12 (futuro) | Pós-MVP | Como dono dos dados, quero que as medições sejam enviadas automaticamente para um servidor. | P2 | 8 |
-
-**Exemplo de critério de aceitação (US-07):**
-```
-Dado que uma medição manual (pêndulo) foi registrada como referência,
-Quando o usuário insere esse valor no app junto à medição do sensor,
-Então o app deve calcular e exibir a diferença percentual entre os dois valores,
-E esse dado deve constar no resultado final para fins de validação.
-```
 
 ### Divisão do trabalho em grandes fases (marcos)
 
@@ -185,6 +176,7 @@ E esse dado deve constar no resultado final para fins de validação.
 - Sem bugs bloqueantes conhecidos.
 - Código versionado no repositório Git.
 - Quando envolver precisão de medição: validado com dado de referência manual (pêndulo).
+- Aprovado pelo professor
 
 ### Gestão de riscos
 
@@ -193,6 +185,5 @@ E esse dado deve constar no resultado final para fins de validação.
 | Sensores do celular não atingem precisão suficiente | Média | Crítico | Testar precisão desde o Sprint 01; comparar sistematicamente com o pêndulo |
 | `expo-sensors` não oferecer controle/precisão suficiente | Média | Alto | Spike técnico no Sprint 01; alternativa é acesso mais direto ao hardware |
 | Falta de acesso a embarcação real para teste | Média | Alto | Agendar com o Professor já no Sprint 01, não deixar para a Sprint 09 |
-| Conhecimentos do Membro 2 ainda não mapeados | Alta | Médio | Preencher a Seção 1 e redistribuir tarefas conforme necessário |
 | Orçamento zero limita ferramentas | Baixa | Médio | Usar apenas camadas gratuitas (Expo, GitHub) |
 | Atraso por dependência do Professor (fórmulas, normas, agenda) | Média | Alto | Levar essas perguntas já para a Sprint 01, com prazo de resposta combinado |
