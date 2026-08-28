@@ -129,27 +129,26 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 
 | Marco | Entrega | Data prevista |
 |---|---|---|
-| **EP2** | Pitch do 1º marco — Épico 1 completo (setup, calibração, medição em tempo real, filtragem de ruído) + entrega de documentação | Semana de 28/09 a 04/10/2026 🟨 *(dia exato a confirmar)* |
-| **EP3** | Pitch do 2º marco — Épico 2 completo (comparação com pêndulo, Prova de Mar, geração de relatório, persistência local e modo offline) + entrega de documentação | Semana de 02 a 08/11/2026 🟨 *(dia exato a confirmar)* |
+| **EP2** | Pitch do 1º marco — Épico 1 completo (setup, calibração, medição em tempo real, filtragem de ruído) + entrega de documentação | 02/10/2026
+| **EP3** | Pitch do 2º marco — Épico 2 completo (comparação com pêndulo, Prova de Mar, geração de relatório, persistência local e modo offline) + entrega de documentação | 06/11/2026 |
 | **EF** | Entrega Final — Épico 3 concluído (usabilidade de campo, teste em embarcação real) + envio de todos os entregáveis (App, Documentação, Slides) | Até 20/11/2026 (meta interna: 13/11/2026), prazo formal da disciplina em 22/11/2026 |
 
 ### Planejamento de Sprints
 
 | Mês/Épico | Sprint Nº | Foco/Objetivo da Sprint | Entregáveis/Histórias |
 |---|---|---|---|
-| Ago-Set / Épico 1 | Sprint 01 (31/08–06/09) | Base técnica do app + validar viabilidade dos sensores | Setup do projeto (US-01); spike técnico de precisão do `expo-sensors`; confirmar com o Professor fórmulas de cálculo, norma de referência, formato do relatório e data de teste em embarcação |
-| Set / Épico 1 | Sprint 02 (07–13/09) | Calibração | Calibração do sensor (US-02) |
-| Set / Épico 1 | Sprint 03 (14–20/09) | Medição em tempo real | Ângulo de inclinação em tempo real (US-03) |
-| Set / Épico 1 | Sprint 04 (21–27/09) | Confiabilidade do dado bruto | Filtragem de ruído (US-04) |
-| — | **EP2** (28/09–04/10) | Marco 1 | Demonstração do Épico 1 completo + documentação |
-| Out / Épico 2 | Sprint 05 (05–11/10) | Validação de precisão | Comparação com pêndulo (US-07) |
-| Out / Épico 2 | Sprint 06 (12–18/10) ⚠️ feriado | Prova de Mar | Série temporal de inclinação (US-05) |
-| Out / Épico 2 | Sprint 07 (19–25/10) | Formalização dos dados | Geração do relatório/dados da prova (US-06) |
-| Out-Nov / Épico 2 | Sprint 08 (26/10–01/11) | Robustez de uso em campo | Persistência local (US-09) + modo offline (US-10) |
-| — | **EP3** (02–08/11) | Marco 2 | Demonstração do Épico 2 completo + documentação |
-| Nov / Épico 3 | Sprint 09 (09–15/11) | Usabilidade e teste real | Interface para uso em campo (US-08); início do teste em embarcação real; IV Congresso de Tecnologia — meta interna: tudo pronto até 13/11 |
-| Nov / Épico 3 | Sprint 10 (16–22/11) ⚠️ feriado | Fechamento | Ajustes finais, aprovação do Professor, empacotamento dos entregáveis (App + Doc + Slides) — pronto até 20/11 |
-| — | **EF** (até 22/11) | Marco 3 / Entrega Final | Conclusão do Épico 3 e envio de todos os entregáveis |
+| Set / Épico 2 | Sprint 01 (04/09) | Base técnica do app + validar viabilidade dos sensores | Setup do projeto (US-01); spike técnico de precisão do `expo-sensors`; confirmar com o Professor fórmulas de cálculo, norma de referência, formato do relatório e data de teste em embarcação |
+| Set / Épico 2 | Sprint 02 (11/09) | Calibração | Calibração do sensor (US-02) |
+| Set / Épico 2 | Sprint 03 (18/09) | Medição em tempo real | Ângulo de inclinação em tempo real (US-03) |
+| Set / Épico 2 | Sprint 04 (25/09) | Confiabilidade do dado bruto | Filtragem de ruído (US-04) |
+| — | **EP2** (02/10) | Marco 1 | Demonstração do Épico 1 completo + documentação |
+| Out / Épico 3 | Sprint 05 (09/10) | Validação de precisão | Comparação com pêndulo (US-07) |
+| Out / Épico 3 | Sprint 06 (16/10) ⚠️ feriado | Prova de Mar | Série temporal de inclinação (US-05) |
+| Out / Épico 3 | Sprint 07 (23/10) | Formalização dos dados | Geração do relatório/dados da prova (US-06) |
+| Out / Épico 3 | Sprint 08 (30/10) | Robustez de uso em campo | Persistência local (US-09) + modo offline (US-10) |
+| — | **EP3** (06/11) | Marco 2 | Demonstração do Épico 2 completo + documentação |
+| Nov / Épico Final | Sprint 09 (13/11) | Usabilidade e teste real | Interface para uso em campo (US-08); início do teste em embarcação real; IV Congresso de Tecnologia — meta interna: tudo pronto até 13/11 |
+| — | **EF** (até 20/11) | Marco 3 / Entrega Final | Conclusão do Épico 3 e envio de todos os entregáveis |
 
 > Semana de 23 a 27/11 é reserva de contingência da disciplina (Semana do Projeto Integrador de DSM), sem tarefas de sprint alocadas.
 
