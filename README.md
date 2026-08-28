@@ -12,17 +12,7 @@ Este projeto está sendo desenvolvido como Projeto Integrador da Fatec, tendo o 
 
 **Canvas do Modelo de Negócio:**
 
-| Bloco | Conteúdo |
-|---|---|
-| Segmentos de Clientes | Engenheiros Navais e Arquitetos Navais Autônomos |
-| Proposta de Valor | Medir inclinação (Prova de Inclinação / Prova de Mar) de forma prática e confiavel, usando o celular em vez métodos manuais, como pêndulo e mangueira de nível |
-| Canais | Divulgação acadêmica pelo professor da Naval Alex Prado; distribuição via Google Play; Escola de Inovadores (Analisando se vamos realmente fazer); |
-| Relacionamento com Clientes | Suporte direto/comunidade acadêmica nesta fase; uso self-service pelo app |
-| Fontes de Receita | Não definido neste estágio |
-| Recursos Principais | Equipe de desenvolvimento (2 pessoas), conhecimento de domínio do Professor, ferramentas de desenvolvimento |
-| Atividades-Chave | Desenvolvimento do app de maneira continua |
-| Parcerias Principais | Professor Alex Prado; Fatec Jahu |
-| Estrutura de Custos | Custo hora de 2 desenvolvedores "Juniors" - R$30,00/h |
+![Imagem Modelo de Negócio Canvas](./assets/modelo_canvas.png)
 
 ### Contexto do aplicativo móvel
 
