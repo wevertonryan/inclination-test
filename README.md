@@ -129,26 +129,52 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 
 | Marco | Entrega | Data prevista |
 |---|---|---|
-| **EP2** | Pitch do 1º marco — Épico 1 completo (setup, calibração, medição em tempo real, filtragem de ruído) + entrega de documentação | 02/10/2026
-| **EP3** | Pitch do 2º marco — Épico 2 completo (comparação com pêndulo, Prova de Mar, geração de relatório, persistência local e modo offline) + entrega de documentação | 06/11/2026 |
-| **EF** | Entrega Final — Épico 3 concluído (usabilidade de campo, teste em embarcação real) + envio de todos os entregáveis (App, Documentação, Slides) | Até 20/11/2026 (meta interna: 13/11/2026), prazo formal da disciplina em 22/11/2026 |
+| **EP2** | Pitch do 1º marco — Épico 1 completo (Sensores; Calculos; Calibração; Filtragem de Ruído; Testes;) | 02/10/2026
+| **EP3** | Pitch do 2º marco — Épico 2 completo (UX; Telas; Relatorios; Aplicativo Completo;) | 06/11/2026 |
+| **EF** | Entrega Final — Épico 3 concluído App Completo + envio de todos os entregáveis (Documentação, Slides) | Até 20/11/2026 (meta interna: 13/11/2026), prazo formal da disciplina em 22/11/2026 |
 
 ### Planejamento de Sprints
 
-| Mês/Épico | Sprint Nº | Foco/Objetivo da Sprint | Entregáveis/Histórias |
-|---|---|---|---|
-| Set / Épico 2 | Sprint 01 (04/09) | Base técnica do app + validar viabilidade dos sensores | Setup do projeto (US-01); spike técnico de precisão do `expo-sensors`; confirmar com o Professor fórmulas de cálculo, norma de referência, formato do relatório e data de teste em embarcação |
-| Set / Épico 2 | Sprint 02 (11/09) | Calibração | Calibração do sensor (US-02) |
-| Set / Épico 2 | Sprint 03 (18/09) | Medição em tempo real | Ângulo de inclinação em tempo real (US-03) |
-| Set / Épico 2 | Sprint 04 (25/09) | Confiabilidade do dado bruto | Filtragem de ruído (US-04) |
-| — | **EP2** (02/10) | Marco 1 | Demonstração do Épico 1 completo + documentação |
-| Out / Épico 3 | Sprint 05 (09/10) | Validação de precisão | Comparação com pêndulo (US-07) |
-| Out / Épico 3 | Sprint 06 (16/10) ⚠️ feriado | Prova de Mar | Série temporal de inclinação (US-05) |
-| Out / Épico 3 | Sprint 07 (23/10) | Formalização dos dados | Geração do relatório/dados da prova (US-06) |
-| Out / Épico 3 | Sprint 08 (30/10) | Robustez de uso em campo | Persistência local (US-09) + modo offline (US-10) |
-| — | **EP3** (06/11) | Marco 2 | Demonstração do Épico 2 completo + documentação |
-| Nov / Épico Final | Sprint 09 (13/11) | Usabilidade e teste real | Interface para uso em campo (US-08); início do teste em embarcação real; IV Congresso de Tecnologia — meta interna: tudo pronto até 13/11 |
-| — | **EF** (até 20/11) | Marco 3 / Entrega Final | Conclusão do Épico 3 e envio de todos os entregáveis |
+```txt
+# 1. Organização do Projeto
+- Plano de Projeto
+- Resolver alguns assuntos sobre o projeto com o professor
+- Definir pontos (Arquitetura, Telas, Conceito para apresentar ao professor e ele confirmar que está certo)
+- Organização do Projeto com tecnologias
+
+# 2. Prova de Conceito
+- Conseguir captar as informações dos sensores
+- Calibração
+- Implementação dos Calculos
+- Filtragem de Ruído
+- Teste em Embarcação
+
+# 3. Estruturação em Aplicativo
+- Criação de Identidade Visual
+- Aprimoramento do UX
+- Desenvolvimento das Telas juntamente com a parte de processamento (Calibração em 1 clique)
+- Geração de Relátorios
+
+# 4. Documentação e Apresentação
+- Documentação README.MD
+- Apresentação Powerpoint
+- Treinamento da Apresentação
+```
+
+| Mês/Épico | Sprint Nº | Foco/Objetivo da Sprint |
+|---|---|---|
+| Set / Épico 2 | Sprint 01 (04/09) | Organização do Projeto |
+| Set / Épico 2 | Sprint 02 (11/09) | Captar sensores, Calibração e Calculos |
+| Set / Épico 2 | Sprint 03 (18/09) | Calculos e Filtragem de Ruído |
+| Set / Épico 2 | Sprint 04 (25/09) | Calculos e Teste em Embarcação |
+| — | **EP2** (02/10) | Sensores; Calculos; Calibração; Filtragem de Ruído; Testes; |
+| Out / Épico 3 | Sprint 05 (09/10) | Identidade Visual, Telas e UX |
+| Out / Épico 3 | Sprint 06 (16/10) ⚠️ feriado | Telas e Relátorios|
+| Out / Épico 3 | Sprint 07 (23/10) | Telas | 
+| Out / Épico 3 | Sprint 08 (30/10) | Retoques da aplicação e Testes |
+| — | **EP3** (06/11) | UX; Telas; Relatorios; Aplicativo Completo; |
+| Nov / Épico Final | Sprint 09 (13/11) | Documentação e Apresentação |
+| — | **EF** (até 20/11) | Documentação e Apresentação |
 
 > Semana de 23 a 27/11 é reserva de contingência da disciplina (Semana do Projeto Integrador de DSM), sem tarefas de sprint alocadas.
 
