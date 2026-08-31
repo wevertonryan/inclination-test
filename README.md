@@ -110,20 +110,18 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 
 > Estimativas em Story Points (Fibonacci: 1,2,3,5,8,13), a recalibrar após o primeiro Sprint.
 
-| ID | Épico | História de usuário | Prioridade | SP |
-|---|---|---|---|---|
-| US-01 | Épico 1 | Como dev, quero configurar o projeto React Native/Expo com acesso aos sensores nativos, para ter a base técnica do app. | P0 | 5 |
-| US-02 | Épico 1 | Como engenheiro naval, quero calibrar o sensor (em 1 clique ou automaticamente antes da medição), para garantir que o ponto zero esteja correto. | P0 | 8 |
-| US-03 | Épico 1 | Como engenheiro naval, quero medir o ângulo de inclinação em tempo real na tela, para acompanhar a Prova de Inclinação. | P0 | 8 |
-| US-04 | Épico 1 | Como engenheiro naval, quero que o app filtre o ruído dos dados do sensor, para reduzir erro de leitura. | P0 | 8 |
-| US-07 | Épico 2 | Como PO, quero registrar o valor medido manualmente (pêndulo) ao lado do valor do app, para comparar precisão. | P0 | 5 |
-| US-05 (futuro) | Épico 2 | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 | 8 |
-| US-06 | Épico 2 | Como engenheiro naval, quero que os dados coletados e o ângulo calculado sejam documentados/exportados, para formalizar a prova. | P1 | 5 |
-| US-09 | Épico 2 | Como engenheiro naval, quero que os dados fiquem salvos no celular após a medição, para não perder o resultado se o app fechar. | P1 | 5 |
-| US-10 | Épico 2 | Como engenheiro naval, quero usar o app sem internet, pois embarcações costumam não ter sinal. | P1 | 3 |
-| US-08 | Épico 3 | Como engenheiro naval, quero uma interface legível sob luz solar/no convés, para operar o app em condições reais. | P1 | 3 |
-| US-11 (futuro) | Pós-MVP | Como stakeholder fora do barco, quero visualizar os dados em tempo real remotamente. | P2 | 13 |
-| US-12 (futuro) | Pós-MVP | Como dono dos dados, quero que as medições sejam enviadas automaticamente para um servidor. | P2 | 8 |
+| ID | História de usuário | Prioridade |
+|---|---|---|
+| US-01 | Como engenheiro naval, quero calibrar o sensor (em 1 clique ou automaticamente antes da medição), para garantir que o ponto zero esteja correto. | P0 |
+| US-02 | Como engenheiro naval, quero medir o ângulo de inclinação em tempo real na tela, para acompanhar a Prova de Inclinação. | P0 |
+| US-03 | Como engenheiro naval, quero que o app filtre o ruído dos dados do sensor, para reduzir erro de leitura. | P0 |
+| US-04 (futuro) | Como arquiteto naval, quero registrar uma série temporal de inclinação durante a navegação (Prova de Mar). | P1 |
+| US-05 | Como engenheiro naval, quero que os dados coletados e o ângulo calculado sejam documentados/exportados, para formalizar a prova. | P1 |
+| US-06 | Como engenheiro naval, quero uma interface fácil de usar, para operar o app em condições reais. | P1 |
+| US-07 | Como engenheiro naval, quero que os dados fiquem salvos no celular após a medição, para não perder o resultado se o app fechar. | P1 |
+| US-08 | Como engenheiro naval, quero usar o app sem internet, pois embarcações costumam não ter sinal. | P1 |
+| US-09 (futuro) | Como stakeholder fora do barco, quero visualizar os dados em tempo real remotamente. | P2 |
+| US-10 (futuro) | Como dono dos dados, quero que as medições sejam enviadas automaticamente para um servidor. | P2 |
 
 ### Divisão do trabalho em grandes fases (marcos)
 
@@ -181,15 +179,19 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 ### Definição de preparada (Definition of Ready)
 
 - História no formato "Como... quero... para...", com critério de aceitação Given/When/Then.
-- Dependências técnicas identificadas.
+- Testes desenhados.
+- Dependências técnicas identificadas e resolvidas.
 - Quando envolver conhecimento naval (fórmulas, normas), validado previamente com o Professor.
 
 ### Definição de pronta (Definition of Done)
 
+- Ter atendido ao critério de aceitação
+- Código aprovado em todos os testes (Unitário, Integrado, EA2)
 - Código funcionando no dispositivo Android de teste.
-- Critério de aceitação validado manualmente.
+- Validado manualmente.
 - Sem bugs bloqueantes conhecidos.
 - Código versionado no repositório Git.
+- Quando envolver precisão de medição: ser testado em uma embarcação real
 - Quando envolver precisão de medição: validado com dado de referência manual (pêndulo).
 - Aprovado pelo professor
 
