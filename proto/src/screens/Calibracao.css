@@ -1,0 +1,135 @@
+.calib-body {
+  flex: 1;
+  padding: 16px;
+}
+
+.calib-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.calib-table__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.calib-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+}
+
+.calib-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.calib-row__icon {
+  width: 22px;
+  height: 22px;
+  color: var(--text-muted);
+  flex: none;
+}
+
+.calib-row__name {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calib-row__status {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.calib-row__status:active {
+  transform: scale(0.86);
+}
+
+.calib-row__status svg {
+  width: 22px;
+  height: 22px;
+}
+
+.calib-row__status--ok {
+  color: var(--ok);
+}
+
+.calib-row__status--uncalibrated {
+  color: var(--danger);
+}
+
+.calib-row__status--error {
+  color: var(--danger);
+}
+
+.calib-row__status--unknown {
+  color: var(--text-muted);
+}
+
+.calib-row__status--calibrating {
+  color: var(--accent);
+}
+
+.calib-spinner {
+  animation: calib-spin 0.9s linear infinite;
+}
+
+@keyframes calib-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.calib-btn {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + 16px);
+  transform: translateX(-50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: radial-gradient(circle at 50% 40%, #ffc14d 0%, #f5a623 80%);
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.45);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.calib-btn:active:not(:disabled) {
+  transform: translateX(-50%) scale(0.94);
+}
+
+.calib-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.calib-btn__icon {
+  width: 30px;
+  height: 30px;
+  color: #2a2008;
+}

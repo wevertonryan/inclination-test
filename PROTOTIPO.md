@@ -50,9 +50,13 @@ Protótipo em `proto/` (Vite + React, arquitetura por telas, componentes e simul
 - **Cancelar (✕)** → modal "Cancelar gravação?" + "Os dados registrados serão perdidos para sempre" com **[Voltar]** e **[Cancelar gravação]**.
 - **Salvar (✓)** → modal com input de título + **[Voltar]** e **[Salvar]**. Ao salvar cria o registro (`{id, título, data, duração, média e desvio padrão por eixo, nº de amostras}`) no store do App e volta para a Home normal.
 
-### 🔜 Calibragem (a especificar)
-- Lista com **1 sensor (Acelerômetro)** + status + botão que calibra de uma vez.
-- Status possíveis: Calibrado / Não Calibrado / Calibrando / Não identificado / Erro na Calibragem.
+### ✅ Calibragem (implementado)
+- Lista de **5 sensores** (Acelerômetro, Giroscópio, Magnetômetro, Barômetro, GPS) em **tabela invisível** (sem linhas/cards): `[ícone sensor] Nome ......... [status à direita]`, com cabeçalho discreto **SENSOR / STATUS**.
+- Status possíveis: `✓` Calibrado (verde) · `✕` Não calibrado (vermelho) · `?` Não identificado (cinza) · `!` Erro na calibragem (vermelho) · spinner (âmbar, animado) para **Calibrando**.
+- **Botão de calibragem em 1 clique**: redondo, âmbar, flutuante e centralizado acima da nav bar, com **ícone de chave de boca**. O layout não muda durante o processo.
+- **Ao tocar**: sensores reconhecidos (≠ não identificado) passam por **spinner em sequência** (~650ms cada) e terminam **✓ Calibrado**; os **?** permanecem. Botão desabilitado durante a execução.
+- **Sincronia com a Home**: ao final, o status do sensor da Home (Acelerômetro) atualiza para ✓ no chip do header.
+- **Modal de status**: tocar no status de qualquer sensor abre um card flutuante (sem escurecer a tela, sem botão) explicando a situação daquele sensor — fecha ao tocar fora.
 
 ### 🔜 Relatórios, Relatório (detalhe), Teste de Integridade, Configurações
 - A especificar tela a tela. A tela Relatórios já recebe a lista de relatórios salvos pelo store do App.

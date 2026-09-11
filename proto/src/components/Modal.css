@@ -18,6 +18,15 @@
   }
 }
 
+.modal--bare {
+  background: transparent;
+  z-index: 40;
+}
+
+.modal--bare .modal__card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
 .modal__card {
   width: 100%;
   max-width: 340px;
