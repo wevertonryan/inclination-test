@@ -1,0 +1,245 @@
+.rep-back,
+.rep-dots {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.rep-back svg {
+  width: 24px;
+  height: 24px;
+}
+
+.rep-dots svg {
+  width: 22px;
+  height: 22px;
+}
+
+.rep-dots:active,
+.rep-back:active {
+  opacity: 0.6;
+}
+
+.rel-body {
+  flex: 1;
+  padding: 18px 16px 32px;
+}
+
+.rep-info {
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.rep-info__title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.rep-info__div {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 0;
+}
+
+.rep-info__line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.rep-info__label {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.rep-info__value {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.rel-section {
+  margin: 20px 2px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---- Grau grande + gauge ---- */
+
+.rep-angle {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rep-angle__gauge {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+}
+
+.rep-angle__value {
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* ---- Gráficos ---- */
+
+.rep-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.rep-chart {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px 6px;
+}
+
+.rep-chart__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.rep-chart__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.rep-chart__value {
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Medidas ---- */
+
+.rep-measures {
+  margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rep-measures__row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  align-items: center;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rep-measures__row + .rep-measures__row {
+  border-top: 1px solid var(--border);
+}
+
+.rep-measures__name {
+  font-weight: 700;
+}
+
+.rep-measures__head {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: var(--bg-elevated);
+}
+
+/* ---- Menu do relatório ---- */
+
+.rep-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rep-menu__option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rep-menu__option--danger {
+  color: var(--danger);
+}
+
+.rep-menu__icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* ---- Toast ---- */
+
+.rep-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 28px);
+  transform: translateX(-50%);
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ok);
+  color: #05150d;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

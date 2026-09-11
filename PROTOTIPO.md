@@ -58,5 +58,25 @@ Protótipo em `proto/` (Vite + React, arquitetura por telas, componentes e simul
 - **Sincronia com a Home**: ao final, o status do sensor da Home (Acelerômetro) atualiza para ✓ no chip do header.
 - **Modal de status**: tocar no status de qualquer sensor abre um card flutuante (sem escurecer a tela, sem botão) explicando a situação daquele sensor — fecha ao tocar fora.
 
-### 🔜 Relatórios, Relatório (detalhe), Teste de Integridade, Configurações
+### ✅ Relatórios — Listagem (implementado)
+- **Seed de exemplos**: 4 relatórios de exemplo no store (título, data, duração, localização, média/desvio); salvos na Home entram no topo.
+- **Barra de busca**: campo arredondado com **lupa** dentro à esquerda + botão **funil** à direita (abre modal de filtros). Busca por **título ou localização** (case-insensitive).
+- **Texto acima da lista**: "Todos os relatórios" por padrão; vira "Relatórios pesquisados/filtrados" com busca/filtro ativos.
+- **Cards por item**: cada relatório em um card com **título · data à direita · localização abaixo** ("—" quando GPS desligado/vazio). Título/localização com ellipsis.
+- **Modal de filtro (funil)**: grupos **Data**, **Localização** e **Tempo gravado** (≤30s · 30s–1min · ≥1min), com *chips* de valores derivados da lista, seleção múltipla, botões **Limpar** (zera) e **Aplicar** (fecha). Filtros combinam entre si e com a busca.
+- **Estado vazio**: "Nenhum relatório encontrado" quando nada corresponde.
+- Item tocável abre a tela de detalhe do relatório.
+
+### ✅ Relatório — Detalhe (implementado)
+- **Sem nav bar** nessa tela — a nav bar fica oculta e reaparece ao tocar em **‹ voltar** (retorna à listagem).
+- **Header**: ‹ voltar + "Relatório" + **⋮** (abre modal com **Excluir** e **Exportar PDF**).
+  - Excluir → confirmação "Excluir relatório?" ("Esta ação não pode ser desfeita") com [Voltar]/[Excluir]; ao confirmar remove da lista e volta.
+  - Exportar PDF → toast curto "PDF exportado".
+- **Seção Informações** (card): título em destaque, divisor, **Localização / Data (dd/mm/aaaa) / Hora (hh:mm:ss)**, divisor, **Tempo registrado (mm:ss)**.
+- **Seção Informações da gravação**:
+  - **Diferenciação em graus bem grande** com **gauge/arco SVG** (ponteiro): valor = **média do eixo X**, em âmbar.
+  - **4 gráficos fixos** (X, Y, Z, Absoluto — magnitude) com séries simuladas determinísticas por relatório (hash do id + seno + ruído).
+  - **Medidas**: tabela Média | Desvio para X, Y, Z, Absoluto (valores pt-BR com vírgula, ex. `3,2°`).
+
+### 🔜 Teste de Integridade, Configurações
 - A especificar tela a tela. A tela Relatórios já recebe a lista de relatórios salvos pelo store do App.
