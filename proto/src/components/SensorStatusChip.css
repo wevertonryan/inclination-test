@@ -1,0 +1,51 @@
+.sensor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.sensor-chip__sensor {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.sensor-chip__status {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.sensor-chip__status svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sensor-chip__status--ok {
+  background: var(--ok);
+  color: #05150d;
+}
+
+.sensor-chip__status--uncalibrated {
+  background: var(--danger);
+  color: #fff;
+}
+
+.sensor-chip__status--error {
+  background: var(--danger);
+  color: #fff;
+}
+
+.sensor-chip__status--unknown {
+  background: var(--text-muted);
+  color: #101828;
+}
