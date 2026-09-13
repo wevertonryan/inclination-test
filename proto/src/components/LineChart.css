@@ -1,0 +1,11 @@
+.line-chart {
+  width: 100%;
+  height: 72px;
+  display: block;
+}
+
+.line-chart__zero {
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}

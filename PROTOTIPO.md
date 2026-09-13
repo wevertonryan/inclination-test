@@ -37,16 +37,19 @@ Protótipo em `proto/` (Vite + React, arquitetura por telas, componentes e simul
 
 **Estado normal (idle):**
 - Header com **chip de sensor** (ícone de sensor + ícone de status colorido) — tocar leva para a Calibragem. Status: `✓` calibrado (verde), `✕` não calibrado (vermelho), `?` não identificado (cinza), `!` erro na calibragem (vermelho).
-- **Slice de seleção** no canto superior direito acima dos gráficos: `XYZ` (três gráficos de linha, X âmbar / Y azul / Z verde) e `ABS` (um gráfico com a magnitude), ambos com ícone SVG + rótulo.
-- **Gráficos de linha ao vivo** com dados simulados (~12 leituras/s, janela de 64 pontos). **Congelados quando não há gravação** — só se movem durante a gravação.
+- **Inclinômetro** ao vivo e sempre em tempo real (não congela em idle), **sem card/moldura** — solto sobre o fundo da tela:
+  - **Nível 1 (topo): anel com furo central** — escala de **Roll** na banda do anel com `0` no topo até `180` em cada lado (90 nos lados); o anel **gira** no eixo e a leitura é feita por um **ponteiro fixo no topo** (âmbar).
+  - **Nível 2 (fundo): régua do Trim** (±90°, marcas 30/60/90 para cima e para baixo) visível **através do furo** do anel; desliza verticalmente e a leitura é feita por uma **linha central tracejada fixa**.
 - **Botão de gravar**: círculo vermelho com círculo branco central, flutuante e centralizado acima da nav bar.
 
 **Gravando/pausado (imersivo):**
 - Header e nav bar **somem com animação** (header desliza para cima, nav bar desce). Volta ao normal ao cancelar/salvar.
 - **Cronômetro** `00:00 · 000` (minutos·segundos·milésimos) no lugar do header, surge suave.
+- Inclinômetro **permanece visível e ao vivo**.
+- **Card "Trim × Roll"** surge (animado) logo abaixo do inclinômetro: **gráfico de linha com 2 séries** (Trim azul · Roll âmbar) registrando as amostras conforme são gravadas (linha crescente). **Some ao salvar ou cancelar** (fade-out).
 - Barra inferior (na posição da nav bar): **✕ vermelho** (cancelar) à esquerda, botão de gravar centralizado (mudou com a nav bar), **✓ verde** (salvar) à direita — os laterais surgem suave.
 - Botão central: **⏸ duas barras** enquanto grava; **▶ play** quando pausado (retomar).
-- **Pausa** para cronômetro e gráficos; retomar continua de onde parou.
+- **Pausa** para cronômetro e gráfico; retomar continua de onde parou.
 - **Cancelar (✕)** → modal "Cancelar gravação?" + "Os dados registrados serão perdidos para sempre" com **[Voltar]** e **[Cancelar gravação]**.
 - **Salvar (✓)** → modal com input de título + **[Voltar]** e **[Salvar]**. Ao salvar cria o registro (`{id, título, data, duração, média e desvio padrão por eixo, nº de amostras}`) no store do App e volta para a Home normal.
 

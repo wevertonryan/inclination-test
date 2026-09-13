@@ -1,28 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { ScreenHeader } from '../components/ScreenHeader.jsx'
 import SensorStatusChip from '../components/SensorStatusChip.jsx'
-import SegmentedControl from '../components/SegmentedControl.jsx'
 import Modal from '../components/Modal.jsx'
 import { LineChart } from '../components/LineChart.jsx'
-import {
-  ChartXYZIcon,
-  ChartAbsIcon,
-  CrossIcon,
-  CheckIcon,
-} from '../components/icons.jsx'
-import { useSensor, magnitude, computeStats } from '../data/useSensor.js'
+import Inclinometer from '../components/Inclinometer.jsx'
+import { CrossIcon, CheckIcon } from '../components/icons.jsx'
+import { useSensor, toPose, computeStats, ROLL_AXIS, TRIM_AXIS } from '../data/useSensor.js'
 import '../components/ScreenHeader.css'
 import '../components/Modal.css'
 import './Home.css'
 
-const AXIS_COLORS = { x: '#f5a623', y: '#4aa3ff', z: '#34c98a' }
-const ABS_COLOR = '#f5a623'
+const TRIM_COLOR = '#4aa3ff'
+const ROLL_COLOR = '#f5a623'
 const EXIT_MS = 230
-
-const CHART_OPTIONS = [
-  { id: 'xyz', label: 'XYZ', Icon: ChartXYZIcon },
-  { id: 'abs', label: 'ABS', Icon: ChartAbsIcon },
-]
 
 function pad2(n) {
   return String(n).padStart(2, '0')
@@ -36,22 +26,33 @@ function formatTimer(ms) {
   return `${pad2(Math.floor(ms / 60000))}:${pad2(Math.floor((ms % 60000) / 1000))} · ${pad3(ms % 1000)}`
 }
 
-function uid() {
-  return crypto.randomUUID ? crypto.randomUUID() : `r-${Date.now()}-${Math.random()}`
+function clock(ms) {
+  const s = Math.floor(ms / 1000)
+  return `${Math.floor(s / 60)}:${pad2(s % 60)}`
 }
 
-function ChartPanel({ title, value, color, values }) {
-  return (
-    <div className="home-chart">
-      <div className="home-chart__top">
-        <span className="home-chart__name">{title}</span>
-        <span className="home-chart__value" style={{ color }}>
-          {value.toFixed(1)}°
-        </span>
-      </div>
-      <LineChart values={values} color={color} />
-    </div>
-  )
+function axisScale(values) {
+  const max = values.reduce((m, v) => Math.max(m, Math.abs(v)), 0)
+  return Math.max(10, Math.ceil(max / 10) * 10)
+}
+
+function timeLabels(ms) {
+  const total = Math.floor(ms / 1000)
+  if (!total) return ['0:00']
+  let step = 1000
+  if (total > 8) step = 5000
+  if (total > 40) step = 10000
+  if (total > 120) step = 30000
+  if (total > 360) step = 60000
+  const out = []
+  for (let t = 0; t <= total * 1000; t += step) out.push(clock(t))
+  const last = clock(total * 1000)
+  if (out[out.length - 1] !== last) out.push(last)
+  return out
+}
+
+function uid() {
+  return crypto.randomUUID ? crypto.randomUUID() : `r-${Date.now()}-${Math.random()}`
 }
 
 function PlayIcon() {
@@ -95,8 +96,16 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   const [title, setTitle] = useState('')
   const [elapsed, setElapsed] = useState(0)
 
-  const data = useSensor(mode === 'recording')
-  const recorded = useRef([])
+  const modeRef = useRef(mode)
+  useEffect(() => {
+    modeRef.current = mode
+  }, [mode])
+
+  const [recorded, setRecorded] = useState([])
+  const data = useSensor(true, (sample) => {
+    if (modeRef.current !== 'recording') return
+    setRecorded((prev) => [...prev, sample])
+  })
   const baseMs = useRef(0)
   const runStart = useRef(0)
   const exitTimer = useRef(null)
@@ -105,11 +114,6 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   useEffect(() => {
     onImmersiveChange(immersive)
   }, [immersive, onImmersiveChange])
-
-  useEffect(() => {
-    if (mode !== 'recording') return
-    recorded.current.push(data[data.length - 1])
-  }, [data, mode])
 
   useEffect(() => {
     if (mode !== 'recording') return
@@ -122,7 +126,7 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   useEffect(() => () => clearTimeout(exitTimer.current), [])
 
   function startRecording() {
-    recorded.current = []
+    setRecorded([])
     baseMs.current = 0
     runStart.current = Date.now()
     setElapsed(0)
@@ -141,7 +145,7 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   }
 
   function resetAll() {
-    recorded.current = []
+    setRecorded([])
     baseMs.current = 0
     setTitle('')
     setCancelOpen(false)
@@ -159,7 +163,7 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   }
 
   function handleSave() {
-    const { mean, std, length } = computeStats(recorded.current)
+    const { mean, std, length } = computeStats(recorded)
     const fallback = `Medição ${new Date().toLocaleDateString('pt-BR')}`
     onSaveReport({
       id: uid(),
@@ -174,8 +178,13 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
   }
 
   const showOverlay = mode !== 'idle' || exiting
-  const [chartMode, setChartMode] = useState('xyz')
-  const last = data[data.length - 1]
+  const pose = toPose(data[data.length - 1])
+  const trimSeries = recorded.map((s) => s[TRIM_AXIS])
+  const rollSeries = recorded.map((s) => s[ROLL_AXIS])
+
+  const scale = axisScale([...trimSeries, ...rollSeries])
+  const yTicks = []
+  for (let v = -scale; v <= scale; v += 10) yTicks.push(v)
 
   return (
     <>
@@ -190,29 +199,47 @@ function Home({ sensorStatus, onNavigate, onImmersiveChange, onSaveReport }) {
         }
       />
       <div className="home-body">
-        <div className="home-toolbar">
-          <SegmentedControl
-            label="Tipo de gráfico"
-            options={CHART_OPTIONS}
-            value={chartMode}
-            onChange={setChartMode}
-          />
-        </div>
+        <Inclinometer roll={pose.roll} trim={pose.trim} />
 
-        {chartMode === 'xyz' ? (
-          <div className="home-charts">
-            <ChartPanel title="X" value={last.x} color={AXIS_COLORS.x} values={data.map((d) => d.x)} />
-            <ChartPanel title="Y" value={last.y} color={AXIS_COLORS.y} values={data.map((d) => d.y)} />
-            <ChartPanel title="Z" value={last.z} color={AXIS_COLORS.z} values={data.map((d) => d.z)} />
-          </div>
-        ) : (
-          <div className="home-charts">
-            <ChartPanel
-              title="Absoluto"
-              value={magnitude(last)}
-              color={ABS_COLOR}
-              values={data.map(magnitude)}
-            />
+        {showOverlay && (
+          <div className={`home-rec ${exiting ? 'home-rec--exit' : ''}`}>
+            <div className="home-rec__top">
+              <span className="home-rec__name">Trim × Roll</span>
+              <span className="home-rec__legend">
+                <span className="home-rec__key">
+                  <i className="home-rec__dot" style={{ background: TRIM_COLOR }} />
+                  Trim
+                </span>
+                <span className="home-rec__key">
+                  <i className="home-rec__dot" style={{ background: ROLL_COLOR }} />
+                  Roll
+                </span>
+              </span>
+            </div>
+            <div className="home-rec__plot">
+              <div className="home-rec__yaxis">
+                {yTicks.map((t) => (
+                  <span
+                    key={t}
+                    className="home-rec__yval"
+                    style={{ top: `${50 - (t / scale) * 42}%` }}
+                  >
+                    {`${t}°`}
+                  </span>
+                ))}
+              </div>
+              <LineChart scale={scale} series={[
+                { values: trimSeries, color: TRIM_COLOR },
+                { values: rollSeries, color: ROLL_COLOR },
+              ]} />
+            </div>
+            <div className="home-rec__xaxis">
+              {timeLabels(elapsed).map((label) => (
+                <span key={label} className="home-rec__xval">
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
         )}
       </div>

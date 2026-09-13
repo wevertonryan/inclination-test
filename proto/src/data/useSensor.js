@@ -4,6 +4,13 @@ const HZ = 12
 const HISTORY = 64
 const STEP_MS = Math.round(1000 / HZ)
 
+export const ROLL_AXIS = 'x'
+export const TRIM_AXIS = 'y'
+
+export function toPose(sample) {
+  return { roll: sample[ROLL_AXIS], trim: sample[TRIM_AXIS] }
+}
+
 function noise(amp) {
   return (Math.random() * 2 - 1) * amp
 }
@@ -50,7 +57,7 @@ export function computeStats(samples) {
   return { mean, std, length }
 }
 
-export function useSensor(active = true) {
+export function useSensor(active = true, onSample) {
   const [data, setData] = useState(() => {
     const now = Date.now()
     const out = []
@@ -65,10 +72,17 @@ export function useSensor(active = true) {
     activeRef.current = active
   }, [active])
 
+  const onSampleRef = useRef(onSample)
+  useEffect(() => {
+    onSampleRef.current = onSample
+  }, [onSample])
+
   useEffect(() => {
     const id = setInterval(() => {
       if (!activeRef.current) return
-      setData((prev) => [...prev.slice(1), sampleAt(Date.now())])
+      const sample = sampleAt(Date.now())
+      setData((prev) => [...prev.slice(1), sample])
+      onSampleRef.current?.(sample)
     }, STEP_MS)
     return () => clearInterval(id)
   }, [])

@@ -6,56 +6,113 @@
   gap: 10px;
 }
 
-.home-toolbar {
-  display: flex;
-  justify-content: flex-end;
-}
+/* ---- Card Trim × Roll (gravando) ---- */
 
-.home-charts {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: flex-start;
-}
-
-.home-chart {
+.home-rec {
+  margin-bottom: 96px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 10px 12px 6px;
+  animation: rec-in 0.4s ease;
 }
 
-.home-chart__top {
+.home-rec--exit {
+  animation: rec-out 0.22s ease forwards;
+}
+
+@keyframes rec-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rec-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.home-rec__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.home-chart__name {
+.home-rec__name {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.06em;
 }
 
-.home-chart__value {
-  font-size: 13px;
-  font-weight: 800;
+.home-rec__legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-rec__key {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.home-rec__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.home-rec__plot {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.home-rec__yaxis {
+  position: relative;
+  width: 34px;
+  height: 150px;
+  flex: none;
+}
+
+.home-rec__yval {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.line-chart {
-  width: 100%;
-  height: 72px;
-  display: block;
+.home-rec__xaxis {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 2px 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-.line-chart__zero {
-  stroke: var(--border);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
+.home-rec .line-chart {
+  flex: 1;
+  width: auto;
+  height: 150px;
 }
 
 /* ---- Botão de gravar ---- */
