@@ -1,8 +1,36 @@
-// See https://containers.dev/implementors/json_reference/ for configuration reference
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-  "name": "Inclination Test",
-  "build": {
-	"dockerfile": "Dockerfile"
-  },
-  "remoteUser": "node"
+	"name": "C# (.NET)",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble",
+	"features": {
+		"ghcr.io/stu-bell/devcontainer-features/node:0": {}
+	},
+	"remoteEnv": {
+		"JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64",
+		"ANDROID_HOME": "${containerEnv:HOME}/Android/Sdk",
+		"ANDROID_SDK_ROOT": "${containerEnv:HOME}/Android/Sdk",
+		"PATH": "${containerEnv:PATH}:/usr/lib/jvm/java-17-openjdk-amd64/bin:${containerEnv:HOME}/Android/Sdk/platform-tools"
+	}
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [5000, 5001],
+	// "portsAttributes": {
+	//		"5001": {
+	//			"protocol": "https"
+	//		}
+	// }
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "dotnet restore",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
 }

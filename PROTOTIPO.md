@@ -77,9 +77,10 @@ Protótipo em `proto/` (Vite + React, arquitetura por telas, componentes e simul
   - Exportar PDF → toast curto "PDF exportado".
 - **Seção Informações** (card): título em destaque, divisor, **Localização / Data (dd/mm/aaaa) / Hora (hh:mm:ss)**, divisor, **Tempo registrado (mm:ss)**.
 - **Seção Informações da gravação**:
-  - **Diferenciação em graus bem grande** com **gauge/arco SVG** (ponteiro): valor = **média do eixo X**, em âmbar.
-  - **4 gráficos fixos** (X, Y, Z, Absoluto — magnitude) com séries simuladas determinísticas por relatório (hash do id + seno + ruído).
-  - **Medidas**: tabela Média | Desvio para X, Y, Z, Absoluto (valores pt-BR com vírgula, ex. `3,2°`).
+  - **Abertura em graus (máx − mín)** bem grande com **gauge/arco SVG**: dois indicadores (menor e maior, verdes/âmbar) sobre o arco e o **arco entre eles em âmbar** marcando toda a abertura; valor = diferença entre o maior e o menor grau registrado (sempre positivo), baseado na série sintética de Roll (X).
+  - **1 único gráfico Trim × Roll** (em vez de X/Y/Z/Absoluto): séries simuladas determinísticas por relatório (hash do id + seno + ruído), com **rótulos de graus à esquerda** (escala arredondada a cada 10°) e **eixo do tempo no rodapé** (`0:00 · 0:05 …`, conforme `durationMs`); mesma identidade dos eixos do gráfico de gravação da Home; legenda Trim (azul) / Roll (âmbar).
+  - **Medidas**: tabela Média | Desvio apenas para **Trim** (azul) e **Roll** (âmbar), valores pt-BR com vírgula (ex. `3,2°`).
+  - **Dados brutos**: seção com contador "48 leituras · ~1/10s" e tabela rolável **Nº | X | Y | Z** (48 linhas geradas deterministicamente por relatório a partir das médias/desvios de cada eixo).
 
 ### 🔜 Teste de Integridade, Configurações
 - A especificar tela a tela. A tela Relatórios já recebe a lista de relatórios salvos pelo store do App.

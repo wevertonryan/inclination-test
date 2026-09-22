@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InclinationTest.Core/InclinationTest.Core.csproj" />
+    <Project Path="src/InclinationTest/InclinationTest.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/InclinationTest.Tests/InclinationTest.Tests.csproj" />
+  </Folder>
+</Solution>
