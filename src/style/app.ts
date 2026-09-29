@@ -34,3 +34,46 @@ export const appStyles = StyleSheet.create({
     color: '#333',
   },
 });
+
+export const homeStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  error: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    textAlign: 'center',
+    fontSize: 13,
+    color: '#c0392b',
+  },
+});
+
+export const inclinometerStyles = StyleSheet.create({
+  readout: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 16,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: '600',
+    letterSpacing: 3,
+  },
+  value: {
+    fontSize: 56,
+    fontWeight: 'bold',
+    fontVariant: ['tabular-nums'],
+  },
+  rollColor: {
+    color: '#f5a623',
+  },
+  trimColor: {
+    color: '#4aa3ff',
+  },
+});
