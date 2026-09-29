@@ -1,32 +1,18 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
 {
-	"name": "C# (.NET)",
+	"name": "Node.js",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble",
-	"features": {
-		"ghcr.io/stu-bell/devcontainer-features/node:0": {}
-	},
-	"remoteEnv": {
-		"JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64",
-		"ANDROID_HOME": "${containerEnv:HOME}/Android/Sdk",
-		"ANDROID_SDK_ROOT": "${containerEnv:HOME}/Android/Sdk",
-		"PATH": "${containerEnv:PATH}:/usr/lib/jvm/java-17-openjdk-amd64/bin:${containerEnv:HOME}/Android/Sdk/platform-tools"
-	}
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:5-24-trixie"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5000, 5001],
-	// "portsAttributes": {
-	//		"5001": {
-	//			"protocol": "https"
-	//		}
-	// }
+	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "dotnet restore",
+	// "postCreateCommand": "yarn install",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
