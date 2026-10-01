@@ -1,97 +1,46 @@
+/**
+ * Estilo do shell do app — a entrada única do design system.
+ *
+ * `theme.ts` guarda os tokens (cor, espaçamento, raio, tipografia, elevação,
+ * movimento, ícones) e este arquivo os reexporta, para que qualquer camada
+ * importe o design de um lugar só:
+ *
+ * ```ts
+ * import { colors, spacing, typography, appStyles } from '../../style/app';
+ * ```
+ *
+ * `appStyles` cobre apenas a casca estrutural de `App.tsx` (§7.1): o container,
+ * a área da Screen e a área flutuante acima da NavBar. Cada componente tem seu
+ * próprio `StyleSheet` — nada de estilo espalhado pelo app.
+ */
+
 import { StyleSheet } from 'react-native';
 
-// Paleta espelhando as variáveis do protótipo (--bg, --bg-card, ...), adaptada ao tema claro atual.
-export const colors = {
-  bg: '#ffffff',
-  bgElevated: '#f4f6fa',
-  bgCard: '#e9edf5',
-  border: '#ccd4e2',
-  text: '#1b2436',
-  textMuted: '#7d8aa6',
-  accent: '#f5a623',
-  roll: '#f5a623',
-  trim: '#4aa3ff',
-  danger: '#c0392b',
-};
+import { colors, layout, spacing } from './theme';
+
+export * from './theme';
 
 export const appStyles = StyleSheet.create({
+  /** Raiz do app: fundo do canvas, com a safe-area do sistema. */
   container: {
     flex: 1,
     backgroundColor: colors.bg,
   },
-  header: {
-    height: 60,
-    backgroundColor: '#f8f8f8',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  content: {
+  /** Área da Screen. A NavBar é irmã dela, nunca filha. */
+  screen: {
     flex: 1,
   },
-  navBar: {
-    height: 48,
-    backgroundColor: '#f8f8f8',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  /**
+   * Área flutuante: botão de gravar, toast e demais controles sobrepostos.
+   * Fica no fim da ordem flex para sobrepor a área da Screen, com o
+   * `paddingBottom` da NavBar para nunca ficar sob a barra.
+   */
+  floating: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingBottom: layout.navHeight + spacing.s5,
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  navItem: {
-    fontSize: 14,
-    color: colors.text,
-  },
-});
-
-export const homeStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 14,
-    paddingTop: 12,
-  },
-  error: {
-    marginTop: 16,
-    paddingHorizontal: 10,
-    textAlign: 'center',
-    fontSize: 13,
-    color: colors.danger,
-  },
-});
-
-export const inclinometerStyles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  legend: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 20,
-    marginTop: 8,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  itemText: {
-    fontSize: 15,
-    fontWeight: '800',
-    fontVariant: ['tabular-nums'],
-    color: colors.text,
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: colors.accent,
   },
 });
