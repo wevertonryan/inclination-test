@@ -16,6 +16,7 @@ Plataforma-alvo: **Android** (Expo SDK 57).
 | UI | React Native 0.86 + React 19 |
 | Runtime / build | Expo SDK 57 (`expo start`) |
 | Sensores | `expo-sensors` — `DeviceMotion` |
+| Desenho do inclinômetro | `react-native-svg` (anel, escala e régua) |
 | Testes | Jest + `jest-expo` + `@testing-library/react-native` |
 | Gerenciador | npm |
 
@@ -41,7 +42,7 @@ src/
     types.ts                # tipos compartilhados do pipeline (contratos)
   style/
     app.ts                  # StyleSheet global
-  __tests__/                # testes Jest (um arquivo por módulo do core)
+  __tests__/                # testes Jest (módulos do core e componentes da UI)
   assets/                   # ícones e splash
   app.json                  # configuração do Expo
   jest.config.js            # preset jest-expo
@@ -84,6 +85,7 @@ npm audit                               # vulnerabilidades
 |---|---|
 | `expo`, `react`, `react-native` | app |
 | `expo-sensors` | leitura do `DeviceMotion` no `SensorService` |
+| `react-native-svg` | desenho do inclinômetro em `app/components/Inclinometer.tsx` |
 | `jest`, `jest-expo`, `@types/jest` | execução dos testes |
 | `@testing-library/react-native`, `react-test-renderer` | testes do hook `useInclination` e de componentes |
 | `typescript` | `npm run typecheck` |
@@ -110,6 +112,7 @@ src/__tests__/
   FilterService.test.ts
   AngleConverter.test.ts
   useInclination.test.ts
+  Inclinometer.test.tsx
 ```
 
 ## 6. Arquitetura em pipeline
@@ -161,8 +164,8 @@ export interface MotionSample {
 }
 
 export interface Angles {
-  roll: number; // 0..180 — magnitude absoluta, em graus (banda)
-  trim: number; // 0..90  — magnitude absoluta, em graus (longitudinal)
+  roll: number; // −180..180 — adernada COM sinal, em graus (banda)
+  trim: number; // −90..90   — inclinação longitudinal COM sinal, em graus
 }
 
 export interface Calibration {
@@ -177,24 +180,25 @@ Função principal de cada módulo:
 |---|---|---|---|
 | `SensorService` | `createSensorService({ updateIntervalMs? })` → `{ start(onSample), stop(), isAvailable() }` | evento `DeviceMotion` (`expo-sensors`) | `MotionSample` bruto (via `normalizeSample`) |
 | `FilterService` | `createFilter()` → `{ process(sample) }` | `MotionSample` bruto | mesma `MotionSample` (passa-redirect; filtragem real entra depois) |
-| `AngleConverter` | `toAngles(sample, calibration?)` e `toSignedAngles(sample)` | `MotionSample` filtrado + offset de calibração (zero) | `Angles` absolutos (roll 0..180, trim 0..90) |
+| `AngleConverter` | `toAngles(sample, calibration?)` e `toSignedAngles(sample)` | `MotionSample` filtrado + offset de calibração (zero) | `Angles` com sinal (roll −180..180, trim −90..90) |
 | `useInclination` | `useInclination({ sensorService?, filter?, updateIntervalMs? })` | — | `{ roll, trim, isRunning, isCalibrated, error, start(), stop(), calibrate() }` |
 
 ### Conversão de ângulos (AngleConverter)
 
 - **Convenção do sensor:** o `expo-sensors` segue a convenção W3C — com o celular deitado (tela para cima), `accelerationIncludingGravity ≈ (0, 0, −9.81)` (Android: `acelerômetro − 2 × gravity`; iOS: `gravity` do CoreMotion apontando para baixo). O `AngleConverter` nega o vetor (`up = −a`) antes de calcular.
 - `toSignedAngles` — valor cru **com sinal**: `roll = atan2(−up_x, up_z)` (∈ −180..180) e `trim = asin(up_y / ‖up‖)` (∈ −90..90).
-- `toAngles` — subtrai o offset de calibração **com sinal** e só então aplica `Math.abs` (mais clamp em 0..180 / 0..90). Subtrair antes do `abs` preserva a direção: calibrar com o convés em 2° e medir 1° resulta em 1°, não 0.
-- Orientação de referência: celular em **retrato**, topo = proa. Deitado (tela para cima) → `0/0`; de lado → `roll 90`; de bruços → `roll 180`; proa inclinada → `trim` (satura em 90).
+- `toAngles` — subtrai o offset de calibração **com sinal** e preserva o **sinal** do resultado: o roll é envolvido em (−180, 180] pelo caminho mais curto e o trim é saturado em ±90. Subtrair antes de resolver preserva a direção: calibrar com o convés em 2° e medir 1° do outro lado resulta em −1°, não 1°. O wrap evita o salto de 358° ao cruzar a proa (179,9° → −179,9° dá 0,2°).
+- Orientação de referência: celular em **retrato**, topo = proa. Deitado (tela para cima) → `0/0`; de lado → `roll ±90`; de bruços → `roll 180`; proa inclinada → `trim` (satura em ±90).
+- Sinal: `roll > 0` = borda direita para baixo (leitura pelo lado direito da escala do anel), `trim > 0` = proa para cima (régua desliza para baixo). Assim o mostrador gira e desliza nos dois sentidos.
 
 Decisões de projeto fixadas nos contratos:
 
 - **DeviceMotion** (e não só o acelerômetro) porque entrega `rotationRate`/`rotation`, dando mais matéria-prima para a filtragem.
-- **Ângulos absolutos** (sem sinal negativo): `roll` 0..180 e `trim` 0..90.
+- **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180] para que a virada pela proa não dé uma volta completa no mostrador.
 - **Calibração como parâmetro do `AngleConverter`** (US-01): `toAngles` aplica o offset do zero, continuando uma função pura.
 - **Funções puras + factory** (não classes): `createFilter()`, `createSensorService()`, `toAngles()` — fáceis de mockar e testar.
 
-> **Status:** os 4 módulos do `core/` estão implementados (`types.ts`, `SensorService`, `FilterService`, `AngleConverter`, `useInclination`) e a UI inicial exibe `roll`/`trim` ao vivo (`HomeScreen` + `Inclinometer`, sem botão de calibração ainda — a tela de calibragem entra na US-01). Frequência: **60 Hz na visualização**; taxa da gravação da série temporal, a definir. Próxima etapa: os testes em `src/__tests__/`.
+> **Status:** os 4 módulos do `core/` estão implementados (`types.ts`, `SensorService`, `FilterService`, `AngleConverter`, `useInclination`) e a UI exibe `roll`/`trim` ao vivo pelo inclinômetro gráfico (`HomeScreen` + `Inclinometer`, em `react-native-svg`, igual ao protótipo: anel com escala de Roll que gira nos dois sentidos + régua de Trim que desliza para cima e para baixo sob o furo; sem botão de calibração ainda — a tela de calibragem entra na US-01). Frequência: **60 Hz na visualização**; taxa da gravação da série temporal, a definir. Testes prontos: `AngleConverter.test.ts` e `Inclinometer.test.tsx`; próxima etapa é cobrir `SensorService`, `FilterService` e `useInclination`.
 
 ### Como cada etapa é testada
 
@@ -202,7 +206,7 @@ Decisões de projeto fixadas nos contratos:
 |---|---|
 | `SensorService` | `jest.mock('expo-sensors')` — simula eventos do `DeviceMotion` |
 | `FilterService` | puro, sem mock — hoje o passa-redirect devolve a mesma amostra; quando o filtro entrar: entrada ruidosa → saída mais suave |
-| `AngleConverter` | puro, sem mock — vetor conhecido → ângulo conhecido; aplica calibração |
+| `AngleConverter` | puro, sem mock — vetor conhecido → ângulo conhecido (roll ±90/±180, trim ±90); calibração com sinal; wrap do roll em (−180, 180]; saturação do trim |
 | `useInclination` | `renderHook` (`@testing-library/react-native`) — estado e ações |
 
 ## 8. Fluxo para adicionar lógica + teste (TDD)
@@ -212,22 +216,27 @@ Decisões de projeto fixadas nos contratos:
 3. Implementar a função no módulo do `core/` até o teste passar (fase verde).
 4. Rodar `npm test` e `npm run typecheck` para validar.
 
-Exemplo de teste (assinatura do `AngleConverter`):
+Exemplo de teste (assinatura do `AngleConverter`, como em `src/__tests__/AngleConverter.test.ts`):
 
 ```ts
-import { toAngles } from '../core/processing/AngleConverter';
-import type { MotionSample } from '../core/types';
+const G = 9.81;
 
-const deitado: MotionSample = {
-  accelerationIncludingGravity: { x: 0, y: 0, z: -9.81 },
-  rotationRate: { x: 0, y: 0, z: 0 },
-  rotation: { x: 0, y: 0, z: 0 },
-  timestamp: 0,
-};
+// O conversor trabalha com `up = −gravity`, então montar a amostra a partir do
+// vetor "para cima" deixa o caso legível.
+function sample(up: Partial<Vector3>): MotionSample {
+  const vector = { x: 0, y: 0, z: G, ...up };
+  return {
+    accelerationIncludingGravity: { x: -vector.x, y: -vector.y, z: -vector.z },
+    rotationRate: { x: 0, y: 0, z: 0 },
+    rotation: { x: 0, y: 0, z: 0 },
+    timestamp: 0,
+  };
+}
 
 describe('toAngles', () => {
-  it('retorna roll 0 e trim 0 com o celular deitado (tela para cima)', () => {
-    expect(toAngles(deitado)).toEqual({ roll: 0, trim: 0 });
+  it('mantém o sinal do roll para os dois lados', () => {
+    expect(toAngles(sample({ x: G, z: 0 })).roll).toBeCloseTo(-90, 6);
+    expect(toAngles(sample({ x: -G, z: 0 })).roll).toBeCloseTo(90, 6);
   });
 });
 ```

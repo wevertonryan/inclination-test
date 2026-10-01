@@ -3,7 +3,10 @@
 {
 	"name": "Node.js",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/javascript-node:5-24-trixie"
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:5-24-trixie",
+
+	// Publica a porta do Metro (8081) na máquina host para o Expo Go conectar pelo Wi-Fi
+	"appPort": [8081],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

@@ -1,9 +1,23 @@
 import { StyleSheet } from 'react-native';
 
+// Paleta espelhando as variáveis do protótipo (--bg, --bg-card, ...), adaptada ao tema claro atual.
+export const colors = {
+  bg: '#ffffff',
+  bgElevated: '#f4f6fa',
+  bgCard: '#e9edf5',
+  border: '#ccd4e2',
+  text: '#1b2436',
+  textMuted: '#7d8aa6',
+  accent: '#f5a623',
+  roll: '#f5a623',
+  trim: '#4aa3ff',
+  danger: '#c0392b',
+};
+
 export const appStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.bg,
   },
   header: {
     height: 60,
@@ -11,11 +25,12 @@ export const appStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -27,53 +42,56 @@ export const appStyles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: colors.border,
   },
   navItem: {
     fontSize: 14,
-    color: '#333',
+    color: colors.text,
   },
 });
 
 export const homeStyles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingTop: 12,
   },
   error: {
     marginTop: 16,
-    paddingHorizontal: 24,
+    paddingHorizontal: 10,
     textAlign: 'center',
     fontSize: 13,
-    color: '#c0392b',
+    color: colors.danger,
   },
 });
 
 export const inclinometerStyles = StyleSheet.create({
-  readout: {
+  container: {
     alignItems: 'center',
-    gap: 12,
+    paddingVertical: 4,
   },
-  row: {
+  legend: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 20,
+    marginTop: 8,
   },
-  label: {
-    fontSize: 18,
-    fontWeight: '600',
-    letterSpacing: 3,
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
   },
-  value: {
-    fontSize: 56,
-    fontWeight: 'bold',
+  itemText: {
+    fontSize: 15,
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
+    color: colors.text,
   },
-  rollColor: {
-    color: '#f5a623',
-  },
-  trimColor: {
-    color: '#4aa3ff',
+  dot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: colors.accent,
   },
 });

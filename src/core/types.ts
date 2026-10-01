@@ -1,23 +1,23 @@
 export interface Vector3 {
-  x: number;
-  y: number;
-  z: number;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
 }
 
 export interface MotionSample {
   // Convenção expo-sensors/W3C: deitado (tela para cima) accelerationIncludingGravity ≈ (0, 0, -9.81)
-  accelerationIncludingGravity: Vector3;
-  rotationRate: Vector3;
-  rotation: Vector3;
-  timestamp: number;
+  readonly accelerationIncludingGravity: Vector3;
+  readonly rotationRate: Vector3;
+  readonly rotation: Vector3;
+  readonly timestamp: number;
 }
 
 export interface Angles {
-  roll: number;
-  trim: number;
+  readonly roll: number;
+  readonly trim: number;
 }
 
 export interface Calibration {
-  roll: number;
-  trim: number;
+  readonly roll: number;
+  readonly trim: number;
 }

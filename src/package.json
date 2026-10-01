@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
-    "expo": "~57.0.25",
+    "expo": "~57.0.26",
     "expo-sensors": "^57.0.3",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
-    "react-native": "0.86.3"
+    "react-native": "0.86.3",
+    "react-native-svg": "15.15.4"
   },
   "devDependencies": {
     "@react-native/jest-preset": "^0.86.3",
@@ -21,7 +22,7 @@
   },
   "scripts": {
     "start": "expo start",
-    "dev": "expo start --tunnel",
+    "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
