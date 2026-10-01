@@ -1,6 +1,6 @@
 # Documentação Técnica — Inclination Test
 
-Documentação técnica/de desenvolvimento do projeto. Para visão de produto, backlog, sprints e marcos, veja [`README.md`](README.md).
+Documentação técnica/de desenvolvimento do projeto. Para visão de produto, backlog, sprints e marcos, veja [`README.md`](README.md). Para o design system, o layout e a estrutura da camada de apresentação, veja [`DESIGN.md`](DESIGN.md).
 
 ## 1. Visão geral
 
@@ -27,57 +27,53 @@ Plataforma-alvo: **Android** (Expo SDK 57).
 ```
 src/
   index.ts                  # registro do componente raiz (registerRootComponent)
-  App.tsx                   # layout base (header, conteúdo, nav bar)
+  App.tsx                   # shell: container + <Screen/> + <NavBar/> + estado de navegação
+  navigation/
+    routes.ts               # ScreenId + TABS (id, label, ícone Lucide) — fonte única das rotas
   app/
-    screens/                # telas (HomeScreen, ...)
-    components/             # componentes (Inclinometer, ...)
+    screens/                # telas (HomeScreen, CalibrationScreen, ...)
+    components/
+      layout/               # ScreenHeader, NavBar, Card, ScreenContainer
+      ui/                   # Button, IconButton, Chip, Modal, Input, ListRow, ...
+      features/             # Inclinometer, LineChart, Gauge, RecordButton, ...
   core/
     sensors/
-      SensorService.ts      # captura o DeviceMotion e normaliza a amostra
+      SensorService.ts      # captura o DeviceMotion
     processing/
-      FilterService.ts      # filtragem de ruído (hoje é um passa-redirect)
+      FilterService.ts      # filtragem de ruído
       AngleConverter.ts     # converte a amostra filtrada em ângulos
     hooks/
       useInclination.ts     # ViewModel: intermediário entre o core e a UI
-    types.ts                # tipos compartilhados do pipeline (contratos)
+    types.ts                # tipos compartilhados entre o pipeline (contratos)
   style/
-    app.ts                  # StyleSheet global
-  __tests__/                # testes Jest (módulos do core e componentes da UI)
+    theme.ts                # tokens: colors · spacing · radii · typography · elevation · motion
+    app.ts                  # StyleSheet do shell
+  test-utils/
+    motion.ts               # fixtures e utilitários dos testes (NÃO é uma suite)
+  __tests__/
+    core/                   # testes das etapas do pipeline
+      SensorService.test.ts
+      FilterService.test.ts
+      AngleConverter.test.ts
+      useInclination.test.ts
+    components/             # testes da camada de apresentação
+      Inclinometer.test.tsx
   assets/                   # ícones e splash
   app.json                  # configuração do Expo
   jest.config.js            # preset jest-expo
   tsconfig.json             # strict + types: ["jest"]
 ```
 
+> A árvore completa, com a divisão de responsabilidades entre `App.tsx` e as telas, está em [`DESIGN.md` §7](DESIGN.md).
+
 - `app/` — camada de apresentação (telas e componentes). consome o `core/` apenas pelo hook `useInclination`.
+- `app/components/ui/` — componentes genéricos, sem vocabulário de domínio. Não importam de `features/`.
 - `core/` — lógica pura (captura, filtragem, cálculo de ângulo, ViewModel). Sem dependência de UI, testável na CLI sem emulador nem dispositivo.
-- `__tests__/` — testes Jest que exercitam o `core/`.
+- `style/theme.ts` — tokens do design system. Nenhum componente usa cor ou espaçamento literais.
+- `__tests__/core/` — testes Jest que exercitam o `core/`.
+- `test-utils/` — fixtures compartilhadas entre as suites. **Fora de `__tests__/` de propósito:** o `testMatch` do `jest.config.js` trata qualquer `.ts` dentro de `__tests__/` como suite de testes, e um arquivo de helpers lá seria reportado como "sua suite não contém nenhum teste". Por isso o `jest.config.js` tem `testPathIgnorePatterns` para `test-utils/`, e ele também está fora da cobertura.
 
 ## 4. Dependências (npm)
-
-### Instalar uma dependência
-
-```bash
-cd src
-npm install <pacote>
-npm install <pacote>@<versao>
-```
-
-### Restaurar (instalar as já declaradas)
-
-```bash
-cd src
-npm install
-```
-
-### Listar dependências
-
-```bash
-cd src
-npm ls                                  # árvore instalada
-npm outdated                            # desatualizadas
-npm audit                               # vulnerabilidades
-```
 
 ### Dependências de runtime e de teste
 
@@ -85,10 +81,13 @@ npm audit                               # vulnerabilidades
 |---|---|
 | `expo`, `react`, `react-native` | app |
 | `expo-sensors` | leitura do `DeviceMotion` no `SensorService` |
-| `react-native-svg` | desenho do inclinômetro em `app/components/Inclinometer.tsx` |
+| `react-native-svg` | desenho do inclinômetro, do `LineChart` e do `Gauge` em `app/components/features/` |
+| `lucide-react-native` | biblioteca de ícones do app (substitui os SVGs manuais do `proto/` — ver [`DESIGN.md` §5](DESIGN.md)) |
 | `jest`, `jest-expo`, `@types/jest` | execução dos testes |
 | `@testing-library/react-native`, `react-test-renderer` | testes do hook `useInclination` e de componentes |
 | `typescript` | `npm run typecheck` |
+
+> `lucide-react-native` ainda não está no `package.json` — entra na primeira entrega de código do design system. Suas peers (`react ^19`, `react-native-svg ^15`) já são atendidas pela stack atual.
 
 ## 5. Ambiente de testes
 
@@ -107,13 +106,44 @@ npm run typecheck       # tsc --noEmit
 Os testes ficam em `src/__tests__/` (coberto pelo `testMatch` do `jest.config.js`):
 
 ```
-src/__tests__/
-  SensorService.test.ts
-  FilterService.test.ts
-  AngleConverter.test.ts
-  useInclination.test.ts
-  Inclinometer.test.tsx
+src/__tests__/core/
+  SensorService.test.ts      # 19 testes — assinatura, taxa, conversão de forma
+  FilterService.test.ts      # 13 testes — contrato de forma + invariantes
+  AngleConverter.test.ts     # 37 testes — round-trip, golden vectors, fuzz
+  useInclination.test.ts     # 24 testes — orquestração do pipeline
+src/__tests__/components/
+  Inclinometer.test.tsx      # (a escrever)
 ```
+
+Total do `core/`: **93 testes**, todos escritos contra a implementação vazia — ou seja, todos
+vermelhos até o código existir. É o estado esperado do TDD, não uma falha.
+
+### 5.1 O que os testes travam — e o que eles deixam passar
+
+O objetivo é um **padrão de qualidade que não trave a evolução**. Isso se consegue escrevendo os
+testes na altitude certa. Existem três níveis, e só um deles prende:
+
+| Nível | Afirma sobre | Exemplo | Trava? |
+|---|---|---|---|
+| **Contrato** | a forma que atravessa a fronteira | saída tem as 4 chaves de `MotionSample`; `timestamp` intacto | Não |
+| **Semântica** | o significado físico do número | `roll > 0` = borda direita para baixo; `trim` satura em ±90 | **Sim, e deve** |
+| **Implementação** | como o cálculo foi feito | "cria o filtro uma só vez"; "chama X 60 vezes" | Não deve |
+
+O terceiro nível é o que vira um freio: passa no código de hoje e quebra numa refatoração que
+deixou o app *melhor*. Por isso o `FilterService`, cujo algoritmo esta documentação permite trocar
+livremente, **não tem golden value** — só propriedades que qualquer filtro decente precisa ter.
+
+Já o `AngleConverter` é função pura e determinística, então o nível Semântica se aplica com
+força: ali uma "melhoria" que muda o ângulo em meio grau é um bug silencioso, do tipo que só
+um engenheiro naval reclamando em campo revelaria.
+
+**Consequência prática:** reescrever o filtro (EMA → mediana → Butterworth), trocar `useState`
+por um store, usar ring buffer, bufferizar amostras, trocar o `SensorService` por outra fonte
+nativa — tudo isso continua verde. Mudar o contrato ou o significado do número fica vermelho
+de propósito.
+
+Quando um teste bloquear uma melhoria legítima, **o certo é mudar o teste** — e isso é um diff
+visível em review, não uma falha do processo.
 
 ## 6. Arquitetura em pipeline
 
@@ -126,7 +156,7 @@ DeviceMotion (expo-sensors)
 SensorService      captura e normaliza        → MotionSample bruto
   │
   ▼
-FilterService      remove o ruído (hoje passa-redirect) → MotionSample filtrado
+FilterService      remove o ruído             → MotionSample filtrado
   │
   ▼
 AngleConverter     converte para ângulos      → Angles { roll, trim }
@@ -139,13 +169,11 @@ Interface          app/screens + app/components
 ```
 
 - **SensorService** (`core/sensors/SensorService.ts`) — consome o `DeviceMotion` do `expo-sensors` e entrega uma `MotionSample` normalizada, a **60 Hz** por padrão (`updateIntervalMs = 1000 / 60`, configurável nas options). Essa taxa é para a **visualização ao vivo**; a **gravação da série temporal** (Prova de Mar) pode usar uma taxa menor — definir na hora de implementar a gravação. Não conhece filtragem, ângulos nem UI.
-- **FilterService** (`core/processing/FilterService.ts`) — recebe a `MotionSample` bruta e devolve a mesma forma. Por enquanto é um passa-redirect (sem código de filtragem); o filtro de ruído real entra aqui depois, sem alterar os vizinhos. Não sabe de onde o dado veio nem o que será feito com ele.
-- **AngleConverter** (`core/processing/AngleConverter.ts`) — recebe a `MotionSample` filtrada (mais a calibração/zero) e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
+- **FilterService** (`core/processing/FilterService.ts`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter 
+- **AngleConverter** (`core/processing/AngleConverter.ts`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
 - **useInclination** (`core/hooks/useInclination.ts`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`roll`, `trim`, `isRunning`, `isCalibrated`) e expõe as ações (`start`, `stop`, `calibrate`). A UI só conversa com ele.
 
 **Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `core/types.ts`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
-
-## 7. Contratos (tipos e funções principais)
 
 Tipos compartilhados em `src/core/types.ts`:
 
@@ -178,80 +206,20 @@ Função principal de cada módulo:
 
 | Módulo | Função principal | Entrada | Saída |
 |---|---|---|---|
-| `SensorService` | `createSensorService({ updateIntervalMs? })` → `{ start(onSample), stop(), isAvailable() }` | evento `DeviceMotion` (`expo-sensors`) | `MotionSample` bruto (via `normalizeSample`) |
-| `FilterService` | `createFilter()` → `{ process(sample) }` | `MotionSample` bruto | mesma `MotionSample` (passa-redirect; filtragem real entra depois) |
-| `AngleConverter` | `toAngles(sample, calibration?)` e `toSignedAngles(sample)` | `MotionSample` filtrado + offset de calibração (zero) | `Angles` com sinal (roll −180..180, trim −90..90) |
-| `useInclination` | `useInclination({ sensorService?, filter?, updateIntervalMs? })` | — | `{ roll, trim, isRunning, isCalibrated, error, start(), stop(), calibrate() }` |
+| `SensorService` | `createSensorService(options?: { updateIntervalMs?: number })` | eventos `DeviceMotion` (via `expo-sensors`) | `SensorService { isAvailable(), start(cb: (s: MotionSample) => void), stop() }` |
+| `FilterService` | `createFilter()` | `MotionSample` bruto | `Filter { process(s: MotionSample): MotionSample }` (mesma forma, filtrada) |
+| `AngleConverter` | `toAngles(sample: MotionSample, calibration?: Calibration): Angles` | `MotionSample` filtrada + offset opcional | `Angles { roll, trim }` (em graus, com sinal e faixas) |
+| `useInclination` | `useInclination()` | — | `{ roll, trim, isRunning, isCalibrated, error, start(), stop(), calibrate() }` |
 
 ### Conversão de ângulos (AngleConverter)
 
 - **Convenção do sensor:** o `expo-sensors` segue a convenção W3C — com o celular deitado (tela para cima), `accelerationIncludingGravity ≈ (0, 0, −9.81)` (Android: `acelerômetro − 2 × gravity`; iOS: `gravity` do CoreMotion apontando para baixo). O `AngleConverter` nega o vetor (`up = −a`) antes de calcular.
-- `toSignedAngles` — valor cru **com sinal**: `roll = atan2(−up_x, up_z)` (∈ −180..180) e `trim = asin(up_y / ‖up‖)` (∈ −90..90).
-- `toAngles` — subtrai o offset de calibração **com sinal** e preserva o **sinal** do resultado: o roll é envolvido em (−180, 180] pelo caminho mais curto e o trim é saturado em ±90. Subtrair antes de resolver preserva a direção: calibrar com o convés em 2° e medir 1° do outro lado resulta em −1°, não 1°. O wrap evita o salto de 358° ao cruzar a proa (179,9° → −179,9° dá 0,2°).
 - Orientação de referência: celular em **retrato**, topo = proa. Deitado (tela para cima) → `0/0`; de lado → `roll ±90`; de bruços → `roll 180`; proa inclinada → `trim` (satura em ±90).
 - Sinal: `roll > 0` = borda direita para baixo (leitura pelo lado direito da escala do anel), `trim > 0` = proa para cima (régua desliza para baixo). Assim o mostrador gira e desliza nos dois sentidos.
 
 Decisões de projeto fixadas nos contratos:
 
 - **DeviceMotion** (e não só o acelerômetro) porque entrega `rotationRate`/`rotation`, dando mais matéria-prima para a filtragem.
-- **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180] para que a virada pela proa não dé uma volta completa no mostrador.
+- **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dé uma volta completa no mostrador.
 - **Calibração como parâmetro do `AngleConverter`** (US-01): `toAngles` aplica o offset do zero, continuando uma função pura.
 - **Funções puras + factory** (não classes): `createFilter()`, `createSensorService()`, `toAngles()` — fáceis de mockar e testar.
-
-> **Status:** os 4 módulos do `core/` estão implementados (`types.ts`, `SensorService`, `FilterService`, `AngleConverter`, `useInclination`) e a UI exibe `roll`/`trim` ao vivo pelo inclinômetro gráfico (`HomeScreen` + `Inclinometer`, em `react-native-svg`, igual ao protótipo: anel com escala de Roll que gira nos dois sentidos + régua de Trim que desliza para cima e para baixo sob o furo; sem botão de calibração ainda — a tela de calibragem entra na US-01). Frequência: **60 Hz na visualização**; taxa da gravação da série temporal, a definir. Testes prontos: `AngleConverter.test.ts` e `Inclinometer.test.tsx`; próxima etapa é cobrir `SensorService`, `FilterService` e `useInclination`.
-
-### Como cada etapa é testada
-
-| Etapa | Estratégia de teste |
-|---|---|
-| `SensorService` | `jest.mock('expo-sensors')` — simula eventos do `DeviceMotion` |
-| `FilterService` | puro, sem mock — hoje o passa-redirect devolve a mesma amostra; quando o filtro entrar: entrada ruidosa → saída mais suave |
-| `AngleConverter` | puro, sem mock — vetor conhecido → ângulo conhecido (roll ±90/±180, trim ±90); calibração com sinal; wrap do roll em (−180, 180]; saturação do trim |
-| `useInclination` | `renderHook` (`@testing-library/react-native`) — estado e ações |
-
-## 8. Fluxo para adicionar lógica + teste (TDD)
-
-1. Definir/ajustar o contrato da etapa em `src/core/types.ts` (entrada e saída).
-2. Escrever o teste em `src/__tests__/<Modulo>.test.ts` — ele falha (fase vermelha).
-3. Implementar a função no módulo do `core/` até o teste passar (fase verde).
-4. Rodar `npm test` e `npm run typecheck` para validar.
-
-Exemplo de teste (assinatura do `AngleConverter`, como em `src/__tests__/AngleConverter.test.ts`):
-
-```ts
-const G = 9.81;
-
-// O conversor trabalha com `up = −gravity`, então montar a amostra a partir do
-// vetor "para cima" deixa o caso legível.
-function sample(up: Partial<Vector3>): MotionSample {
-  const vector = { x: 0, y: 0, z: G, ...up };
-  return {
-    accelerationIncludingGravity: { x: -vector.x, y: -vector.y, z: -vector.z },
-    rotationRate: { x: 0, y: 0, z: 0 },
-    rotation: { x: 0, y: 0, z: 0 },
-    timestamp: 0,
-  };
-}
-
-describe('toAngles', () => {
-  it('mantém o sinal do roll para os dois lados', () => {
-    expect(toAngles(sample({ x: G, z: 0 })).roll).toBeCloseTo(-90, 6);
-    expect(toAngles(sample({ x: -G, z: 0 })).roll).toBeCloseTo(90, 6);
-  });
-});
-```
-
-> Não há acoplamento manual entre interface e testes: os dois importam o mesmo arquivo do `core/`. Mudou o contrato, os testes acusam antes da interface quebrar em campo.
-
-## 9. Comandos úteis
-
-| Ação | Comando |
-|---|---|
-| Instalar dependências | `npm install` (em `src/`) |
-| Adicionar pacote | `npm install <pacote>` (em `src/`) |
-| Rodar testes | `npm test` |
-| Testes em watch | `npm run test:watch` |
-| Cobertura | `npm run test:coverage` |
-| Typecheck | `npm run typecheck` |
-| Subir o app | `npm start` (ou `npm run android`) |
-| Tunnel (rede local) | `npm run dev` |
