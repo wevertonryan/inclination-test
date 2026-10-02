@@ -1,0 +1,2 @@
+Leia [Documentação Tecnica](DOCUMENTAÇÃO.MD) e [Documentação do projeto](README.md) para entender o contexto do projeto
+Não altere os Testes, você pode apenas ler, se quiser alguma alteração avise para mim

@@ -17,6 +17,30 @@ export interface UseInclinationResult {
   calibrate: () => void;
 }
 
+export interface UseInclinationOptions {
+  /**
+   * Recebe cada par de ângulos assim que ele é calculado — já filtrado e já
+   * calibrado, ou seja, exatamente o que está no mostrador.
+   *
+   * É a torneira que o gravador usa. Ela existe aqui, e não no `SensorService`,
+   * por um motivo: a série gravada tem que ser a mesma que o usuário viu, e um
+   * segundo sensor teria um segundo filtro e um segundo estado de calibração.
+   *
+   * Três regras, e as três vêm do caminho de 60 Hz:
+   *
+   * - **A referência precisa ser estável** (ex.: um `useCallback`), senão o
+       efeito que a instala re-roda a cada amostra. Por isso a assinatura é
+   *   lida de uma `ref` e não da opção direto.
+   * - **O instante é `Date.now()`, não `sample.timestamp`.** O timestamp do
+   *   sensor é ms desde o boot no Android e segundos desde o boot no iOS;
+   *   misturá-lo com o relógio do relatório quebraria o eixo x do gráfico.
+   * - **Não deve lançar.** A chamada acontece dentro do callback do
+   *   `DeviceMotion`; uma exceção aqui subiria para o emissor de eventos do
+   *   sensor, não para quem chamou.
+   */
+  onSample?: (angles: Angles, tMs: number) => void;
+}
+
 const NEUTRAL: Angles = { roll: 0, trim: 0 };
 
 /**
@@ -33,7 +57,7 @@ const NEUTRAL: Angles = { roll: 0, trim: 0 };
  * - `start` nunca rejeita. A tela chama `void start()`, e uma rejeicao nao
  *   observada viraria unhandled rejection; o erro vai para `error`.
  */
-export function useInclination(): UseInclinationResult {
+export function useInclination(options: UseInclinationOptions = {}): UseInclinationResult {
   const [angles, setAngles] = useState<Angles>(NEUTRAL);
   const [isRunning, setIsRunning] = useState(false);
   const [isCalibrated, setIsCalibrated] = useState(false);
@@ -45,6 +69,15 @@ export function useInclination(): UseInclinationResult {
   const latestRef = useRef<Angles>(NEUTRAL);
   const runningRef = useRef(false);
 
+  // A opção entra por uma ref para que o `handleSample` continue com deps
+  // vazias: se ele dependesse de `options.onSample`, uma referência nova a cada
+  // render criaria um `handleSample` novo, que re-assinaria o sensor.
+  const onSampleRef = useRef<((angles: Angles, tMs: number) => void) | null>(null);
+
+  useEffect(() => {
+    onSampleRef.current = options.onSample ?? null;
+  }, [options.onSample]);
+
   const handleSample = useCallback((sample: MotionSample): void => {
     const filter = filterRef.current;
     if (filter === null || !runningRef.current) {
@@ -54,6 +87,11 @@ export function useInclination(): UseInclinationResult {
     const next = toAngles(filter.process(sample), calibrationRef.current ?? undefined);
     latestRef.current = next;
     setAngles(next);
+
+    const onSample = onSampleRef.current;
+    if (onSample !== null) {
+      onSample(next, Date.now());
+    }
   }, []);
 
   const start = useCallback(async (): Promise<void> => {

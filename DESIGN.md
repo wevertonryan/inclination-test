@@ -4,7 +4,7 @@ Especificação de **design** (identidade visual, tokens e componentes) e de **l
 
 Para o comportamento funcional das telas, ver [`TELAS.md`](TELAS.md). Para o protótipo navegável que definiu o layout, ver [`PROTOTIPO.md`](PROTOTIPO.md). Para arquitetura, stack e contratos do `core/`, ver [`DOCUMENTAÇÃO.MD`](DOCUMENTAÇÃO.MD).
 
-> **Status:** documento de especificação. Nenhum código deste design está implementado ainda — os tokens e componentes aqui descritos são o contrato de implementação da Sprint 05 (Identidade Visual, Telas e UX).
+> **Status:** implementado. Os tokens vivem em [`src/tamagui.config.ts`](src/tamagui.config.ts) como tokens do [Tamagui](https://tamagui.dev), com [`src/style/theme.ts`](src/style/theme.ts) como fachada de literais crus para o código que ainda usa `StyleSheet` do React Native. Este documento é o contrato; o código é a implementação.
 
 ---
 
@@ -118,12 +118,15 @@ Vale para: cronômetro, ângulos Roll/Trim do anel e da régua, valores de Médi
 | `space.2` | 4 | Gap ícone↔texto |
 | `space.3` | 8 | Gap interno de chip, gap entre linhas de lista |
 | `space.4` | 12 | Padding de tela, gap entre blocos do card |
+| `space.14` | 14 | Padding vertical do header, padding horizontal do `Input` — único valor fora da base 4 |
 | `space.5` | 16 | Padding de card, padding lateral padrão |
 | `space.6` | 20 | Padding de modal |
 | `space.7` | 24 | Margem acima de seção |
 | `space.8` | 32 | Respiro do topo de tela |
 
 Padding lateral padrão de tela: **16** (`space.5`). Padding de card: **16**. Padding de modal: **20** horizontal.
+
+**Sobre o `space.14`.** A escala é base 4, mas `ScreenHeader` pede `padding 14/16` e `Input` pede `12/14` (§6.1, §6.2). O 14 não cabe na base 4 e ainda assim §6.4 proíbe número literal. As saídas seriam um token ad-hoc ou quebrar a regra — por isso `space.14` é um token deliberado, e não um deslize da régua. Ele fica na escala **na ordem do valor** (`12 → 14 → 16`), e não no fim, para que a régua visual da página de design continue legível.
 
 ### 3.2 Raios
 
@@ -248,8 +251,8 @@ A biblioteca é dividida em três camadas, dentro de `src/app/components/`:
 | `IconButton` | `size: 48 \| 60`, `tone: neutral \| accent \| ok \| danger`, `Icon` | default, pressed, disabled | Redondo (`radius.pill`). `60` é o dos botões flutuantes; `48` para ações de header |
 | `Chip` | `active?`, `Icon?`, `size` | default, active, disabled | `radius.pill`, `bgCard` + borda; ativo = `accentSoft` + borda `accent` + texto `accent` |
 | `StatusDot` | `status: ok \| uncalibrated \| unknown \| error \| calibrating` | — | Círculo 18px com ícone 14px dentro. `ok` → `ok`/texto `#05150D`; `uncalibrated` e `error` → `danger`/branco; `unknown` → `textMuted`/`#101828`; `calibrating` → `LoaderCircle` girando em `accent` |
-| `Modal` | `visible`, `backdrop?: boolean` (default `true`), `onClose?`, `dismissible?` | abrindo, aberto, fechando | Card `bgElevated` + borda, `radius.lg`, largura máx 340, `padding 20`. `backdrop={false}` = card flutuante sem escurecer a tela (usado no modal de status do sensor). Entrada `motion.base`, saída `motion.exit` |
-| `Input` | `placeholder?`, `Icon?` (ícone dentro à esquerda), `value`, `onChangeText`, `error?` | default, focado, com erro | `bgInput`, borda `border`, `radius.md`, `padding 12/14`. Focado → borda `accent`. Com erro → borda `danger` + mensagem em `danger` |
+| `Modal` | `visible`, `backdrop?: boolean` (default `true`), `onClose?`, `dismissible?` | abrindo, aberto, fechando | Card `bgElevated` + borda, `radius.lg`, largura máx 340, `padding 20`. `backdrop={false}` = card flutuante: **não escurece a tela e o toque fora dele passa direto** para o que estiver embaixo, sem camada de dispensa — fechar é por botão de voltar ou por um controle dentro de `children`. Entrada `motion.base`, saída `motion.exit` |
+| `Input` | `placeholder?`, `Icon?` (ícone dentro à esquerda), `value`, `onChangeText`, `error?` | default, focado, com erro | `bgInput`, borda `border`, `radius.md`, `padding 12/14` (`space.4`/`space.14`). Focado → borda `accent`, **desde que não haja erro** — com erro a borda `danger` manda, e o `backgroundColor` vai para `dangerSoft`. Com erro → borda `danger` + mensagem em `danger` |
 | `ListRow` | `Icon?`, `title`, `subtitle?`, `right?`, `onPress?` | default, pressed | Linha sem card próprio: `padding 12/16`, `gap 12`, divisor `border` entre linhas. `right` alinhado à direita |
 | `Divider` | — | — | 1px `border` |
 | `EmptyState` | `Icon?`, `title`, `description?` | — | Centralizado, ícone 40px `textFaint`, título `label`, descrição `body` `textMuted` |
@@ -259,10 +262,10 @@ A biblioteca é dividida em três camadas, dentro de `src/app/components/`:
 
 | Componente | Contrato | Notas |
 |---|---|---|
-| `ScreenHeader` | `title`, `left?`, `right?`, `hidden?` | Header da própria Screen (§7.1). 3 slots: `left` · `title` centralizado · `right`. `bgElevated` + borda inferior, `padding 14/16`. `hidden` desliza para cima com `motion.slow` — usado na gravação imersiva |
+| `ScreenHeader` | `title`, `left?`, `right?`, `hidden?` | Header da própria Screen (§7.1). 3 slots: `left` · `title` centralizado · `right`, os laterais com `flex: 1` + `minWidth: 0` para o título ficar centrado e truncar. `bgElevated` + borda inferior, `padding 14/16` (`space.14`/`space.5`). `hidden` desliza para cima com `motion.slow` — usado na gravação imersiva |
 | `NavBar` | `active: ScreenId`, `onChange`, `hidden?` | Vive no `App.tsx` (§7.2). 5 itens, ícone `xl` + label `micro`. Ativo = `accent`, inativo = `textMuted`. `hidden` desce com `motion.slow` |
 | `Card` | `padded?: boolean` | Superfície padrão de conteúdo: `bgCard`, borda `border`, `radius.lg`, `elevation.1` |
-| `ScreenContainer` | `scroll?: boolean`, `navPadding?: boolean` | `ScrollView` com `padding 16` e `paddingBottom` = altura da NavBar (64 + safe-area). Elimina a repetição de padding em todas as telas |
+| `ScreenContainer` | `scroll?: boolean`, `navPadding?: boolean` | `ScrollView` com `padding 16`, `paddingTop` = `space.8` + inset de topo, e `paddingBottom` = altura da NavBar **já com o inset dela** (`64 + inset.bottom + space.5`, e `false` remove). Elimina a repetição de padding em todas as telas |
 
 ### 6.3 `features/`
 
@@ -315,7 +318,7 @@ Esta é a regra estrutural mais importante da camada de apresentação.
 - **`App.tsx` contém apenas:** o container (`flex: 1`, `bg`), a área da Screen (`flex: 1`) e a `<NavBar>`. Mais o estado de navegação. Nada mais.
 - **Cada Screen renderiza o seu `<ScreenHeader>`**, porque cada tela tem título, `left` e `right` próprios (o chip de sensor só existe na Home; o `‹` + `⋮` só existem no Relatório).
 - O header **não** é fixo por padrão: rola junto com o conteúdo (`ScrollView`). Só durante a gravação ele trava e some, porque o cronômetro ocupa aquele lugar.
-- A Screen tem `paddingBottom` igual à altura da NavBar (64 + safe-area), exceto nas telas sem NavBar.
+- A Screen tem `paddingBottom` igual à altura da NavBar já com o inset dela (64 + safe-area), exceto nas telas sem NavBar (`navPadding={false}`). Ver §7.3.
 
 ### 7.2 Navegação
 
@@ -329,7 +332,19 @@ Navegação por estado, sem biblioteca:
 
 ### 7.3 Safe area
 
-`StatusBar` com `style="light"` (fundo escuro exige conteúdo claro). `NavBar` e `RecordingBar` aplicam `paddingBottom` da safe-area inferior; o header aplica a superior via `SafeAreaView`.
+`StatusBar` com `style="light"` (fundo escuro exige conteúdo claro).
+
+O inset é medido por `react-native-safe-area-context` e **consumido por borda**, não por um `SafeAreaView` em volta de tudo. A diferença é visível no aparelho com notch:
+
+| Borda | Quem consome | Por quê |
+|---|---|---|
+| Topo | `ScreenContainer` (`paddingTop`) | O `<ScreenHeader>` é filho dele, então empurrar o container empurra o header junto. |
+| Fundo | `NavBar` (`paddingBottom`) | A barra encosta no gesto do sistema e a borda de 1px fica colada nele. |
+| Fundo, na Screen | `ScreenContainer` (`paddingBottom`) | §7.1: a tela reserva `64 + inset.bottom`. Como a NavBar cresce com o inset, a altura total a reservar também cresce. |
+
+Um `SafeAreaView` no container aplicaria o mesmo inset nas duas bordas de uma vez, empurrando a NavBar para *abaixo* do gesto em vez de deixá-la encostar nele. Por isso ele não é usado: o `SafeAreaProvider` fica na raiz e só mede.
+
+Somar o inset de baixo nos dois lugares não é dupla contagem — é a mesma medida vista das duas pontas: a NavBar cresce para `64 + inset`, e a tela reserva `64 + inset`. `RecordingBar` segue a NavBar nesse ponto.
 
 ### 7.4 Estrutura de pastas proposta
 
@@ -395,6 +410,24 @@ Mudanças em relação a `src/` hoje:
 ### 7.5 Fronteira com o `core`
 
 Imediatamente mantida: a camada de apresentação **só** conversa com o `core/` pelo hook `useInclination`. Nenhum `screen/` ou `components/` importa `expo-sensors`, `FilterService` ou `AngleConverter` diretamente. `Inclinometer` recebe `roll` e `trim` prontos — é um componente de desenho, cego ao pipeline.
+
+### 7.6 Onde o Tamagui entra — e onde não entra
+
+Os tokens (§1–§4) são tokens do [Tamagui](https://tamagui.dev), criados em `tamagui.config.ts` por `createTokens` e consumidos como referências `$token`. O `TamaguiProvider` fica na raiz, acima do shell.
+
+`ui/` e `layout/` usam primitivas do Tamagui (`YStack`, `XStack`, `SizableText`, `ScrollView`, `styled`). Onde a primitiva é adequate — `Card`, `Chip`, `Button`, `ListRow`, `ScreenHeader` — o componente **é** a primitiva, com a identidade em `styled`.
+
+Onde não é, o Tamagui é deliberadamente ausente:
+
+| Componente | Por que fica em React Native |
+|---|---|
+| `Inclinometer` | Desenho SVG a 60 Hz (`react-native-svg`) + `Animated` para o ponteiro e a régua. É o componente mais otimizado do app e não tem equivalente no Tamagui — mexer nele seria trocar um desenho afinado por uma abstração genérica. |
+| `Modal` | `Modal` nativo do RN + `Animated` para entrada/saída. O `Dialog` do Tamagui puxa `Popper`, que depende de `react-dom` — um caminho de web num app Android. |
+| `Toast`, `NavBar`, `ScreenHeader`, `ScreenContainer` | As animações de esconder/somar usam `Animated` do RN com `useNativeDriver`. A casca e o layout migraram para Tamagui; o que se move é RN. |
+
+E o inverso: `style/theme.ts` é uma **fachada**, não uma cópia. Os literais de cor, espaçamento, raio, tamanho e fonte são declarados uma vez em `tamagui.config.ts` e reexportados. A fachada existe porque `Inclinometer.tsx` — que não muda — usa `StyleSheet.create` com `colors`, `radii`, `spacing` e `typography`, e `StyleSheet` não entende referências `$token`.
+
+**Regra prática:** um componente novo nasce Tamagui. Só sai de lá quando o trabalho depende de algo que o Tamagui não faz melhor — SVG de alta frequência, `Modal` nativo, animação com `useNativeDriver` em cascata.
 
 ---
 

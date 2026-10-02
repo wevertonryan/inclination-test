@@ -44,6 +44,16 @@ src/
       AngleConverter.ts     # converte a amostra filtrada em ângulos
     hooks/
       useInclination.ts     # ViewModel: intermediário entre o core e a UI
+    recording/
+      RecordingSession.ts   # o gravador sem React: decimação, lotes, pause/save
+      Statistics.ts         # média e desvio de Welford, sem lista de amostras
+      useRecorder.ts        # ViewModel do gravador
+    persistence/
+      schema.ts             # DDL de recordings + samples
+      ReportRepository.ts   # contrato de persistência
+      inMemoryReportRepository.ts
+      sqliteReportRepository.ts
+      RecordingStore.ts     # abre o banco (expo-sqlite) e aplica o schema
     types.ts                # tipos compartilhados entre o pipeline (contratos)
   style/
     theme.ts                # tokens: colors · spacing · radii · typography · elevation · motion
@@ -56,6 +66,10 @@ src/
       FilterService.test.ts
       AngleConverter.test.ts
       useInclination.test.ts
+      Statistics.test.ts
+      ReportRepository.test.ts
+      RecordingSession.test.ts
+      useRecorder.test.ts
     components/             # testes da camada de apresentação
       Inclinometer.test.tsx
   assets/                   # ícones e splash
@@ -81,6 +95,7 @@ src/
 |---|---|
 | `expo`, `react`, `react-native` | app |
 | `expo-sensors` | leitura do `DeviceMotion` no `SensorService` |
+| `expo-sqlite` | persistência local dos relatórios e da série temporal (`core/persistence/`); exige o plugin `"expo-sqlite"` em `app.json` |
 | `react-native-svg` | desenho do inclinômetro, do `LineChart` e do `Gauge` em `app/components/features/` |
 | `lucide-react-native` | biblioteca de ícones do app (substitui os SVGs manuais do `proto/` — ver [`DESIGN.md` §5](DESIGN.md)) |
 | `jest`, `jest-expo`, `@types/jest` | execução dos testes |
@@ -168,10 +183,13 @@ useInclination     ViewModel / mediador       → estado exposto para a UI
 Interface          app/screens + app/components
 ```
 
-- **SensorService** (`core/sensors/SensorService.ts`) — consome o `DeviceMotion` do `expo-sensors` e entrega uma `MotionSample` normalizada, a **60 Hz** por padrão (`updateIntervalMs = 1000 / 60`, configurável nas options). Essa taxa é para a **visualização ao vivo**; a **gravação da série temporal** (Prova de Mar) pode usar uma taxa menor — definir na hora de implementar a gravação. Não conhece filtragem, ângulos nem UI.
+- **SensorService** (`core/sensors/SensorService.ts`) — consome o `DeviceMotion` do `expo-sensors` e entrega uma `MotionSample` normalizada, a **60 Hz** por padrão (`updateIntervalMs = 1000 / 60`, configurável nas options). Essa taxa é para a **visualização ao vivo**; a gravação da série temporal (Prova de Mar) rebaixa para **12 Hz** na ponta da gravação, sem ressuscitar o sensor. Não conhece filtragem, ângulos nem UI.
 - **FilterService** (`core/processing/FilterService.ts`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter 
 - **AngleConverter** (`core/processing/AngleConverter.ts`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
-- **useInclination** (`core/hooks/useInclination.ts`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`roll`, `trim`, `isRunning`, `isCalibrated`) e expõe as ações (`start`, `stop`, `calibrate`). A UI só conversa com ele.
+- **useInclination** (`core/hooks/useInclination.ts`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`roll`, `trim`, `isRunning`, `isCalibrated`) e expõe as ações (`start`, `stop`, `calibrate`). A UI só conversa com ele. Aceita também `onSample?: (angles: Angles, tMs: number) => void`, chamado com o **mesmo** `toAngles` que alimenta o estado — é por essa torneira que o gravador recebe a série, sem sensor próprio e sem segunda assinatura do `DeviceMotion`.
+- **useRecorder** (`core/recording/useRecorder.ts`) — ViewModel do gravador, irmão do `useInclination` e não filho dele: conhece ângulos, não sensor. Encaminha cada amostra para um `RecordingSession`, publica estado no máximo a cada 100 ms (`DEFAULT_TICK_MS`) para não arrastar a tela a 60 Hz, e expõe `start`, `pause`, `resume`, `toggle`, `save`, `discard`.
+- **RecordingSession** (`core/recording/RecordingSession.ts`) — o gravador sem React. Decide o que entra no disco: **decima de 60 Hz para 12 Hz** (`DEFAULT_SAMPLE_INTERVAL_MS = 83`, a mesma taxa do protótipo), acumula as estatísticas de Welford e **escreve em lotes de 2 s** (`DEFAULT_FLUSH_INTERVAL_MS`). Um flush só grava o que está no buffer, então o custo de uma queda de energia é de no máximo 2 s.
+- **ReportRepository** (`core/persistence/ReportRepository.ts`) — o contrato de persistência, com duas implementações: `sqliteReportRepository` (`expo-sqlite`, aberta por `RecordingStore`) e `inMemoryReportRepository`, que é o fake dos testes e a referência de semântica. O `PRIMARY KEY (recording_id, elapsed_ms)` é o que torna o retry de um lote idempotente.
 
 **Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `core/types.ts`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
 
@@ -223,3 +241,50 @@ Decisões de projeto fixadas nos contratos:
 - **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dé uma volta completa no mostrador.
 - **Calibração como parâmetro do `AngleConverter`** (US-01): `toAngles` aplica o offset do zero, continuando uma função pura.
 - **Funções puras + factory** (não classes): `createFilter()`, `createSensorService()`, `toAngles()` — fáceis de mockar e testar.
+
+## 7. Gravação e persistência (Prova de Mar)
+
+A gravação entra pela **mesma** amostra que o mostrador. `useInclination` publica
+`onSample(angles, tMs)` logo depois do `toAngles` que alimentou o estado, e o
+`useRecorder` apenas encaminha. Um gravador com sensor próprio registraria uma
+série diferente da que o usuário viu — e o gráfico da revisão não bateria com a
+gravação.
+
+| Etapa | Onde | O que decide |
+|---|---|---|
+| decimação | `RecordingSession` | 60 Hz na tela → 12 Hz no disco (`83 ms`) |
+| estatísticas | `Statistics` | média e desvio de Welford, calculados no fluxo, sem lista |
+| lote | `RecordingSession` | escrever a cada 2 s, não a cada amostra |
+| gravação | `sqliteReportRepository` | prepared statement, uma transação por lote |
+
+### Por que a linha nasce como `recording`
+
+`start()` grava a linha **antes** do primeiro ângulo, com `status = 'recording'`.
+`save()` é o que promove a `saved`. Isso é deliberado:
+
+- uma queda de energia no meio da prova deixa uma gravação **recuperável**, e não
+  um órfão. `findInterrupted()` devolve exatamente essas linhas;
+- a listagem de relatórios (`listReports`) nunca mostra uma gravação em andamento;
+  quem navega para a tela de relatórios vê só o que foi salvo.
+
+`finished_at` fica `null` enquanto `recording`. Uma gravação recuperada não tem
+"fim" — tem um `duration_ms` acumulado até a última amostra persistida.
+
+### O que uma queda de força custa
+
+No máximo `DEFAULT_FLUSH_INTERVAL_MS` (2 s) de amostras, porque só o buffer em
+memória se perde. O buffer volta a ser o que o sensor já entregou, e o `t_ms` de
+cada linha é absoluto — a lacuna aparece como linha reta no gráfico, sem deslocar
+o eixo x.
+
+O retry de um lote é idempotente: o `PRIMARY KEY (recording_id, elapsed_ms)`
+descarta a reescrita, então reprocessar um flush que falhou no meio não duplica
+amostras.
+
+### Por que o SQLite não roda na suíte
+
+`expo-sqlite` é nativo. `ReportRepository.test.ts` roda contra
+`inMemoryReportRepository`, que é a **referência de semântica**: se ele fica
+verde e o SQLite divergir, o bug é do SQLite. Por isso o fake copia as linhas na
+leitura, como o SQLite materializa objetos novos a cada `SELECT` — devolver a
+referência interna faria o teste passar com um bug que só apareceria no aparelho.

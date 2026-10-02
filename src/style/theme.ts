@@ -7,53 +7,44 @@
  *
  * `style/app.ts` reexporta tudo daqui, então `style/app` é a porta de entrada
  * única do design para o resto do projeto.
+ *
+ * ## Relação com o Tamagui
+ *
+ * A fonte única dos tokens agora é [`tamagui.config.ts`](../tamagui.config.ts):
+ * os literais de cor, espaçamento, raio, tamanho e fonte são declarados lá uma
+ * vez e alimentam o `createTokens`. Este arquivo é a **fachada** que os
+ * reexporta — não uma segunda cópia.
+ *
+ * A fachada existe porque a migração é por etapas e a maior parte do app ainda
+ * consome estilo pela API do React Native (`StyleSheet.create`, `TextStyle`,
+ * `ViewStyle`). Servir as referências `$token` do Tamagui a esse código exigiria
+ * que todo `StyleSheet` passasse a ser prop de componente Tamagui, o que é a
+ * Fase 3 e não cabe aqui. Por isso a fachada expõe os **literais crus**
+ * (`spacing.s5 === 16`, `colors.accent === '#F5A623'`), que funcionam
+ * indistintamente em `StyleSheet` e como valor de prop Tamagui.
+ *
+ * Consequência a conhecer: `tokens.space.s14` é uma `Variable` (`{ val: 14 }`),
+ * enquanto `spacing.s14` é o número. `__tests__/tamagui.primitives.test.tsx`
+ * afirma sobre a `Variable` para que a escala não se dissocie do config.
  */
 
 import { Easing, type TextStyle, type ViewStyle } from 'react-native';
+
+import {
+  domainColors,
+  fonts,
+  radius,
+  semanticColors,
+  size,
+  space,
+  surfaceColors,
+} from '../tamagui.config';
 
 // ---------------------------------------------------------------------------
 // §1 — Cor
 // ---------------------------------------------------------------------------
 
-/** Superfícies, em três níveis de elevação (bg → bgElevated → bgCard). */
-export const surfaceColors = {
-  bg: '#0B1220',
-  bgElevated: '#111A2E',
-  bgCard: '#16203A',
-  bgInput: '#0D1526',
-  overlay: 'rgba(4, 8, 16, 0.72)',
-  shadow: '#000000',
-  /** Hairline de 1px — a única borda permitida no sistema. */
-  border: '#22304F',
-} as const;
-
-/** Conteúdo e semânticas. Cada cor tem um significado fixo (`DESIGN.md` §1.2). */
-export const semanticColors = {
-  text: '#E8EDF6',
-  textMuted: '#8B98B4',
-  textFaint: '#5E6B87',
-  accent: '#F5A623',
-  accentStrong: '#FFB93F',
-  accentSoft: 'rgba(245, 166, 35, 0.12)',
-  ok: '#34C98A',
-  /** Colisão deliberada com `accent`: "atenção" e "marca" são a mesma família. */
-  warn: '#F5A623',
-  danger: '#FF5C5C',
-  dangerSoft: 'rgba(255, 92, 92, 0.14)',
-  /** Vermelho saturado do botão de gravar — ≠ `danger`. */
-  rec: '#E13B3B',
-  /** Tinta escura para texto sobre `accent`/`ok`. */
-  onAccent: '#1A1505',
-  onOk: '#05150D',
-} as const;
-
-/** Cores de domínio — fixas, não acompanham o accent (`DESIGN.md` §1.3). */
-export const domainColors = {
-  roll: '#F5A623',
-  trim: '#4AA3FF',
-  chartGrid: '#1C2842',
-  chartAxis: '#8B98B4',
-} as const;
+export { surfaceColors, semanticColors, domainColors };
 
 export const colors = {
   ...surfaceColors,
@@ -95,18 +86,26 @@ export type TypographyRole =
 export const tabular: TextStyle = { fontVariant: ['tabular-nums'] };
 
 /**
- * Papéis tipográficos (`DESIGN.md` §2.1). `lineHeight` acompanha o tamanho em
- * ~1.4, exceto `display` e `title`, que centralizam verticalmente.
+ * Aplica a regra tabular a um papel. Só o `display` numérico precisa dela, mas
+ * a função existe para que "adicionar tabular a um papel" seja uma linha e não
+ * um patch local — o erro que §2.2 existe para impedir é o número que "pula".
+ */
+const withTabular = <T extends TextStyle>(style: T): TextStyle => ({ ...style, ...tabular });
+
+/**
+ * Papéis tipográficos (`DESIGN.md` §2.1), derivados de `fonts` no config.
+ * `lineHeight` acompanha o tamanho em ~1.4, exceto `display` e `title`, que
+ * centralizam verticalmente.
  */
 export const typography = {
-  display: { fontSize: 40, fontWeight: '800', lineHeight: 40, ...tabular },
-  title: { fontSize: 17, fontWeight: '700', lineHeight: 17 },
-  heading: { fontSize: 16, fontWeight: '700', lineHeight: 22 },
-  body: { fontSize: 14, fontWeight: '400', lineHeight: 20 },
-  label: { fontSize: 13, fontWeight: '600', lineHeight: 18 },
-  caption: { fontSize: 11, fontWeight: '700', lineHeight: 15 },
-  micro: { fontSize: 10, fontWeight: '500', lineHeight: 14 },
-} as const satisfies Record<TypographyRole, TextStyle>;
+  display: withTabular(fonts.display),
+  title: withTabular(fonts.title),
+  heading: withTabular(fonts.heading),
+  body: withTabular(fonts.body),
+  label: withTabular(fonts.label),
+  caption: withTabular(fonts.caption),
+  micro: withTabular(fonts.micro),
+} satisfies Record<TypographyRole, TextStyle>;
 
 export type Typography = typeof typography;
 
@@ -114,27 +113,13 @@ export type Typography = typeof typography;
 // §3 — Espaçamento, raios e elevação
 // ---------------------------------------------------------------------------
 
-/** Escala base 4 (`DESIGN.md` §3.1). */
-export const spacing = {
-  s1: 2,
-  s2: 4,
-  s3: 8,
-  s4: 12,
-  s5: 16,
-  s6: 20,
-  s7: 24,
-  s8: 32,
-} as const;
+/** Escala base 4 mais o `s14` que §6.1/§6.2 exigem (`DESIGN.md` §3.1). */
+export const spacing = space;
 
 export type SpacingToken = keyof typeof spacing;
 export type Space = (typeof spacing)[SpacingToken];
 
-export const radii = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  pill: 999,
-} as const;
+export const radii = radius;
 
 export type RadiusToken = keyof typeof radii;
 export type Radius = (typeof radii)[RadiusToken];
@@ -177,7 +162,8 @@ export const layout = {
   screenPaddingHorizontal: spacing.s5,
   /** Respiro do topo de tela. */
   screenPaddingTop: spacing.s8,
-  headerPaddingVertical: spacing.s4,
+  /** §6.1 pede 14 aqui — por isso `s14` existe na escala. */
+  headerPaddingVertical: spacing.s14,
   headerPaddingHorizontal: spacing.s5,
   /** Altura mínima do header, para a animação de saída ter um offset estável. */
   headerMinHeight: 48,
@@ -204,15 +190,14 @@ export type MotionToken = keyof typeof motion;
 // §5 — Iconografia (Lucide, viewBox 24×24)
 // ---------------------------------------------------------------------------
 
-export const iconSize = {
-  sm: 14,
-  md: 16,
-  lg: 20,
-  xl: 24,
-  xxl: 28,
-  /** Só o `EmptyState` (§6.1) — fora da tabela de §5.2 porque é uma ilustração. */
-  hero: 40,
-} as const;
+/**
+ * Tamanhos de ícone (§5.2) e as três medidas de casca que não são de ícone.
+ *
+ * Reexporta o grupo `size` do config em vez de declarar de novo: `size` já
+ * carrega o `hero` do `EmptyState` e o `touch` do alvo de toque (§8), e duas
+ * listas de tamanho é exatamente como `s14` sumiria de novo.
+ */
+export const iconSize = size;
 
 export type IconSizeToken = keyof typeof iconSize;
 export type IconSize = (typeof iconSize)[IconSizeToken];
