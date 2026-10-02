@@ -272,11 +272,11 @@ A biblioteca é dividida em três camadas, dentro de `src/app/components/`:
 | Componente | Contrato | Notas |
 |---|---|---|
 | `SensorStatusChip` | `status`, `onPress` | Chip no header da Home: `Radio` 20px + `StatusDot`. Pressionar navega para Calibração |
-| `Inclinometer` | `roll: number`, `trim: number`, `size?` | SVG (`react-native-svg`), sem card — solto sobre o `bg`. Nível 1: anel com furo central, escala de Roll 0→180 nos dois sentidos, âmbar, ponteiro fixo no topo. Nível 2: régua de Trim (±90°, marcas 30/60/90) visível pelo furo, desliza verticalmente, leitura por linha tracejada central fixa |
+| `Inclinometer` | `roll: number`, `trim: number`, `size?`, `onSample?` | SVG (`react-native-svg`), sem card — solto sobre o `bg`. Nível 1: anel com furo central, escala de Roll 0→180 nos dois sentidos, âmbar, ponteiro fixo no topo. Nível 2: régua de Trim (±90°, marcas 30/60/90) visível pelo furo, desliza verticalmente, leitura por linha tracejada central fixa |
 | `RecordButton` | `mode: idle \| recording \| paused`, `onPress` | Círculo 68px, fundo `rec`, `elevation.2`. `idle`: núcleo branco 30px (`Circle` preenchido). `recording`: `Pause`. `paused`: `Play`. Preso no rodapé acima da NavBar (idle) ou no centro da barra de gravação |
 | `RecordingBar` | `mode`, `onCancel`, `onToggle`, `onSave` | Substitui a NavBar durante a gravação: `X` (danger) à esquerda, botão redondo central, `Check` (ok) à direita, `gap 44`, `paddingBottom` de safe-area |
 | `Timer` | `elapsedMs`, `paused?` | Pill no lugar do header durante a gravação. `mm:ss · mmm` tabular, `display`, cor `accent` |
-| `LineChart` | `series: { values, color, name }[]`, `scale`, `xLabels`, `yLabels?`, `height?` | SVG. Grade `chartGrid`, rótulos `chartAxis` `caption`, `tabular-nums`. Legenda com dot 8px + nome `caption` |
+| `LineChart` | `series: { values, color, name }[]`, `scale?`, `xLabels?`, `yLabels?`, `height?` | SVG. Grade `chartGrid`, rótulos `chartAxis` `caption`, `tabular-nums`. Legenda com dot 8px + nome `caption`. **Escala com piso de 5°** (o protótipo usa `max|v|×1,15`, que no repouso transforma ruído em serra). Sem amostras mostra `Sem amostras ainda` |
 | `Gauge` | `value`, `min`, `max`, `lowMark`, `highMark` | Arco SVG para a abertura em graus: arco de fundo `chartGrid`, arco entre mínimo e máximo em `accent`, dois indicadores (menor `ok`, maior `accent`) |
 | `FilterChips` | `groups`, `value`, `onChange` | Grupos rotulados (`caption` `textMuted`) com linha de `Chip`s rolável |
 | `ReportCard` | `report`, `onPress` | `ListRow` com `title` + `date` à direita na linha 1 e `location` (`—` quando vazio) na linha 2. Title/location com ellipsis |
@@ -364,7 +364,9 @@ src/
       ReportsScreen.tsx         # Relatórios     — header + busca/filtro + lista
       ReportDetailScreen.tsx    # Relatório      — header com voltar + ⋮, SEM NavBar
       IntegrityTestScreen.tsx   # Testes         — header + conteúdo
-      SettingsScreen.tsx        # Configurações  — header + conteúdo
+      SettingsScreen.tsx         # Configurações  — header + conteúdo
+      DesignSystemScreen.tsx     # Design         — galeria de avaliação da UI kit (§7.6)
+      design/                    # uma seção da galeria por arquivo
     components/
       layout/
         ScreenHeader.tsx
@@ -393,6 +395,7 @@ src/
         FilterChips.tsx
         ReportCard.tsx
   core/                    # intocado — sensors, processing, hooks, types
+    recording/RecordingProvider.tsx   # o contexto que a casca consome (ver §7.5)
   __tests__/
   assets/
   app.json
@@ -406,16 +409,28 @@ Mudanças em relação a `src/` hoje:
 2. `Inclinometer.tsx` sai de `app/components/` para `app/components/features/`.
 3. Entra `navigation/routes.ts` para que `App.tsx` e `NavBar.tsx` não dupliquem a lista de tabs.
 4. Entra `app/components/layout/ScreenContainer.tsx` para que todas as telas repitam o mesmo padding e scroll.
+5. Entra `app/screens/DesignSystemScreen.tsx` + `app/screens/design/` — a galeria que testou a UI kit, uma seção por arquivo, para que a recomendação de §7.6 fosse conferida e não presumida. Não é tela do produto: vive na tab `design`, que existe para isso.
 
 ### 7.5 Fronteira com o `core`
 
-Imediatamente mantida: a camada de apresentação **só** conversa com o `core/` pelo hook `useInclination`. Nenhum `screen/` ou `components/` importa `expo-sensors`, `FilterService` ou `AngleConverter` diretamente. `Inclinometer` recebe `roll` e `trim` prontos — é um componente de desenho, cego ao pipeline.
+Imediatamente mantida: nenhum `screen/` ou `components/` importa `expo-sensors`, `FilterService` ou `AngleConverter` diretamente. `Inclinometer` recebe `roll` e `trim` prontos — é um componente de desenho, cego ao pipeline.
+
+A fronteira é composta por **dois** ganchos, ambos do `core/`:
+
+| Fronteira | Quem consome | Por que |
+|---|---|---|
+| `useInclination` | `Inclinometer` — e **só** ele | o dono do `start`/`stop` do sensor é quem tem o botão de calibrate e o unmount limpo |
+| `useRecording` | `RecordingProvider`, montado em `App.tsx` | o gravador precisa sobreviver à troca de tela; a `RecordingBar` (em `App`) e o botão de gravar (na Home) são o **mesmo** estado |
+
+O fluxo da série gravada atravessa a fronteira como uma **prop de dados**, não como um sensor: `App` entrega `recording.captureAngle` para a `Home`, que repassa como `onSample` ao `Inclinometer`, e ele a entrega ao `useInclination`. A Home nunca vê `expo-sensors`, e o `core/` nunca vê JSX.
+
+O `RecordingProvider` é a única exceção a "nada em `components/` importa `core/`": ele mora em `core/recording/` justamente para poder ser importado de `App.tsx` sem que nenhum componente de apresentação vire dependente da gravação. `Inclinometer` ganhou a prop `onSample` por isso — é o caminho mais curto entre a fronteira e a tela, e mantém `HomeScreen.test.tsx` valendo `useInclination` uma única vez.
 
 ### 7.6 Onde o Tamagui entra — e onde não entra
 
 Os tokens (§1–§4) são tokens do [Tamagui](https://tamagui.dev), criados em `tamagui.config.ts` por `createTokens` e consumidos como referências `$token`. O `TamaguiProvider` fica na raiz, acima do shell.
 
-`ui/` e `layout/` usam primitivas do Tamagui (`YStack`, `XStack`, `SizableText`, `ScrollView`, `styled`). Onde a primitiva é adequate — `Card`, `Chip`, `Button`, `ListRow`, `ScreenHeader` — o componente **é** a primitiva, com a identidade em `styled`.
+`ui/` e `layout/` usam primitivas do Tamagui (`YStack`, `XStack`, `SizableText`, `ScrollView`, `styled`). Onde a primitiva é adequada — `Card`, `Chip`, `Button`, `ListRow`, `ScreenHeader` — o componente **é** a primitiva, com a identidade em `styled`.
 
 Onde não é, o Tamagui é deliberadamente ausente:
 
@@ -428,6 +443,58 @@ Onde não é, o Tamagui é deliberadamente ausente:
 E o inverso: `style/theme.ts` é uma **fachada**, não uma cópia. Os literais de cor, espaçamento, raio, tamanho e fonte são declarados uma vez em `tamagui.config.ts` e reexportados. A fachada existe porque `Inclinometer.tsx` — que não muda — usa `StyleSheet.create` com `colors`, `radii`, `spacing` e `typography`, e `StyleSheet` não entende referências `$token`.
 
 **Regra prática:** um componente novo nasce Tamagui. Só sai de lá quando o trabalho depende de algo que o Tamagui não faz melhor — SVG de alta frequência, `Modal` nativo, animação com `useNativeDriver` em cascata.
+
+#### 7.6.1 O que a galeria encontrou
+
+A galeria de `DesignSystemScreen` compôs os 17 pacotes do Tamagui com as regras deste documento. O resultado não mudou a regra prática acima — mudou o que ela autoriza a usar.
+
+**Entram, porque a UI kit entrega a peça com a API certa:**
+
+| Peça | Onde entra |
+|---|---|
+| `Input` + `Label` | `ui/Input.tsx`. §6.1 já é `Input` no papel, com erro em `danger` e foco em `accent`; a UI kit faz os dois, e o `padding 12/14` do §6.1 entra em `styled`. |
+| `Select` | Onboarding ("Qual é o seu equipamento?") e unidade nas configurações. Vale para 3 a 8 opções: no native é um `Picker` de rolagem, **sem busca**. Acima disso, falta o que o app precisaria. |
+| `Toast` | Fecha a lacuna real de feedback: §7.5 mede os três eixos e nada avisa se um passou do limite. |
+
+**Continuam fora, e a galeria mostra por quê:**
+
+| Peça | Motivo |
+|---|---|
+| `Gauge` · `Inclinometer` · `Spinner` | SVG de alta frequência e valor a 60 Hz. §7.6 já é código próprio; a UI kit não muda isso. |
+| `Slider` | Não substitui o `Gauge` do §6.3 — o `Gauge` é arco com faixa entre mínimo e máximo e dois indicadores; o `Slider` é régua reta com uma alça. Serve para ajuste num formulário, que o app não tem. |
+| `RadioGroup` | Não substitui o `FilterChips` do §6.3: o filtro de período é multi-seleção, `RadioGroup` é escolha única. |
+| `Avatar` | O app não tem conta, login nem foto de usuário. |
+| `Dialog` · `Popover` · `Popper` | `Popper` importa `react-dom` e não empacota para native; `Popover` ainda exigiria `@react-native/async-storage` para estado de posição — uma dependência nativa a mais por um menu. |
+| `Tooltip` | É `no-op` no React Native: o pacote devolve o próprio filho. Não há hover em toque. |
+
+**Peças sem tela ainda** — `Switch`, `Checkbox`, `Progress`, `Tabs`, `Collapsible` e `Accordion` funcionam e estão na galeria, mas o app ainda não tem tela que as use. `Tabs` não substitui a `NavBar`: 6 destinos de primeiro nível com ícone e label, contra sub-páginas de um destino.
+
+#### 7.6.2 Quatro armadilhas que qualquer componente novo vai encontrar
+
+São o custo real da UI kit, e valem mais que a lista acima porque valem para tudo que vier depois.
+
+**1. `size` é altura de controle, indexada pela escala numérica do Tamagui (`$1`…`$12`) — e os tokens deste projeto são semânticos.** Consequência dupla:
+
+- Todo `defaultVariants.size` do Tamagui aponta para `$2` ou `$true`, que **não existem** aqui. Sem `size` explícito, `minHeight` resolve `undefined` e o controle nasce com a altura do conteúdo.
+- `size="$md"` também não serve: `tokens.size.md` é 16, e o `Input` do §6.1 tem 44 de altura.
+
+O único token do grupo `size` que representa altura de controle é `$touch` (44) — que é o mesmo número do alvo de toque de §8, por coincidência de spec, não de propósito. E quando `size` vem do Tamagui, o `radius` precisa vir explícito: o `defaultVariants` do `Select` faz `radius: tokens.radius[val] ?? val`, e `tokens.radius.$touch` não existe.
+
+**2. A chave de animação que o Tamagui resolve não é a chave que o app nomeia.** §4 define `fast` · `base` · `exit` · `slow` e o código do app passa o nome — mas `Collapsible`, `Accordion`, `Dialog`, `Popover` e o `Toaster` passam o nome que o **Tamagui** usa por omissão (`quick`, `bouncy`, `toast`…). Sem esses nomes no registro, o driver cai em `animations[nomeInexistente]` → `{}` e a transição **não acontece**: sem erro, sem aviso, o componente salta entre os estados. `tamagui.config.ts > animations` registra os dois vocabulários apontando para as mesmas molas.
+
+**3. `fontFamily: '$font.*'` só funciona em componente de texto — e o `Input` do §6.1 não é um deles.** O Tamagui converte `fontFamily` numa família real olhando o mapa `face` do token de fonte, e os tokens deste projeto **não têm `face`**: §2 deixa a família indefinida de propósito, para o Tamagui usar a fonte da plataforma em vez de tentar carregar uma. Sem `face`, o token passa inteiro — `{ fontSize, lineHeight, fontWeight }` — para a propriedade nativa.
+
+Em `SizableText` isso nunca aparece, porque o componente é de texto e o Tamagui decompõe o token. Em `Input`, que embrulha um `TextInput` cru, o objeto chega ao Android e a tela fica vermelha:
+
+> Erro while updating property `fontFamily` of a view managed by: AndroidTextInput with.facebook.react.bridge.ReadAbleNativeMap cannot be cast to java.lang.String
+
+Então `ui/Input.tsx` escreve `fontSize`, `lineHeight` e `fontWeight` por extenso, sem `fontFamily` — e é a única forma de tipografar um `TextInput` neste projeto.
+
+**4. A entrada principal de `@tamagui/toast` é a API depreciada.** Ela exporta `ToastProvider`, `ToastViewport` e `useToastController`, em que `show()` vive num contexto e devolve estado a cada toast. A API atual é composável, com o estado num observer fora do React, e sai de **`@tamagui/toast/v2`**: `toast.success(...)`, `toast.error(...)`, `toast.promise(...)` — sem hook, então dá para chamar de um `catch` ou de um listener de sensor. Quem seguir a documentação chega na versão antiga.
+
+E o preço do `Toast` é o mesmo do portal: `<Toaster />` fica na raiz, sob o `<PortalProvider>` do `App.tsx`, e sem ele `toast.success()` **não erra** — apenas não desenha.
+
+O `PortalProvider` é necessário porque o `Portal` nativo do Tamagui tem dois caminhos: *teleport*, que preserva o contexto do React e exigiria `react-native-teleport` (dependência nativa e rebuild), e o sistema Gorham, em JS, que precisa de um host montado. O estado padrão é `type: null` — sem host, um `Portal` simplesmente não renderiza.
 
 ---
 

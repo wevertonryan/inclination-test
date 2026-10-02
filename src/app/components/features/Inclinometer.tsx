@@ -49,6 +49,7 @@ import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { useInclination } from '../../../core/hooks/useInclination';
+import type { Angles } from '../../../core/types';
 import { colors, formatAngle, radii, spacing, tabular, typography } from '../../../style/app';
 
 // ---------------------------------------------------------------------------
@@ -275,10 +276,23 @@ export interface InclinometerProps {
    * abaixo re-roda a cada amostra.
    */
   onError?: (message: string | null) => void;
+  /**
+   * Torneira da gravação (`DESIGN.md` §7.1).
+   *
+   * O gravador entra por aqui, e não por um sensor próprio, para que a série
+   * gravada seja a mesma que o usuário está vendo: mesmo filtro, mesma
+   * calibração, mesmo `toAngles`. A referência precisa ser estável — a do
+   * `useRecorder` é um `useCallback` — senão o `useInclination` re-instala a
+   * torneira a cada amostra.
+   *
+   * Segue valendo que o `Inclinometer` é o **único** consumidor do hook e o
+   * dono do `start`/`stop`: a tela passa a prop, não o estado.
+   */
+  onSample?: (angles: Angles, tMs: number) => void;
 }
 
-export function Inclinometer({ size = DEFAULT_SIZE, onError }: InclinometerProps) {
-  const { roll, trim, error, start, stop } = useInclination();
+export function Inclinometer({ size = DEFAULT_SIZE, onError, onSample }: InclinometerProps) {
+  const { roll, trim, error, start, stop } = useInclination({ onSample });
 
   // `Animated.Value` nativo precisa ser criado uma única vez: o construtor já
   // registra o nó no grafo animado nativo, e um por render vazaria um nó por

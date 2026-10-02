@@ -288,3 +288,49 @@ amostras.
 verde e o SQLite divergir, o bug é do SQLite. Por isso o fake copia as linhas na
 leitura, como o SQLite materializa objetos novos a cada `SELECT` — devolver a
 referência interna faria o teste passar com um bug que só apareceria no aparelho.
+
+## 8. A gravação na interface
+
+O núcleo grava desde o incremento anterior; aqui está como ele chega na tela.
+
+```
+App.tsx
+└── RecordingProvider          ← a ÚNICA instância do useRecorder
+ └── Shell
+      ├── Screen (HomeScreen)
+      │    ├── ScreenHeader hidden={immersive}
+      │    ├── Timer            (só quando imersivo)
+      │    ├── Inclinometer onSample={captureAngle}
+      │    │    └── useInclination({ onSample })   ← 1ª e única chamada
+      │    ├── LineChart         (só quando imersivo)
+      │    ├── RecordButton      (só quando idle)
+      │    └── Modal ×2          (cancelar / salvar)
+      ├── NavBar hidden={immersive}
+      └── RecordingBar visible={immersive}
+```
+
+### Por que o `RecordingProvider` precisa subir
+
+A `RecordingBar` mora em `App.tsx`, irmã da `NavBar` que ela substitui (§7.1), mas o botão que **inicia** a gravação mora na `HomeScreen`. Os dois precisam do mesmo `mode`, e instanciar o gravador nos dois daria duas sessões, dois lotes e duas linhas em `recordings`.
+
+Durante a gravação a NavBar está oculta, então ninguém navega para fora da Home no meio de uma prova — o diálogo de confirmação, que fica na Home, sempre tem quem o mostre.
+
+O **pedido** de confirmação (`none | cancel | save`) mora no provider pelo mesmo motivo: o botão `X` está na barra e o diálogo está na tela. Guardar o estado aqui mantém cada componente com uma responsabilidade só — `App` desenha a barra, `Home` desenha o diálogo, nenhum conhece o detalhe do outro.
+
+### A torneira continua sendo o `Inclinometer`
+
+A tela **não** consome `useInclination`. O `Inclinometer` segue sendo o dono do `start`/`stop` do sensor e o único que o chama; a tela só repassa a prop `onSample` até ele. É o que mantém a série gravada igual à série vista, e é o que `HomeScreen.test.tsx` trava com `toHaveBeenCalledTimes(1)`.
+
+`captureAngle` é um `useCallback` estável. Se a referência mudasse a cada render, o efeito que a instala no `useInclination` re-dispararia a 60 Hz.
+
+### O sumiço suave
+
+A NavBar e o header somem por `hidden`, e a `RecordingBar` fica **sempre montada** cuidando do próprio unmount atrasado — só sai de cena quando a animação de saída termina (§4). Sem isso os dois módulos trocariam de lugar no mesmo quadro e o usuário veria um corte. É a mesma técnica do `Modal`.
+
+### Por que o gráfico é SVG próprio
+
+`@tamagui/charts` não existe mais no npm, e o `victory-native` que ele embrulha hoje exige `@shopify/react-native-skia`, `gesture-handler` e `reanimated` como peers — um módulo nativo pesado e um driver de render diferente do `Animated` que o `Inclinometer` usa, por um gráfico de duas poligonais.
+
+Então este é o caso que §7.6 já prevê como exceção. A matemática da poligonal vem do `proto/src/components/LineChart.jsx`, que fazia isso em 50 linhas; o `LineChart` acrescenta o que §6.3 pede e o protótipo não tinha: grade, rótulos de eixo e legenda.
+
+**A escala tem piso de 5°.** O protótipo usa `max|v| × 1,15`, que num barco parado amplia o ruído do sensor até virar uma serra sugerindo adernamento onde não houve.

@@ -181,10 +181,23 @@ export type AppTokens = typeof tokens;
  * off-thread exigiria `react-native-reanimated` + worklets, com histórico de
  * regressões de memória e startup no SDK 57.
  *
- * Os nomes seguem `DESIGN.md` §4. As molas são o que o driver RN suporta
+ * Os nomes do app seguem `DESIGN.md` §4. As molas são o que o driver RN suporta
  * nativamente (`mass`, `damping`, `stiffness`); as durações em ms continuam
  * disponíveis em `theme.ts > motion` para o código que anima direto com
  * `Animated`, como o `Spinner`.
+ *
+ * ## Os dois vocabulários
+ *
+ * `fast` · `base` · `exit` · `slow` são os que o DESIGN.md nomeia, e o código do
+ * app é quem passa o nome — nenhum componente do app pede `animation` sozinho.
+ *
+ * A UI kit, essa, pede. `Collapsible`, `Accordion`, `Dialog`, `Popover` e o
+ * `Toaster` passam o nome que o Tamagui usa por omissão, e esses nomes não são
+ * os do DESIGN.md. Sem eles no registro o driver cai em
+ * `animations[nomeInexistente]` → `{}` e a transição **não acontece**: sem erro,
+ * sem aviso, o componente só salta entre os estados. Como §4 é a única fonte dos
+ * movimentos, os nomes do kit são registrados aqui também — apontando para as
+ * mesmas molas, não para molas novas.
  */
 export const animations = createAnimations({
   fast: { type: 'spring', mass: 0.7, damping: 26, stiffness: 420 },
@@ -192,6 +205,15 @@ export const animations = createAnimations({
   exit: { type: 'spring', mass: 0.8, damping: 32, stiffness: 260 },
   /** Mola do `Pressable` e do `Spinner` — o ciclo contínuo de §4. */
   slow: { type: 'spring', mass: 1.1, damping: 20, stiffness: 180 },
+
+  // Vocabulário da UI kit, nas molas de §4.
+  quick: { type: 'spring', mass: 0.7, damping: 26, stiffness: 420 },
+  snappy: { type: 'spring', mass: 0.9, damping: 24, stiffness: 300 },
+  gentle: { type: 'spring', mass: 0.9, damping: 24, stiffness: 300 },
+  bouncy: { type: 'spring', mass: 1.1, damping: 20, stiffness: 180 },
+  toast: { type: 'spring', mass: 0.8, damping: 32, stiffness: 260 },
+  overlay: { type: 'spring', mass: 0.9, damping: 24, stiffness: 300 },
+  focus: { type: 'spring', mass: 0.7, damping: 26, stiffness: 420 },
 });
 
 // ---------------------------------------------------------------------------
@@ -244,6 +266,32 @@ const theme = {
   borderColor: colors.border,
   outlineColor: colors.border,
   shadowColor: colors.shadow,
+
+  /**
+   * Tints de interação (`DESIGN.md` §4 — os mesmos estados que o `Pressable`
+   * sempre teve, agora nomeados).
+   *
+   * A UI kit do Tamagui não desenha o estado pressionado: ela **pede** estas
+   * chaves ao tema. `Switch`, `Checkbox`, `Slider`, `RadioGroup`, `ListItem`,
+   * `Accordion`, `Tabs` e o próprio `Button` citam `backgroundHover`,
+   * `backgroundPress`, `backgroundFocus`, `borderColorHover`, `borderColorPress`,
+   * `borderColorFocus` e `colorPress` nos próprios estilos. Chave ausente não é
+   * erro: resolve para `undefined` e o estado simplesmente não acontece — o
+   * botão fica igual pressionado e solto, e ninguém percebe no código.
+   *
+   * São os únicos valores do tema que **não** vêm de §1, porque §1 define
+   * superfícies e inks, não interações. São véus de `text` sobre a superfície
+   * (`text` a 4% no hover, 8% no press) mais o `accent` no foco — a mesma
+   * receita de "hover clareia, press afunda" que o protótipo usava, agora com
+   * um número em vez de uma cor nova na paleta.
+   */
+  backgroundHover: 'rgba(232, 237, 246, 0.04)',
+  backgroundPress: 'rgba(232, 237, 246, 0.08)',
+  backgroundFocus: colors.accentSoft,
+  borderColorHover: 'rgba(232, 237, 246, 0.16)',
+  borderColorPress: 'rgba(232, 237, 246, 0.24)',
+  borderColorFocus: colors.accent,
+  colorPress: colors.textMuted,
 } as const;
 
 export const appConfig = createTamagui({
