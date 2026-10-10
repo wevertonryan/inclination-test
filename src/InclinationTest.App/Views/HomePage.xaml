@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="InclinationTest.App.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Inclination Test">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="12">
+
+            <Label
+                FontSize="32"
+                HorizontalTextAlignment="Center"
+                Text="Inclination Test" />
+
+            <Border
+                Margin="0,12,0,0"
+                Padding="24"
+                StrokeShape="RoundRectangle 16">
+                <VerticalStackLayout Spacing="8">
+                    <Label FontSize="28" Text="{Binding Roll, StringFormat='Roll  {0:F1}°'}" />
+                    <Label FontSize="28" Text="{Binding Trim, StringFormat='Trim  {0:F1}°'}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="{Binding IsRunning, StringFormat='Rodando: {0}'}" />
+            <Label Text="{Binding IsCalibrated, StringFormat='Calibrado: {0}'}" />
+
+            <Label
+                x:Name="ErrorLabel"
+                IsVisible="False"
+                Text="{Binding Error}"
+                TextColor="Red" />
+
+            <HorizontalStackLayout Spacing="12">
+                <Button Text="Iniciar" Clicked="OnIniciarClicked" />
+                <Button Text="Parar" Clicked="OnPararClicked" />
+                <Button Text="Calibrar" Clicked="OnCalibrarClicked" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,31 +1,105 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using InclinationTest.Core.Models;
 using InclinationTest.Core.Processing;
 using InclinationTest.Core.Sensors;
 
 namespace InclinationTest.Core.ViewModels;
 
-public sealed class InclinationViewModel
+public sealed class InclinationViewModel : ObservableObject
 {
+    private readonly IFilter _filter;
+    private readonly ISensorService _sensor;
+
+    private Calibration? _calibration;
+    private string? _error;
+    private bool _isCalibrated;
+    private bool _isRunning;
+    private double _roll;
+    private double _trim;
+
     public InclinationViewModel(ISensorService sensor, IFilter filter)
-        => throw new NotImplementedException();
+    {
+        _sensor = sensor;
+        _filter = filter;
+    }
 
-    public double Roll => throw new NotImplementedException();
+    public double Roll
+    {
+        get => _roll;
+        private set => SetProperty(ref _roll, value);
+    }
 
-    public double Trim => throw new NotImplementedException();
+    public double Trim
+    {
+        get => _trim;
+        private set => SetProperty(ref _trim, value);
+    }
 
-    public bool IsRunning => throw new NotImplementedException();
+    public bool IsRunning
+    {
+        get => _isRunning;
+        private set => SetProperty(ref _isRunning, value);
+    }
 
-    public bool IsCalibrated => throw new NotImplementedException();
+    public bool IsCalibrated
+    {
+        get => _isCalibrated;
+        private set => SetProperty(ref _isCalibrated, value);
+    }
 
-    public string? Error => throw new NotImplementedException();
+    public string? Error
+    {
+        get => _error;
+        private set => SetProperty(ref _error, value);
+    }
 
-#pragma warning disable CS0067
     public event Action<Angles, double>? OnSample;
-#pragma warning restore CS0067
 
-    public void Start() => throw new NotImplementedException();
+    public void Start()
+    {
+        if (_isRunning)
+        {
+            return;
+        }
 
-    public void Stop() => throw new NotImplementedException();
+        try
+        {
+            _sensor.Start(HandleSample);
+            IsRunning = true;
+            Error = null;
+        }
+        catch (Exception exception)
+        {
+            IsRunning = false;
+            Error = exception.Message;
+        }
+    }
 
-    public void Calibrate() => throw new NotImplementedException();
+    public void Stop()
+    {
+        if (!_isRunning)
+        {
+            return;
+        }
+
+        _sensor.Stop();
+        IsRunning = false;
+    }
+
+    public void Calibrate()
+    {
+        _calibration = new Calibration(_roll, _trim);
+        IsCalibrated = true;
+    }
+
+    private void HandleSample(MotionSample sample)
+    {
+        var filtered = _filter.Process(sample);
+        var angles = AngleConverter.ToAngles(filtered, _calibration);
+
+        Roll = angles.Roll;
+        Trim = angles.Trim;
+
+        OnSample?.Invoke(angles, filtered.Timestamp);
+    }
 }
