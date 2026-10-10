@@ -1,136 +1,138 @@
 # Documentação Técnica — Inclination Test
 
-Documentação técnica/de desenvolvimento do projeto. Para visão de produto, backlog, sprints e marcos, veja [`README.md`](README.md). Para o design system, o layout e a estrutura da camada de apresentação, veja [`DESIGN.md`](DESIGN.md).
+Documentação técnica/de desenvolvimento do projeto. Para visão de produto, backlog, sprints e marcos, veja [`README.md`](README.md).
 
 ## 1. Visão geral
 
-O **Inclination Test** é um aplicativo móvel (React Native + Expo) para automatizar a Prova de Inclinação e a Prova de Mar de embarcações, usando os sensores do celular (lidos via `expo-sensors`, sensor `DeviceMotion`) para medir o ângulo de inclinação.
+O **Inclination Test** é um aplicativo móvel (.NET MAUI) para automatizar a Prova de Inclinação e a Prova de Mar de embarcações, usando os sensores do celular (lidos via `Microsoft.Maui.Devices.Sensors`, sensor `Accelerometer`) para medir o ângulo de inclinação.
 
-Plataforma-alvo: **Android** (Expo SDK 57).
+Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
 ## 2. Stack e ferramentas
 
 | Item | Tecnologia |
 |---|---|
-| Linguagem | TypeScript (modo `strict`) |
-| UI | React Native 0.86 + React 19 |
-| Runtime / build | Expo SDK 57 (`expo start`) |
-| Sensores | `expo-sensors` — `DeviceMotion` |
-| Desenho do inclinômetro | `react-native-svg` (anel, escala e régua) |
-| Testes | Jest + `jest-expo` + `@testing-library/react-native` |
-| Gerenciador | npm |
+| Linguagem | C# (`nullable` + `ImplicitUsings`), .NET 10 |
+| UI | .NET MAUI 10 + XAML + UraniumUI (Material) |
+| Arquitetura de apresentação | MVVM com CommunityToolkit.Mvvm |
+| Runtime / build | .NET SDK 10 (`dotnet build`) |
+| Sensores | `Microsoft.Maui.Devices.Sensors` — `Accelerometer` |
+| Desenho do inclinômetro | `GraphicsView` + `IDrawable` (Microsoft.Maui.Graphics) / SkiaSharp (anel, escala e régua) |
+| Gráficos de série | LiveCharts2 |
+| Persistência | Microsoft.Data.Sqlite |
+| Testes | xUnit + FluentAssertions + NSubstitute |
+| Gerenciador | NuGet / CLI `dotnet` |
 
-> O app Expo fica dentro de `src/`. Todos os comandos npm deste documento rodam a partir de `src/`.
+> A solução .NET fica em `src/`. Todos os comandos `dotnet` deste documento rodam a partir de `src/`.
 
 ## 3. Estrutura de pastas
 
+Estrutura dentro de `src/`:
+
 ```
-src/
-  index.ts                  # registro do componente raiz (registerRootComponent)
-  App.tsx                   # shell: container + <Screen/> + <NavBar/> + estado de navegação
-  navigation/
-    routes.ts               # ScreenId + TABS (id, label, ícone Lucide) — fonte única das rotas
-  app/
-    screens/                # telas (HomeScreen, CalibrationScreen, ...)
-    components/
-      layout/               # ScreenHeader, NavBar, Card, ScreenContainer
-      ui/                   # Button, IconButton, Chip, Modal, Input, ListRow, ...
-      features/             # Inclinometer, LineChart, Gauge, RecordButton, ...
-  core/
-    sensors/
-      SensorService.ts      # captura o DeviceMotion
-    processing/
-      FilterService.ts      # filtragem de ruído
-      AngleConverter.ts     # converte a amostra filtrada em ângulos
-    hooks/
-      useInclination.ts     # ViewModel: intermediário entre o core e a UI
-    recording/
-      RecordingSession.ts   # o gravador sem React: decimação, lotes, pause/save
-      Statistics.ts         # média e desvio de Welford, sem lista de amostras
-      useRecorder.ts        # ViewModel do gravador
-    persistence/
-      schema.ts             # DDL de recordings + samples
-      ReportRepository.ts   # contrato de persistência
-      inMemoryReportRepository.ts
-      sqliteReportRepository.ts
-      RecordingStore.ts     # abre o banco (expo-sqlite) e aplica o schema
-    types.ts                # tipos compartilhados entre o pipeline (contratos)
-  style/
-    theme.ts                # tokens: colors · spacing · radii · typography · elevation · motion
-    app.ts                  # StyleSheet do shell
-  test-utils/
-    motion.ts               # fixtures e utilitários dos testes (NÃO é uma suite)
-  __tests__/
-    core/                   # testes das etapas do pipeline
-      SensorService.test.ts
-      FilterService.test.ts
-      AngleConverter.test.ts
-      useInclination.test.ts
-      Statistics.test.ts
-      ReportRepository.test.ts
-      RecordingSession.test.ts
-      useRecorder.test.ts
-    components/             # testes da camada de apresentação
-      Inclinometer.test.tsx
-  assets/                   # ícones e splash
-  app.json                  # configuração do Expo
-  jest.config.js            # preset jest-expo
-  tsconfig.json             # strict + types: ["jest"]
+InclinationTest.sln
+  InclinationTest.Core/              # biblioteca net10.0 — lógica pura, sem dependência de UI
+    Sensors/
+      ISensorService.cs              # contrato de captura
+      SensorService.cs               # captura o Accelerometer
+    Processing/
+      FilterService.cs               # filtragem de ruído
+      AngleConverter.cs              # converte a amostra filtrada em ângulos
+    ViewModels/
+      InclinationViewModel.cs        # ViewModel: intermediário entre o Core e a UI
+      RecorderViewModel.cs           # ViewModel do gravador
+    Recording/
+      RecordingSession.cs            # o gravador sem UI: decimação, lotes, pause/save
+      Statistics.cs                  # média e desvio de Welford, sem lista de amostras
+    Persistence/
+      Schema.cs                      # DDL de recordings + samples
+      IReportRepository.cs           # contrato de persistência
+      InMemoryReportRepository.cs    # fake dos testes / referência de semântica
+      SqliteReportRepository.cs      # implementação (Microsoft.Data.Sqlite)
+      RecordingStore.cs              # abre o banco e aplica o schema
+    Models/
+      Vector3.cs                     # tipos compartilhados entre o pipeline (contratos)
+      MotionSample.cs
+      Angles.cs
+      Calibration.cs
+  InclinationTest.App/               # app MAUI (net10.0-android)
+    App.xaml
+    AppShell.xaml                    # shell: navegação por abas
+    Views/                           # ContentPages (HomePage, CalibrationPage, ...)
+    Components/
+      Layout/                        # ScreenHeader, Card, ScreenContainer
+      Ui/                            # Button, Chip, Modal, Input, ListRow, ...
+      Features/                      # InclinometerView, ChartView, GaugeView, RecordButton, ...
+    Resources/
+      Styles/Colors.xaml             # tokens do design system
+      Styles/Styles.xaml
+    MauiProgram.cs                   # registro de DI (services, ViewModels, Views)
+    Platforms/Android/               # manifesto e permissões
+  InclinationTest.Core.Tests/        # xUnit (net10.0)
+    Sensors/                         # SensorServiceTests
+    Processing/                      # FilterServiceTests, AngleConverterTests
+    ViewModels/                      # InclinationViewModelTests, RecorderViewModelTests
+    Recording/                       # StatisticsTests, RecordingSessionTests
+    Persistence/                     # ReportRepositoryTests
+    Components/                      # InclinometerViewTests (a escrever)
+    TestUtils/                       # fixtures e utilitários dos testes (NÃO é uma suite)
 ```
 
-> A árvore completa, com a divisão de responsabilidades entre `App.tsx` e as telas, está em [`DESIGN.md` §7](DESIGN.md).
+- `InclinationTest.App/` — camada de apresentação (páginas e componentes). Consome o Core apenas pelo `InclinationViewModel`.
+- `InclinationTest.App/Components/Ui/` — componentes genéricos, sem vocabulário de domínio. Não dependem de `Features/`.
+- `InclinationTest.Core/` — lógica pura (captura, filtragem, cálculo de ângulo, ViewModel). Sem dependência de UI, testável na CLI (`dotnet test`) sem emulador nem dispositivo.
+- `Resources/Styles/Colors.xaml` — tokens do design system. Nenhum componente usa cor ou espaçamento literais.
+- `InclinationTest.Core.Tests/` — testes xUnit que exercitam o Core.
+- `TestUtils/` — fixtures compartilhadas entre as suites, mantidas fora dos diretórios de teste para não serem coletadas como suites (o runner xUnit descobre qualquer classe `*Tests`; utilitários ficam sem esse sufixo).
 
-- `app/` — camada de apresentação (telas e componentes). consome o `core/` apenas pelo hook `useInclination`.
-- `app/components/ui/` — componentes genéricos, sem vocabulário de domínio. Não importam de `features/`.
-- `core/` — lógica pura (captura, filtragem, cálculo de ângulo, ViewModel). Sem dependência de UI, testável na CLI sem emulador nem dispositivo.
-- `style/theme.ts` — tokens do design system. Nenhum componente usa cor ou espaçamento literais.
-- `__tests__/core/` — testes Jest que exercitam o `core/`.
-- `test-utils/` — fixtures compartilhadas entre as suites. **Fora de `__tests__/` de propósito:** o `testMatch` do `jest.config.js` trata qualquer `.ts` dentro de `__tests__/` como suite de testes, e um arquivo de helpers lá seria reportado como "sua suite não contém nenhum teste". Por isso o `jest.config.js` tem `testPathIgnorePatterns` para `test-utils/`, e ele também está fora da cobertura.
-
-## 4. Dependências (npm)
+## 4. Dependências (NuGet)
 
 ### Dependências de runtime e de teste
 
 | Pacote | Papel |
 |---|---|
-| `expo`, `react`, `react-native` | app |
-| `expo-sensors` | leitura do `DeviceMotion` no `SensorService` |
-| `expo-sqlite` | persistência local dos relatórios e da série temporal (`core/persistence/`); exige o plugin `"expo-sqlite"` em `app.json` |
-| `react-native-svg` | desenho do inclinômetro, do `LineChart` e do `Gauge` em `app/components/features/` |
-| `lucide-react-native` | biblioteca de ícones do app (substitui os SVGs manuais do `proto/` — ver [`DESIGN.md` §5](DESIGN.md)) |
-| `jest`, `jest-expo`, `@types/jest` | execução dos testes |
-| `@testing-library/react-native`, `react-test-renderer` | testes do hook `useInclination` e de componentes |
-| `typescript` | `npm run typecheck` |
+| `Microsoft.Maui.Controls` + workload `maui` | app (o `Microsoft.Maui.Essentials` vem no workload) |
+| `Microsoft.Maui.Devices.Sensors` (Essentials) | leitura do `Accelerometer` no `SensorService` |
+| `CommunityToolkit.Mvvm` | `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]` |
+| `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI |
+| `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView`) |
+| `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Components/Features/` |
+| `Microsoft.Data.Sqlite` | persistência local dos relatórios e da série temporal (`Core/Persistence/`) |
+| `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` | execução dos testes |
+| `FluentAssertions`, `NSubstitute` | asserções legíveis e mocks nos testes |
+| `coverlet.collector` | cobertura (`dotnet test --collect:"XPlat Code Coverage"`) |
 
-> `lucide-react-native` ainda não está no `package.json` — entra na primeira entrega de código do design system. Suas peers (`react ^19`, `react-native-svg ^15`) já são atendidas pela stack atual.
+> Pré-requisito de ambiente: `dotnet workload install maui`. O app compila para `net10.0-android`.
 
 ## 5. Ambiente de testes
 
-**Por que existe o `core/` separado da interface?** Um app React Native só roda com emulador/dispositivo — não dá para testar a tela de forma rápida e headless. Por isso a lógica de captura, filtragem e cálculo fica em `core/` (código puro), onde tanto a interface quanto o projeto de testes a usam. O mesmo código, uma única fonte de verdade, coberta por testes.
+**Por que existe o `Core` separado da interface?** Um app MAUI só roda com emulador/dispositivo — não dá para testar a tela de forma rápida e headless. Por isso a lógica de captura, filtragem e cálculo fica em `InclinationTest.Core` (uma biblioteca `net10.0`, código puro), onde tanto a interface quanto o projeto de testes a usam. O mesmo código, uma única fonte de verdade, coberta por testes.
 
 ### Rodar os testes
 
+A partir de `src/`:
+
 ```bash
-cd src
-npm test                # roda uma vez (passWithNoTests)
-npm run test:watch      # reexecuta a cada alteração
-npm run test:coverage   # cobertura (text-summary + lcov)
-npm run typecheck       # tsc --noEmit
+dotnet test InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj    # só o núcleo
+dotnet test InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj --collect:"XPlat Code Coverage"    # cobertura
+dotnet build                                  # compila app + core (exige o workload maui-android)
+dotnet format --verify-no-changes             # verificação de estilo
 ```
 
-Os testes ficam em `src/__tests__/` (coberto pelo `testMatch` do `jest.config.js`):
+> Só o núcleo (`InclinationTest.Core` + testes) roda headless, sem workload nem Android SDK. O build do `InclinationTest.App` exige o workload `maui-android` (e o Android SDK).
+
+Os testes ficam em `src/InclinationTest.Core.Tests/`:
 
 ```
-src/__tests__/core/
-  SensorService.test.ts      # 19 testes — assinatura, taxa, conversão de forma
-  FilterService.test.ts      # 13 testes — contrato de forma + invariantes
-  AngleConverter.test.ts     # 37 testes — round-trip, golden vectors, fuzz
-  useInclination.test.ts     # 24 testes — orquestração do pipeline
-src/__tests__/components/
-  Inclinometer.test.tsx      # (a escrever)
+InclinationTest.Core.Tests/
+  Sensors/SensorServiceTests.cs            # 19 testes — assinatura, taxa, conversão de forma
+  Processing/FilterServiceTests.cs         # 13 testes — contrato de forma + invariantes
+  Processing/AngleConverterTests.cs        # 37 testes — round-trip, golden vectors, fuzz
+  ViewModels/InclinationViewModelTests.cs  # 24 testes — orquestração do pipeline
+  Components/InclinometerViewTests.cs      # (a escrever)
 ```
 
-Total do `core/`: **93 testes**, todos escritos contra a implementação vazia — ou seja, todos
+Total do `Core`: **93 testes**, todos escritos contra a implementação vazia — ou seja, todos
 vermelhos até o código existir. É o estado esperado do TDD, não uma falha.
 
 ### 5.1 O que os testes travam — e o que eles deixam passar
@@ -140,8 +142,8 @@ testes na altitude certa. Existem três níveis, e só um deles prende:
 
 | Nível | Afirma sobre | Exemplo | Trava? |
 |---|---|---|---|
-| **Contrato** | a forma que atravessa a fronteira | saída tem as 4 chaves de `MotionSample`; `timestamp` intacto | Não |
-| **Semântica** | o significado físico do número | `roll > 0` = borda direita para baixo; `trim` satura em ±90 | **Sim, e deve** |
+| **Contrato** | a forma que atravessa a fronteira | saída tem os 4 campos de `MotionSample`; `Timestamp` intacto | Não |
+| **Semântica** | o significado físico do número | `Roll > 0` = borda direita para baixo; `Trim` satura em ±90 | **Sim, e deve** |
 | **Implementação** | como o cálculo foi feito | "cria o filtro uma só vez"; "chama X 60 vezes" | Não deve |
 
 O terceiro nível é o que vira um freio: passa no código de hoje e quebra numa refatoração que
@@ -152,10 +154,10 @@ Já o `AngleConverter` é função pura e determinística, então o nível Semâ
 força: ali uma "melhoria" que muda o ângulo em meio grau é um bug silencioso, do tipo que só
 um engenheiro naval reclamando em campo revelaria.
 
-**Consequência prática:** reescrever o filtro (EMA → mediana → Butterworth), trocar `useState`
-por um store, usar ring buffer, bufferizar amostras, trocar o `SensorService` por outra fonte
-nativa — tudo isso continua verde. Mudar o contrato ou o significado do número fica vermelho
-de propósito.
+**Consequência prática:** reescrever o filtro (EMA → mediana → Butterworth), trocar
+`[ObservableProperty]` por um store, usar ring buffer, bufferizar amostras, trocar o
+`SensorService` por outra fonte nativa — tudo isso continua verde. Mudar o contrato ou o
+significado do número fica vermelho de propósito.
 
 Quando um teste bloquear uma melhoria legítima, **o certo é mudar o teste** — e isso é um diff
 visível em review, não uma falha do processo.
@@ -165,88 +167,81 @@ visível em review, não uma falha do processo.
 Cada etapa tem um arquivo, uma responsabilidade e seus próprios testes:
 
 ```
-DeviceMotion (expo-sensors)
+Accelerometer (Microsoft.Maui.Devices.Sensors)
   │
   ▼
-SensorService      captura e normaliza        → MotionSample bruto
+SensorService         captura e normaliza        → MotionSample bruto
   │
   ▼
-FilterService      remove o ruído             → MotionSample filtrado
+FilterService         remove o ruído             → MotionSample filtrado
   │
   ▼
-AngleConverter     converte para ângulos      → Angles { roll, trim }
+AngleConverter        converte para ângulos      → Angles { roll, trim }
   │
   ▼
-useInclination     ViewModel / mediador       → estado exposto para a UI
+InclinationViewModel  ViewModel / mediador       → estado exposto para a UI
   │
   ▼
-Interface          app/screens + app/components
+Interface             Views + Components
 ```
 
-- **SensorService** (`core/sensors/SensorService.ts`) — consome o `DeviceMotion` do `expo-sensors` e entrega uma `MotionSample` normalizada, a **60 Hz** por padrão (`updateIntervalMs = 1000 / 60`, configurável nas options). Essa taxa é para a **visualização ao vivo**; a gravação da série temporal (Prova de Mar) rebaixa para **12 Hz** na ponta da gravação, sem ressuscitar o sensor. Não conhece filtragem, ângulos nem UI.
-- **FilterService** (`core/processing/FilterService.ts`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter 
-- **AngleConverter** (`core/processing/AngleConverter.ts`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
-- **useInclination** (`core/hooks/useInclination.ts`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`roll`, `trim`, `isRunning`, `isCalibrated`) e expõe as ações (`start`, `stop`, `calibrate`). A UI só conversa com ele. Aceita também `onSample?: (angles: Angles, tMs: number) => void`, chamado com o **mesmo** `toAngles` que alimenta o estado — é por essa torneira que o gravador recebe a série, sem sensor próprio e sem segunda assinatura do `DeviceMotion`.
-- **useRecorder** (`core/recording/useRecorder.ts`) — ViewModel do gravador, irmão do `useInclination` e não filho dele: conhece ângulos, não sensor. Encaminha cada amostra para um `RecordingSession`, publica estado no máximo a cada 100 ms (`DEFAULT_TICK_MS`) para não arrastar a tela a 60 Hz, e expõe `start`, `pause`, `resume`, `toggle`, `save`, `discard`.
-- **RecordingSession** (`core/recording/RecordingSession.ts`) — o gravador sem React. Decide o que entra no disco: **decima de 60 Hz para 12 Hz** (`DEFAULT_SAMPLE_INTERVAL_MS = 83`, a mesma taxa do protótipo), acumula as estatísticas de Welford e **escreve em lotes de 2 s** (`DEFAULT_FLUSH_INTERVAL_MS`). Um flush só grava o que está no buffer, então o custo de uma queda de energia é de no máximo 2 s.
-- **ReportRepository** (`core/persistence/ReportRepository.ts`) — o contrato de persistência, com duas implementações: `sqliteReportRepository` (`expo-sqlite`, aberta por `RecordingStore`) e `inMemoryReportRepository`, que é o fake dos testes e a referência de semântica. O `PRIMARY KEY (recording_id, elapsed_ms)` é o que torna o retry de um lote idempotente.
+- **SensorService** (`Core/Sensors/SensorService.cs`) — assina o `Accelerometer` do `Microsoft.Maui.Devices.Sensors` e entrega uma `MotionSample` normalizada. A taxa é definida por `SensorSpeed` (`Game`, ~50 Hz, ou `Fastest`, ~200 Hz com decimação no pipeline); diferente do Expo, **não há intervalo configurável em ms**. Essa taxa é para a **visualização ao vivo**; a gravação da série temporal (Prova de Mar) rebaixa para **12 Hz** na ponta da gravação, sem ressuscitar o sensor. Não conhece filtragem, ângulos nem UI. Implementa `ISensorService` para permitir um fake nos testes.
+- **FilterService** (`Core/Processing/FilterService.cs`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter.
+- **AngleConverter** (`Core/Processing/AngleConverter.cs`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
+- **InclinationViewModel** (`Core/ViewModels/InclinationViewModel.cs`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`Roll`, `Trim`, `IsRunning`, `IsCalibrated`) e expõe as ações (`Start`, `Stop`, `Calibrate`). A UI só conversa com ele. Expõe também um evento `OnSample(Angles angles, double tMs)`, disparado com o **mesmo** resultado de `ToAngles` que alimenta o estado — é por essa torneira que o gravador recebe a série, sem sensor próprio e sem segunda assinatura do `Accelerometer`.
+- **RecorderViewModel** (`Core/ViewModels/RecorderViewModel.cs`) — ViewModel do gravador, irmão do `InclinationViewModel` e não filho dele: conhece ângulos, não sensor. Encaminha cada amostra para um `RecordingSession`, publica estado no máximo a cada 100 ms (`DefaultTickMs`) para não arrastar a tela na taxa da visualização, e expõe `Start`, `Pause`, `Resume`, `Toggle`, `Save`, `Discard`.
+- **RecordingSession** (`Core/Recording/RecordingSession.cs`) — o gravador sem UI. Decide o que entra no disco: **decima de 60 Hz para 12 Hz** (`DefaultSampleIntervalMs = 83`, a mesma taxa do protótipo), acumula as estatísticas de Welford e **escreve em lotes de 2 s** (`DefaultFlushIntervalMs`). Um flush só grava o que está no buffer, então o custo de uma queda de energia é de no máximo 2 s.
+- **IReportRepository** (`Core/Persistence/IReportRepository.cs`) — o contrato de persistência, com duas implementações: `SqliteReportRepository` (`Microsoft.Data.Sqlite`, aberta por `RecordingStore`) e `InMemoryReportRepository`, que é o fake dos testes e a referência de semântica. O `PRIMARY KEY (recording_id, elapsed_ms)` é o que torna o retry de um lote idempotente.
 
-**Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `core/types.ts`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
+**Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `Core/Models/`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
 
-Tipos compartilhados em `src/core/types.ts`:
+Tipos compartilhados em `Core/Models/`:
 
-```ts
-export interface Vector3 {
-  x: number;
-  y: number;
-  z: number;
-}
+```csharp
+public readonly record struct Vector3(double X, double Y, double Z);
 
-export interface MotionSample {
-  accelerationIncludingGravity: Vector3; // m/s² — gravidade + aceleração (permite inclinação estática)
-  rotationRate: Vector3;                 // °/s — matéria-prima para a filtragem
-  rotation: Vector3;                     // rad — alpha, beta, gamma
-  timestamp: number;                     // ms
-}
+public readonly record struct MotionSample(
+    Vector3 AccelerationIncludingGravity, // G — gravidade + aceleração (permite inclinação estática)
+    Vector3 RotationRate,                 // rad/s — matéria-prima para a filtragem
+    Quaternion Rotation,                  // quaternion — atitude (substitui os Euler alpha/beta/gamma do Expo)
+    double Timestamp);                    // ms
 
-export interface Angles {
-  roll: number; // −180..180 — adernada COM sinal, em graus (banda)
-  trim: number; // −90..90   — inclinação longitudinal COM sinal, em graus
-}
+public readonly record struct Angles(
+    double Roll,  // −180..180 — adernada COM sinal, em graus (banda)
+    double Trim); // −90..90   — inclinação longitudinal COM sinal, em graus
 
-export interface Calibration {
-  roll: number; // offset do zero COM sinal, em graus
-  trim: number;
-}
+public readonly record struct Calibration(
+    double Roll,  // offset do zero COM sinal, em graus
+    double Trim);
 ```
 
 Função principal de cada módulo:
 
 | Módulo | Função principal | Entrada | Saída |
 |---|---|---|---|
-| `SensorService` | `createSensorService(options?: { updateIntervalMs?: number })` | eventos `DeviceMotion` (via `expo-sensors`) | `SensorService { isAvailable(), start(cb: (s: MotionSample) => void), stop() }` |
-| `FilterService` | `createFilter()` | `MotionSample` bruto | `Filter { process(s: MotionSample): MotionSample }` (mesma forma, filtrada) |
-| `AngleConverter` | `toAngles(sample: MotionSample, calibration?: Calibration): Angles` | `MotionSample` filtrada + offset opcional | `Angles { roll, trim }` (em graus, com sinal e faixas) |
-| `useInclination` | `useInclination()` | — | `{ roll, trim, isRunning, isCalibrated, error, start(), stop(), calibrate() }` |
+| `SensorService` | `Start(Action<MotionSample> cb)` | eventos `Accelerometer` (via MAUI Essentials) | `ISensorService { bool IsAvailable; void Start(Action<MotionSample> cb); void Stop(); }` |
+| `FilterService` | `FilterService.Create()` | `MotionSample` bruto | `IFilter { MotionSample Process(MotionSample s); }` (mesma forma, filtrada) |
+| `AngleConverter` | `AngleConverter.ToAngles(MotionSample s, Calibration? calibration)` | `MotionSample` filtrada + offset opcional | `Angles { Roll, Trim }` (em graus, com sinal e faixas) |
+| `InclinationViewModel` | `new InclinationViewModel(...)` | — | `{ Roll, Trim, IsRunning, IsCalibrated, Error, Start(), Stop(), Calibrate() }` |
 
 ### Conversão de ângulos (AngleConverter)
 
-- **Convenção do sensor:** o `expo-sensors` segue a convenção W3C — com o celular deitado (tela para cima), `accelerationIncludingGravity ≈ (0, 0, −9.81)` (Android: `acelerômetro − 2 × gravity`; iOS: `gravity` do CoreMotion apontando para baixo). O `AngleConverter` nega o vetor (`up = −a`) antes de calcular.
+- **Convenção do sensor:** o `Microsoft.Maui.Devices.Sensors` reporta o acelerômetro em **G** (não m/s²) com os eixos fixos da orientação retrato (X = direita, Y = cima, Z = saindo da tela). Com o celular deitado (tela para cima), a leitura é `(0, 0, +1.0 G)` — o oposto em sinal e unidade da convenção W3C usada pelo `expo-sensors` (`(0, 0, −9.81)`). Por isso o `AngleConverter` consome o vetor da MAUI diretamente, **sem negar Z**, e trata a magnitude em G.
 - Orientação de referência: celular em **retrato**, topo = proa. Deitado (tela para cima) → `0/0`; de lado → `roll ±90`; de bruços → `roll 180`; proa inclinada → `trim` (satura em ±90).
 - Sinal: `roll > 0` = borda direita para baixo (leitura pelo lado direito da escala do anel), `trim > 0` = proa para cima (régua desliza para baixo). Assim o mostrador gira e desliza nos dois sentidos.
 
 Decisões de projeto fixadas nos contratos:
 
-- **DeviceMotion** (e não só o acelerômetro) porque entrega `rotationRate`/`rotation`, dando mais matéria-prima para a filtragem.
-- **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dé uma volta completa no mostrador.
-- **Calibração como parâmetro do `AngleConverter`** (US-01): `toAngles` aplica o offset do zero, continuando uma função pura.
-- **Funções puras + factory** (não classes): `createFilter()`, `createSensorService()`, `toAngles()` — fáceis de mockar e testar.
+- **Apenas o acelerômetro** (e não uma fusão tipo `DeviceMotion`) porque o MAUI Essentials não oferece um evento fundido com `accelerationIncludingGravity`/`rotationRate`/Euler, e o cálculo de banda/trim depende só do vetor de gravidade — o acelerômetro basta para a medição. `Gyroscope`/`OrientationSensor` ficam como matéria-prima opcional para a filtragem.
+- **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dê uma volta completa no mostrador.
+- **Calibração como parâmetro do `AngleConverter`** (US-01): `ToAngles` aplica o offset do zero, continuando uma função pura.
+- **Interfaces + injeção de dependência** (não funções factory soltas): `ISensorService`, `IFilter` e o repositório são injetados pelos construtores via `MauiProgram` — fáceis de mockar e testar sem tocar no hardware.
 
 ## 7. Gravação e persistência (Prova de Mar)
 
-A gravação entra pela **mesma** amostra que o mostrador. `useInclination` publica
-`onSample(angles, tMs)` logo depois do `toAngles` que alimentou o estado, e o
-`useRecorder` apenas encaminha. Um gravador com sensor próprio registraria uma
+A gravação entra pela **mesma** amostra que o mostrador. O `InclinationViewModel` publica
+`OnSample(angles, tMs)` logo depois do `ToAngles` que alimentou o estado, e o
+`RecorderViewModel` apenas encaminha. Um gravador com sensor próprio registraria uma
 série diferente da que o usuário viu — e o gráfico da revisão não bateria com a
 gravação.
 
@@ -255,16 +250,16 @@ gravação.
 | decimação | `RecordingSession` | 60 Hz na tela → 12 Hz no disco (`83 ms`) |
 | estatísticas | `Statistics` | média e desvio de Welford, calculados no fluxo, sem lista |
 | lote | `RecordingSession` | escrever a cada 2 s, não a cada amostra |
-| gravação | `sqliteReportRepository` | prepared statement, uma transação por lote |
+| gravação | `SqliteReportRepository` | prepared statement, uma transação por lote |
 
 ### Por que a linha nasce como `recording`
 
-`start()` grava a linha **antes** do primeiro ângulo, com `status = 'recording'`.
-`save()` é o que promove a `saved`. Isso é deliberado:
+`Start()` grava a linha **antes** do primeiro ângulo, com `status = 'recording'`.
+`Save()` é o que promove a `saved`. Isso é deliberado:
 
 - uma queda de energia no meio da prova deixa uma gravação **recuperável**, e não
-  um órfão. `findInterrupted()` devolve exatamente essas linhas;
-- a listagem de relatórios (`listReports`) nunca mostra uma gravação em andamento;
+  um órfão. `FindInterrupted()` devolve exatamente essas linhas;
+- a listagem de relatórios (`ListReports`) nunca mostra uma gravação em andamento;
   quem navega para a tela de relatórios vê só o que foi salvo.
 
 `finished_at` fica `null` enquanto `recording`. Uma gravação recuperada não tem
@@ -272,7 +267,7 @@ gravação.
 
 ### O que uma queda de força custa
 
-No máximo `DEFAULT_FLUSH_INTERVAL_MS` (2 s) de amostras, porque só o buffer em
+No máximo `DefaultFlushIntervalMs` (2 s) de amostras, porque só o buffer em
 memória se perde. O buffer volta a ser o que o sensor já entregou, e o `t_ms` de
 cada linha é absoluto — a lacuna aparece como linha reta no gráfico, sem deslocar
 o eixo x.
@@ -283,8 +278,8 @@ amostras.
 
 ### Por que o SQLite não roda na suíte
 
-`expo-sqlite` é nativo. `ReportRepository.test.ts` roda contra
-`inMemoryReportRepository`, que é a **referência de semântica**: se ele fica
+`Microsoft.Data.Sqlite` é nativo. `ReportRepositoryTests` roda contra
+`InMemoryReportRepository`, que é a **referência de semântica**: se ele fica
 verde e o SQLite divergir, o bug é do SQLite. Por isso o fake copia as linhas na
 leitura, como o SQLite materializa objetos novos a cada `SELECT` — devolver a
 referência interna faria o teste passar com um bug que só apareceria no aparelho.
@@ -294,43 +289,66 @@ referência interna faria o teste passar com um bug que só apareceria no aparel
 O núcleo grava desde o incremento anterior; aqui está como ele chega na tela.
 
 ```
-App.tsx
-└── RecordingProvider          ← a ÚNICA instância do useRecorder
- └── Shell
-      ├── Screen (HomeScreen)
-      │    ├── ScreenHeader hidden={immersive}
-      │    ├── Timer            (só quando imersivo)
-      │    ├── Inclinometer onSample={captureAngle}
-      │    │    └── useInclination({ onSample })   ← 1ª e única chamada
-      │    ├── LineChart         (só quando imersivo)
-      │    ├── RecordButton      (só quando idle)
-      │    └── Modal ×2          (cancelar / salvar)
-      ├── NavBar hidden={immersive}
-      └── RecordingBar visible={immersive}
+AppShell
+└── DI singleton: RecorderViewModel     ← a ÚNICA instância do RecorderViewModel
+     └── Shell / Tabs
+          ├── HomePage
+          │    ├── ScreenHeader IsVisible={!immersive}
+          │    ├── Timer            (só quando imersivo)
+          │    ├── InclinometerView OnSample={captureAngle}
+          │    │    └── InclinationViewModel.OnSample   ← 1ª e única assinatura
+          │    ├── ChartView (LiveCharts2)  (só quando imersivo)
+          │    ├── RecordButton      (só quando idle)
+          │    └── Popup ×2          (cancelar / salvar)
+          ├── TabBar (nav inferior) IsVisible={!immersive}
+          └── RecordingBar IsVisible={immersive}
 ```
 
-### Por que o `RecordingProvider` precisa subir
+### Por que o `RecorderViewModel` precisa ser singleton
 
-A `RecordingBar` mora em `App.tsx`, irmã da `NavBar` que ela substitui (§7.1), mas o botão que **inicia** a gravação mora na `HomeScreen`. Os dois precisam do mesmo `mode`, e instanciar o gravador nos dois daria duas sessões, dois lotes e duas linhas em `recordings`.
+A `RecordingBar` mora no `AppShell`, irmã da `TabBar` que ela substitui, mas o botão que
+**inicia** a gravação mora na `HomePage`. Os dois precisam do mesmo `Mode`, e instanciar o
+gravador nos dois daria duas sessões, dois lotes e duas linhas em `recordings`. Por isso o
+`RecorderViewModel` é registrado como **singleton no DI** (`AddSingleton<RecorderViewModel>()`)
+e resolvido tanto pela barra quanto pela página.
 
-Durante a gravação a NavBar está oculta, então ninguém navega para fora da Home no meio de uma prova — o diálogo de confirmação, que fica na Home, sempre tem quem o mostre.
+Durante a gravação a `TabBar` está oculta, então ninguém navega para fora da Home no meio de uma
+prova — o diálogo de confirmação, que fica na Home, sempre tem quem o mostre.
 
-O **pedido** de confirmação (`none | cancel | save`) mora no provider pelo mesmo motivo: o botão `X` está na barra e o diálogo está na tela. Guardar o estado aqui mantém cada componente com uma responsabilidade só — `App` desenha a barra, `Home` desenha o diálogo, nenhum conhece o detalhe do outro.
+O **pedido** de confirmação (`None | Cancel | Save`) mora no ViewModel pelo mesmo motivo: o botão
+`X` está na barra e o diálogo está na página. Guardar o estado aqui mantém cada componente com
+uma responsabilidade só — o `AppShell` desenha a barra, a `HomePage` desenha o diálogo, nenhum
+conhece o detalhe do outro.
 
-### A torneira continua sendo o `Inclinometer`
+### A torneira continua sendo o `InclinometerView`
 
-A tela **não** consome `useInclination`. O `Inclinometer` segue sendo o dono do `start`/`stop` do sensor e o único que o chama; a tela só repassa a prop `onSample` até ele. É o que mantém a série gravada igual à série vista, e é o que `HomeScreen.test.tsx` trava com `toHaveBeenCalledTimes(1)`.
+A página **não** consome o `InclinationViewModel` diretamente para o `Start`/`Stop` do sensor. O
+`InclinometerView` segue sendo o dono do `Start`/`Stop` do sensor e o único que o chama; a página
+só repassa o callback `OnSample` até ele. É o que mantém a série gravada igual à série vista, e é
+o que o teste de componente trava verificando **uma única** assinatura.
 
-`captureAngle` é um `useCallback` estável. Se a referência mudasse a cada render, o efeito que a instala no `useInclination` re-dispararia a 60 Hz.
+`captureAngle` é um método estável (guardado numa referência que não muda a cada render). Se a
+referência mudasse, o efeito que a instala no `InclinationViewModel` re-dispararia na taxa da
+visualização.
 
 ### O sumiço suave
 
-A NavBar e o header somem por `hidden`, e a `RecordingBar` fica **sempre montada** cuidando do próprio unmount atrasado — só sai de cena quando a animação de saída termina (§4). Sem isso os dois módulos trocariam de lugar no mesmo quadro e o usuário veria um corte. É a mesma técnica do `Modal`.
+A `TabBar` e o header somem por `IsVisible`, e a `RecordingBar` fica **sempre montada** cuidando
+do próprio unmount atrasado — só sai de cena quando a animação de saída termina. Sem isso os dois
+módulos trocariam de lugar no mesmo quadro e o usuário veria um corte. É a mesma técnica do
+`Popup` de confirmação.
 
-### Por que o gráfico é SVG próprio
+### Por que os gráficos usam a LiveCharts2
 
-`@tamagui/charts` não existe mais no npm, e o `victory-native` que ele embrulha hoje exige `@shopify/react-native-skia`, `gesture-handler` e `reanimated` como peers — um módulo nativo pesado e um driver de render diferente do `Animated` que o `Inclinometer` usa, por um gráfico de duas poligonais.
+Diferente do caso original do React Native (onde não havia biblioteca de gráficos leve e o
+`LineChart` foi desenhado à mão em SVG), no .NET MAUI a **LiveCharts2** é open-source (MIT) e
+feita para tempo real/streaming sobre SkiaSharp — atende o gráfico de duas poligonais (roll/trim)
+sem trazer dependências nativas pesadas.
 
-Então este é o caso que §7.6 já prevê como exceção. A matemática da poligonal vem do `proto/src/components/LineChart.jsx`, que fazia isso em 50 linhas; o `LineChart` acrescenta o que §6.3 pede e o protótipo não tinha: grade, rótulos de eixo e legenda.
+Já o **inclinômetro** (anel + régua) e o **gauge** continuam desenhados por nós em
+`GraphicsView`/`IDrawable`: controle total do visual "Escuro Instrument" e sem custo de licença.
+A matemática da poligonal de referência vem do protótipo (`proto/src/components/LineChart.jsx`),
+que fazia isso em ~50 linhas.
 
-**A escala tem piso de 5°.** O protótipo usa `max|v| × 1,15`, que num barco parado amplia o ruído do sensor até virar uma serra sugerindo adernamento onde não houve.
+**A escala tem piso de 5°.** O protótipo usa `max|v| × 1,15`, que num barco parado amplia o ruído
+do sensor até virar uma serra sugerindo adernamento onde não houve.

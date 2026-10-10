@@ -1,2 +1,4 @@
 Leia [Documentação Tecnica](DOCUMENTAÇÃO.MD) e [Documentação do projeto](README.md) para entender o contexto do projeto
-Não altere os Testes, você pode apenas ler, se quiser alguma alteração avise para mim
+Este projeto é um app .NET MAUI (.NET 10): a lógica pura fica em `InclinationTest.Core` (biblioteca `net10.0`) e é coberta por testes xUnit em `InclinationTest.Core.Tests`
+A solução `.NET` fica em `src/`. Rode os comandos a partir de `src/`
+Para compilar: `dotnet build`. Para rodar os testes: `dotnet test InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj`. Antes de entregar, rode `dotnet format --verify-no-changes`

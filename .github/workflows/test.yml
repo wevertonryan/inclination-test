@@ -12,21 +12,19 @@ on:
       - '.github/workflows/test.yml'
 
 jobs:
-  jest:
-    name: Jest + typecheck
+  dotnet:
+    name: .NET + testes
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: src
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-dotnet@v4
         with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: src/package-lock.json
+          dotnet-version: '10.0.x'
 
-      - run: npm ci
-      - run: npm test
-      - run: npm run typecheck
+      - run: dotnet restore InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj
+      - run: dotnet build InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj --no-restore --configuration Release
+      - run: dotnet test InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"

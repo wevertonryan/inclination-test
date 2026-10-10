@@ -1,0 +1,14 @@
+{
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "2.5.0",
+      "resolved": "ghcr.io/devcontainers/features/dotnet@sha256:0fc16547ed4db6d7ff2a9f5981d2b93eb314e568affb9958029ad794f1f9a093",
+      "integrity": "sha256:0fc16547ed4db6d7ff2a9f5981d2b93eb314e568affb9958029ad794f1f9a093"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "1.8.3",
+      "resolved": "ghcr.io/devcontainers/features/java@sha256:61a839211feda1e2a1f10646648a948e733e4d98d770f3a4b6698a3c5fc92abe",
+      "integrity": "sha256:61a839211feda1e2a1f10646648a948e733e4d98d770f3a4b6698a3c5fc92abe"
+    }
+  }
+}

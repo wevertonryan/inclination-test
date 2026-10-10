@@ -30,6 +30,9 @@ obj/
 *.suo
 .vs/
 *.userprefs
+TestResults/
+*.cobertura.xml
+!src/InclinationTest.sln
 
 # Android
 *.apk

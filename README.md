@@ -2,7 +2,7 @@
 
 ## 1. Introdução
 
-O **Inclination Test** é um aplicativo móvel para automatizar a Prova de Inclinação e a Prova de Mar de embarcações, hoje realizadas manualmente com pêndulo e mangueira de nível. O app usa os sensores nativos do celular (acelerômetro, giroscópio, magnetômetro) para medir o ângulo de inclinação da embarcação, comparando o resultado com o método tradicional para validar sua precisão.
+O **Inclination Test** é um aplicativo móvel (.NET MAUI) para automatizar a Prova de Inclinação e a Prova de Mar de embarcações, hoje realizadas manualmente com pêndulo e mangueira de nível. O app usa os sensores nativos do celular (sobretudo o acelerômetro) para medir o ângulo de inclinação da embarcação, comparando o resultado com o método tradicional para validar sua precisão.
 
 Este documento formaliza o projeto ágil de software referente ao Projeto Integrador do 5º semestre, descrevendo a solução, seu contexto, a arquitetura básica, o planejamento de atividades, responsabilidades e os marcos de entrega do semestre. O foco será exclusivamente para a entrega do MVP, com menção sobre planos futuros, mas que ainda não está definido.
 
@@ -50,8 +50,8 @@ O app deve ser desenvolvido para simplificar o processo de medição da Prova de
 
 O app é organizado em três camadas, todas rodando localmente no dispositivo (sem backend no MVP):
 
-1. **Camada de Apresentação** (React Native/Expo): telas de Calibração, Medição, Prova de Mar e Resultado/Relatório.
-2. **Núcleo de Processamento**: módulo de acesso aos sensores nativos (acelerômetro, giroscópio, magnetômetro), módulo de filtragem de ruído e módulo de cálculo do ângulo de inclinação.
+1. **Camada de Apresentação** (.NET MAUI): telas de Calibração, Medição, Prova de Mar e Resultado/Relatório.
+2. **Núcleo de Processamento**: módulo de acesso aos sensores nativos (acelerômetro), módulo de filtragem de ruído e módulo de cálculo do ângulo de inclinação.
 3. **Persistência local**: armazenamento no próprio dispositivo, sem sincronização em nuvem nesta fase.
 
 O fluxo é: os sensores nativos alimentam o módulo de sensores → os dados passam pelo filtro de ruído → o módulo de cálculo determina o ângulo → o resultado é exibido nas telas de Medição/Prova de Mar e gravado localmente → a tela de Resultado lê os dados salvos para gerar o relatório. 
@@ -64,12 +64,12 @@ OBS: Ainda para análisar sobre esse fluxo se será desse jeito mesmo
 
 | Item | Definição | Justificativa |
 |---|---|---|
-| Tipo de app | Híbrido (React Native + Expo) | Time já tem experiência com Node.js/React, reduzindo a curva de aprendizado e acelerando o desenvolvimento dentro do prazo do semestre |
+| Tipo de app | Nativo multiplataforma (.NET MAUI) | Time já tem experiência com C#; o acesso direto aos sensores nativos e um único projeto Android reduzem a dependência de camadas de abstração de terceiros |
 | Plataforma | Apenas Android nesta fase | Precisão dos sensores precisa ser validada por dispositivo; restringir a plataforma reduz a variável de hardware desconhecido. iOS pode ser reavaliado se a limitação de acesso a sensores não se confirmar um problema |
-| Acesso a sensores | `expo-sensors`, com possível necessidade de acesso mais direto ao hardware 🟨 | A ser confirmado por spike técnico (Sprint 01) — a aplicação exige alta precisão, e ainda não se sabe se a camada de abstração do Expo é suficiente |
+| Acesso a sensores | `Microsoft.Maui.Devices.Sensors` (`Accelerometer`), com possível necessidade de acesso mais direto ao hardware 🟨 | A ser confirmado por spike técnico (Sprint 01) — o MAUI Essentials não oferece um `DeviceMotion` fundido e usa convenção/unidade própria de eixos; validar se a precisão atende à Prova de Inclinação |
 | Backend/nuvem | Nenhum no MVP | Escopo do MVP é validar a medição local; sincronização em nuvem é recurso futuro |
 | Autenticação | Nenhuma no MVP | App é apenas de medição; login só seria necessário para recursos futuros como transmissão em tempo real |
-| Orçamento de infraestrutura | R$ 0,00 — GitHub e camada gratuita do Expo EAS Build | Restrição de orçamento do projeto acadêmico |
+| Orçamento de infraestrutura | R$ 0,00 — GitHub e build local do .NET MAUI (SDK gratuito) | Restrição de orçamento do projeto acadêmico |
 
 ---
 
@@ -200,7 +200,8 @@ Por ser um time de 2 pessoas, ambos os membros desenvolvem todas as etapas da ap
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
 | Sensores do celular não atingem precisão suficiente | Média | Crítico | Testar precisão desde o Sprint 01; comparar sistematicamente com o pêndulo |
-| `expo-sensors` não oferecer controle/precisão suficiente | Média | Alto | Spike técnico no Sprint 01; alternativa é acesso mais direto ao hardware |
+| O MAUI não oferecer sensor fundido (`DeviceMotion`) nem taxa configurável em ms | Média | Alto | Spike técnico no Sprint 01; usar `Accelerometer` + `SensorSpeed` e, se preciso, acesso mais direto ao hardware por plataforma |
+| Mudança de unidade/eixo do acelerômetro (G vs m/s², Z invertido) alterar o sinal do ângulo | Média | Alto | Revalidar os golden vectors no spike; reescrever os testes de sinal (`roll > 0` = borda direita para baixo) para a convenção do MAUI |
 | Falta de acesso a embarcação real para teste | Média | Alto | Agendar com o Professor já no Sprint 01, não deixar para a Sprint 09 |
-| Orçamento zero limita ferramentas | Baixa | Médio | Usar apenas camadas gratuitas (Expo, GitHub) |
+| Orçamento zero limita ferramentas | Baixa | Médio | Usar apenas camadas gratuitas (.NET SDK, UraniumUI, LiveCharts2, GitHub) |
 | Atraso por dependência do Professor (fórmulas, normas, agenda) | Média | Alto | Levar essas perguntas já para a Sprint 01, com prazo de resposta combinado |
