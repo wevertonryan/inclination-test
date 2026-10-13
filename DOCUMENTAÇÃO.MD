@@ -15,8 +15,9 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 > não foi implementado está marcado como **Planejado** ao longo do documento.
 
 **Estágio:** Épico 1 / **EP2** concluído — Sensores, Cálculos, Calibração, Filtragem de Ruído e
-Testes. A camada de interface ainda é um protótipo mínimo (uma tela), e a gravação/persistência
-(Épico 2/3) não começou.
+Testes. A camada de interface já tem o esqueleto de navegação (`AppShell` + `MainPage` com
+`material:TabView` da UraniumUI, 5 abas inferiores): a Home real e quatro telas placeholder. A
+gravação/persistência (Épico 2/3) ainda não começou.
 
 ### Implementado
 
@@ -26,8 +27,8 @@ Testes. A camada de interface ainda é um protótipo mínimo (uma tela), e a gra
 | `Core/Sensors/` | `ISensorService`, `SensorService`, `IAccelerometerSource`, `AccelerometerReading` |
 | `Core/Processing/` | `IFilter`, `FilterService` (filtro EMA), `AngleConverter` |
 | `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`) |
-| `App` | `MauiProgram` (DI), `MauiAccelerometerSource`, `Views/HomePage` (3 campos + botões Iniciar/Parar/Calibrar) |
-| Testes | **88** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 30, `InclinationViewModel` 26 |
+| `App` | `MauiProgram` (DI + UraniumUI), `MauiAccelerometerSource`, `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (3 campos + botões Iniciar/Parar/Calibrar) e 4 views placeholder (`CalibragemView`, `RelatoriosView`, `TestesView`, `ConfiguracoesView`), `Converters/SelectionColorConverter` |
+| Testes | **95** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26 |
 
 ### Planejado (não implementado)
 
@@ -36,8 +37,8 @@ Testes. A camada de interface ainda é um protótipo mínimo (uma tela), e a gra
 | `Core/Recording/` | `RecordingSession` (decimação, lotes, pause/save) e `Statistics` (Welford) |
 | `Core/Persistence/` | `Schema`, `IReportRepository`, `InMemoryReportRepository`, `SqliteReportRepository`, `RecordingStore` |
 | `Core/ViewModels/` | `RecorderViewModel` |
-| `App` | `AppShell`, demais `Views/` (Calibração, Relatórios...), `Components/` (Layout, Ui, Features), design system em `Colors.xaml` |
-| Stack de UI | UraniumUI, LiveCharts2, SkiaSharp (previstos para o Épico 3) |
+| `App` | Telas reais das seções (Calibração, Relatórios...) e `Components/` (Layout, Ui, Features), design system em `Colors.xaml` |
+| Stack de UI | LiveCharts2 e SkiaSharp (previstos para o Épico 3); UraniumUI já referenciada |
 
 > A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP** — por isso as
 > seções 7 e 8 abaixo são especificação futura, não estado atual.
@@ -60,8 +61,9 @@ Testes. A camada de interface ainda é um protótipo mínimo (uma tela), e a gra
 > A solução .NET fica em `src/`. Todos os comandos `dotnet` deste documento rodam a partir de `src/`.
 
 > **Estado dos pacotes (13/10/2026):** já referenciados no build — `CommunityToolkit.Mvvm` e
-> `Microsoft.Data.Sqlite` (Core), `Microsoft.Maui.Controls` e `Microsoft.Extensions.Logging.Debug`
-> (App). **Planejados** — UraniumUI (+ Material), LiveCharts2, SkiaSharp.Views.Maui (Épico 3).
+> `Microsoft.Data.Sqlite` (Core); `Microsoft.Maui.Controls` (10.0.71), `Microsoft.Extensions.Logging.Debug`,
+> `UraniumUI.Material` e `UraniumUI.Icons.MaterialSymbols` (App). **Planejados** — LiveCharts2 e
+> SkiaSharp.Views.Maui (Épico 3).
 
 ## 3. Estrutura de pastas
 
@@ -101,10 +103,17 @@ InclinationTest.sln
   InclinationTest.App/               # app MAUI (net10.0-android)
     App.xaml                   [ok]
     App.xaml.cs                [ok]
-    AppShell.xaml              [plan] # shell: navegação por abas
+    AppShell.xaml(.cs)         [ok]  # Shell: host único, sem flyout/navbar nativa
+    Converters/
+      SelectionColorConverter.cs [ok] # cor do item ativo da NavBar
     Views/
-      HomePage.xaml(.cs)       [ok]  # protótipo: 3 campos + Iniciar/Parar/Calibrar
-      (CalibrationPage, ...)   [plan] # demais ContentPages
+      MainPage.xaml(.cs)       [ok]  # host com material:TabView (NavBar inferior, 5 abas)
+      HomeView.xaml(.cs)       [ok]  # conteúdo real da Home (3 campos + Iniciar/Parar/Calibrar)
+      CalibragemView.xaml(.cs) [ok]  # placeholder
+      RelatoriosView.xaml(.cs) [ok]  # placeholder
+      TestesView.xaml(.cs)     [ok]  # placeholder
+      ConfiguracoesView.xaml(.cs) [ok] # placeholder
+      (RelatorioPage, ...)     [plan] # telas de detalhe empilhadas
     Components/
       Layout/                  [plan] # ScreenHeader, Card, ScreenContainer
       Ui/                      [plan] # Button, Chip, Modal, Input, ListRow, ...
@@ -114,7 +123,7 @@ InclinationTest.sln
       Styles/Styles.xaml       [ok]
     Sensors/
       MauiAccelerometerSource.cs [ok] # adapter do Microsoft.Maui.Devices.Sensors
-    MauiProgram.cs             [ok]  # registro de DI (services, ViewModel, View)
+    MauiProgram.cs             [ok]  # DI + UraniumUI + fontes Material Symbols
     Platforms/Android/         [ok]  # manifesto e permissões
   InclinationTest.Core.Tests/        # xUnit (net10.0)
     Sensors/                   [ok]  # SensorServiceTests
@@ -143,7 +152,8 @@ InclinationTest.sln
 | `Microsoft.Maui.Devices.Sensors` (Essentials) | leitura do `Accelerometer` em `MauiAccelerometerSource` | ok |
 | `CommunityToolkit.Mvvm` | `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]` | ok |
 | `Microsoft.Data.Sqlite` | persistência local dos relatórios e da série temporal (`Core/Persistence/`) | referenciado, uso planejado |
-| `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI | planejado |
+| `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI (`TabView` usado como NavBar) | referenciado |
+| `UraniumUI.Icons.MaterialSymbols` | fonte de ícones (glyphs) da NavBar via `FontImageSource` | referenciado |
 | `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView`) | planejado |
 | `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Components/Features/` | planejado |
 | `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` | execução dos testes | ok |
@@ -175,14 +185,14 @@ Os testes ficam em `src/InclinationTest.Core.Tests/`:
 InclinationTest.Core.Tests/
   Sensors/SensorServiceTests.cs            # 19 testes — assinatura, taxa, conversão de forma
   Processing/FilterServiceTests.cs         # 13 testes — contrato de forma + invariantes
-  Processing/AngleConverterTests.cs        # 30 testes — round-trip, golden vectors, fuzz
+  Processing/AngleConverterTests.cs        # 37 testes — round-trip, golden vectors, fuzz
   ViewModels/InclinationViewModelTests.cs  # 26 testes — orquestração do pipeline
   Recording/                               # [plan] StatisticsTests, RecordingSessionTests
   Persistence/                             # [plan] ReportRepositoryTests
   Components/                              # [plan] InclinometerViewTests
 ```
 
-Total do `Core`: **88 testes** (19 + 13 + 30 + 26), escritos junto com a implementação que já
+Total do `Core`: **95 testes** (19 + 13 + 37 + 26), escritos junto com a implementação que já
 existe — verde com o código atual. As suítes de `Recording/`, `Persistence/` e `Components/`
 acompanham as features ainda planejadas.
 
@@ -346,9 +356,12 @@ referência interna faria o teste passar com um bug que só apareceria no aparel
 
 ## 8. A gravação na interface
 
-> ⚠️ **Planejado — não implementado.** Hoje o `App` tem apenas `HomePage` (protótipo com 3
-> labels e botões Iniciar/Parar/Calibrar). Não existem `AppShell`, `InclinometerView`,
-> `ChartView`, `RecordButton`, `RecordingBar` nem o `RecorderViewModel` singleton que esta
+> ⚠️ **Parcialmente implementado.** Hoje o `App` tem `AppShell` e `MainPage` (NavBar inferior via
+> `material:TabView`, 5 abas), com a `HomeView` real (inclinômetro + labels TRIM/ROLL + botões
+> Iniciar/Parar/Calibrar) e views placeholder nas demais abas. O inclinômetro já existe, desenhado
+> em SkiaSharp como `InclinometerControl` (`Controls/`, ligado aos valores `Roll`/`Trim` do
+> `InclinationViewModel`); o nome abaixo, `InclinometerView`, é o do desenho-alvo. Ainda **não**
+> existem `ChartView`, `RecordButton`, `RecordingBar` nem o `RecorderViewModel` singleton que esta
 > seção descreve. Trata-se do desenho-alvo para o Épico 3.
 
 Quando o núcleo gravar (seção 7), este é o desenho de como ele chegaria à tela.
@@ -356,8 +369,8 @@ Quando o núcleo gravar (seção 7), este é o desenho de como ele chegaria à t
 ```
 AppShell
 └── DI singleton: RecorderViewModel     ← a ÚNICA instância do RecorderViewModel
-     └── Shell / Tabs
-          ├── HomePage
+     └── MainPage / TabView
+          ├── HomeView
           │    ├── ScreenHeader IsVisible={!immersive}
           │    ├── Timer            (só quando imersivo)
           │    ├── InclinometerView OnSample={captureAngle}
@@ -365,24 +378,24 @@ AppShell
           │    ├── ChartView (LiveCharts2)  (só quando imersivo)
           │    ├── RecordButton      (só quando idle)
           │    └── Popup ×2          (cancelar / salvar)
-          ├── TabBar (nav inferior) IsVisible={!immersive}
+          ├── TabView (nav inferior) IsVisible={!immersive}
           └── RecordingBar IsVisible={immersive}
 ```
 
 ### Por que o `RecorderViewModel` precisa ser singleton
 
-A `RecordingBar` mora no `AppShell`, irmã da `TabBar` que ela substitui, mas o botão que
-**inicia** a gravação mora na `HomePage`. Os dois precisam do mesmo `Mode`, e instanciar o
+A `RecordingBar` mora no `AppShell`, irmã da `TabView` que ela substitui, mas o botão que
+**inicia** a gravação mora na `HomeView`. Os dois precisam do mesmo `Mode`, e instanciar o
 gravador nos dois daria duas sessões, dois lotes e duas linhas em `recordings`. Por isso o
 `RecorderViewModel` é registrado como **singleton no DI** (`AddSingleton<RecorderViewModel>()`)
 e resolvido tanto pela barra quanto pela página.
 
-Durante a gravação a `TabBar` está oculta, então ninguém navega para fora da Home no meio de uma
+Durante a gravação a `TabView` está oculta, então ninguém navega para fora da Home no meio de uma
 prova — o diálogo de confirmação, que fica na Home, sempre tem quem o mostre.
 
 O **pedido** de confirmação (`None | Cancel | Save`) mora no ViewModel pelo mesmo motivo: o botão
 `X` está na barra e o diálogo está na página. Guardar o estado aqui mantém cada componente com
-uma responsabilidade só — o `AppShell` desenha a barra, a `HomePage` desenha o diálogo, nenhum
+uma responsabilidade só — o `AppShell` desenha a barra, a `HomeView` desenha o diálogo, nenhum
 conhece o detalhe do outro.
 
 ### A torneira continua sendo o `InclinometerView`

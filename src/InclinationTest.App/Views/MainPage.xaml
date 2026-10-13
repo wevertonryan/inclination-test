@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="InclinationTest.App.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:InclinationTest.App.Converters"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    Title="Inclination Test">
+
+    <ContentPage.Resources>
+        <converters:SelectionColorConverter
+            x:Key="SelectionColor"
+            Selected="{StaticResource Primary}"
+            Unselected="{StaticResource Gray400}" />
+    </ContentPage.Resources>
+
+    <material:TabView
+        x:Name="MainTabView"
+        TabPlacement="Bottom">
+
+        <material:TabView.TabHeaderItemTemplate>
+            <DataTemplate>
+                <Grid
+                    BackgroundColor="Transparent"
+                    HeightRequest="56"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill">
+
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Command}" />
+                    </Grid.GestureRecognizers>
+
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        Spacing="2"
+                        VerticalOptions="Center">
+                        <Image
+                            HeightRequest="24"
+                            HorizontalOptions="Center"
+                            WidthRequest="24">
+                            <Image.Source>
+                                <FontImageSource
+                                    Color="{Binding IsSelected, Converter={StaticResource SelectionColor}}"
+                                    FontFamily="MaterialOutlined"
+                                    Glyph="{Binding Data}"
+                                    Size="24" />
+                            </Image.Source>
+                        </Image>
+                        <Label
+                            FontAutoScalingEnabled="False"
+                            FontSize="10"
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            LineBreakMode="TailTruncation"
+                            MaxLines="1"
+                            Text="{Binding Title}"
+                            TextColor="{Binding IsSelected, Converter={StaticResource SelectionColor}}" />
+                    </VerticalStackLayout>
+
+                </Grid>
+            </DataTemplate>
+        </material:TabView.TabHeaderItemTemplate>
+
+    </material:TabView>
+
+</ContentPage>

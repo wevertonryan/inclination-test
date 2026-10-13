@@ -1,14 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace InclinationTest.App;
 
 public partial class App : Application
 {
-    private readonly Views.HomePage _homePage;
+    private readonly IServiceProvider _services;
 
-    public App(Views.HomePage homePage)
+    public App(IServiceProvider services)
     {
         InitializeComponent();
-        _homePage = homePage;
+        _services = services;
     }
 
-    protected override Window CreateWindow(IActivationState? activationState) => new Window(_homePage);
+    protected override Window CreateWindow(IActivationState? activationState)
+        => new Window(_services.GetRequiredService<AppShell>());
 }

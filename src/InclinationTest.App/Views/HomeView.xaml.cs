@@ -3,29 +3,23 @@ using InclinationTest.Core.ViewModels;
 
 namespace InclinationTest.App.Views;
 
-public partial class HomePage : ContentPage
+public partial class HomeView : ContentView
 {
     private readonly InclinationViewModel _viewModel;
 
-    public HomePage(InclinationViewModel viewModel)
+    public HomeView(InclinationViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _viewModel.Start();
-    }
+    private void OnLoaded(object? sender, EventArgs e) => _viewModel.Start();
 
-    protected override void OnDisappearing()
-    {
-        _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
-        base.OnDisappearing();
-    }
+    private void OnUnloaded(object? sender, EventArgs e) => _viewModel.Stop();
 
     private void OnIniciarClicked(object? sender, EventArgs e) => _viewModel.Start();
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="InclinationTest.App.Views.HomePage"
+<ContentView
+    x:Class="InclinationTest.App.Views.HomeView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Inclination Test">
+    xmlns:controls="clr-namespace:InclinationTest.App.Controls">
 
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="12">
@@ -18,8 +18,14 @@
                 Padding="24"
                 StrokeShape="RoundRectangle 16">
                 <VerticalStackLayout Spacing="8">
-                    <Label FontSize="28" Text="{Binding Roll, StringFormat='Roll  {0:F1}°'}" />
-                    <Label FontSize="28" Text="{Binding Trim, StringFormat='Trim  {0:F1}°'}" />
+                    <controls:InclinometerControl
+                        Roll="{Binding Roll}"
+                        Trim="{Binding Trim}"
+                        Size="260" />
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                        <Label FontSize="20" Text="{Binding Trim, StringFormat='TRIM {0:F1}°'}" TextColor="#2196F3" />
+                        <Label FontSize="20" Text="{Binding Roll, StringFormat='ROLL {0:F1}°'}" TextColor="#FFB300" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Border>
 
@@ -40,4 +46,4 @@
 
         </VerticalStackLayout>
     </ScrollView>
-</ContentPage>
+</ContentView>
