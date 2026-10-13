@@ -8,6 +8,40 @@ O **Inclination Test** é um aplicativo móvel (.NET MAUI) para automatizar a Pr
 
 Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
+## Status atual do projeto
+
+> **Última verificação: 13/10/2026.** Este status reflete o que existe no código hoje e é a
+> fonte de verdade sobre o andamento. As demais seções descrevem o desenho-alvo; o que ainda
+> não foi implementado está marcado como **Planejado** ao longo do documento.
+
+**Estágio:** Épico 1 / **EP2** concluído — Sensores, Cálculos, Calibração, Filtragem de Ruído e
+Testes. A camada de interface ainda é um protótipo mínimo (uma tela), e a gravação/persistência
+(Épico 2/3) não começou.
+
+### Implementado
+
+| Camada | O que existe |
+|---|---|
+| `Core/Models/` | `Vector3`, `MotionSample`, `Angles`, `Calibration` |
+| `Core/Sensors/` | `ISensorService`, `SensorService`, `IAccelerometerSource`, `AccelerometerReading` |
+| `Core/Processing/` | `IFilter`, `FilterService` (filtro EMA), `AngleConverter` |
+| `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`) |
+| `App` | `MauiProgram` (DI), `MauiAccelerometerSource`, `Views/HomePage` (3 campos + botões Iniciar/Parar/Calibrar) |
+| Testes | **88** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 30, `InclinationViewModel` 26 |
+
+### Planejado (não implementado)
+
+| Camada | Pendente |
+|---|---|
+| `Core/Recording/` | `RecordingSession` (decimação, lotes, pause/save) e `Statistics` (Welford) |
+| `Core/Persistence/` | `Schema`, `IReportRepository`, `InMemoryReportRepository`, `SqliteReportRepository`, `RecordingStore` |
+| `Core/ViewModels/` | `RecorderViewModel` |
+| `App` | `AppShell`, demais `Views/` (Calibração, Relatórios...), `Components/` (Layout, Ui, Features), design system em `Colors.xaml` |
+| Stack de UI | UraniumUI, LiveCharts2, SkiaSharp (previstos para o Épico 3) |
+
+> A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP** — por isso as
+> seções 7 e 8 abaixo são especificação futura, não estado atual.
+
 ## 2. Stack e ferramentas
 
 | Item | Tecnologia |
@@ -25,63 +59,77 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
 > A solução .NET fica em `src/`. Todos os comandos `dotnet` deste documento rodam a partir de `src/`.
 
+> **Estado dos pacotes (13/10/2026):** já referenciados no build — `CommunityToolkit.Mvvm` e
+> `Microsoft.Data.Sqlite` (Core), `Microsoft.Maui.Controls` e `Microsoft.Extensions.Logging.Debug`
+> (App). **Planejados** — UraniumUI (+ Material), LiveCharts2, SkiaSharp.Views.Maui (Épico 3).
+
 ## 3. Estrutura de pastas
 
 Estrutura dentro de `src/`:
+
+Legenda: **[ok]** implementado · **[plan]** planejado (não implementado).
 
 ```
 InclinationTest.sln
   InclinationTest.Core/              # biblioteca net10.0 — lógica pura, sem dependência de UI
     Sensors/
-      ISensorService.cs              # contrato de captura
-      SensorService.cs               # captura o Accelerometer
+      ISensorService.cs        [ok]  # contrato de captura
+      SensorService.cs         [ok]  # normaliza a leitura do acelerômetro
+      IAccelerometerSource.cs  [ok]  # abstração da fonte nativa (fake nos testes)
+      AccelerometerReading.cs  [ok]  # forma crua entregue pela fonte
     Processing/
-      FilterService.cs               # filtragem de ruído
-      AngleConverter.cs              # converte a amostra filtrada em ângulos
+      IFilter.cs               [ok]  # contrato de filtragem
+      FilterService.cs         [ok]  # filtragem de ruído (EMA)
+      AngleConverter.cs        [ok]  # converte a amostra filtrada em ângulos
     ViewModels/
-      InclinationViewModel.cs        # ViewModel: intermediário entre o Core e a UI
-      RecorderViewModel.cs           # ViewModel do gravador
+      InclinationViewModel.cs  [ok]  # ViewModel: intermediário entre o Core e a UI
+      RecorderViewModel.cs     [plan] # ViewModel do gravador
     Recording/
-      RecordingSession.cs            # o gravador sem UI: decimação, lotes, pause/save
-      Statistics.cs                  # média e desvio de Welford, sem lista de amostras
+      RecordingSession.cs      [plan] # o gravador sem UI: decimação, lotes, pause/save
+      Statistics.cs            [plan] # média e desvio de Welford, sem lista de amostras
     Persistence/
-      Schema.cs                      # DDL de recordings + samples
-      IReportRepository.cs           # contrato de persistência
-      InMemoryReportRepository.cs    # fake dos testes / referência de semântica
-      SqliteReportRepository.cs      # implementação (Microsoft.Data.Sqlite)
-      RecordingStore.cs              # abre o banco e aplica o schema
+      Schema.cs                [plan] # DDL de recordings + samples
+      IReportRepository.cs     [plan] # contrato de persistência
+      InMemoryReportRepository.cs [plan] # fake dos testes / referência de semântica
+      SqliteReportRepository.cs [plan] # implementação (Microsoft.Data.Sqlite)
+      RecordingStore.cs        [plan] # abre o banco e aplica o schema
     Models/
-      Vector3.cs                     # tipos compartilhados entre o pipeline (contratos)
-      MotionSample.cs
-      Angles.cs
-      Calibration.cs
+      Vector3.cs               [ok]  # tipos compartilhados entre o pipeline (contratos)
+      MotionSample.cs          [ok]
+      Angles.cs                [ok]
+      Calibration.cs           [ok]
   InclinationTest.App/               # app MAUI (net10.0-android)
-    App.xaml
-    AppShell.xaml                    # shell: navegação por abas
-    Views/                           # ContentPages (HomePage, CalibrationPage, ...)
+    App.xaml                   [ok]
+    App.xaml.cs                [ok]
+    AppShell.xaml              [plan] # shell: navegação por abas
+    Views/
+      HomePage.xaml(.cs)       [ok]  # protótipo: 3 campos + Iniciar/Parar/Calibrar
+      (CalibrationPage, ...)   [plan] # demais ContentPages
     Components/
-      Layout/                        # ScreenHeader, Card, ScreenContainer
-      Ui/                            # Button, Chip, Modal, Input, ListRow, ...
-      Features/                      # InclinometerView, ChartView, GaugeView, RecordButton, ...
+      Layout/                  [plan] # ScreenHeader, Card, ScreenContainer
+      Ui/                      [plan] # Button, Chip, Modal, Input, ListRow, ...
+      Features/                [plan] # InclinometerView, ChartView, GaugeView, RecordButton, ...
     Resources/
-      Styles/Colors.xaml             # tokens do design system
-      Styles/Styles.xaml
-    MauiProgram.cs                   # registro de DI (services, ViewModels, Views)
-    Platforms/Android/               # manifesto e permissões
+      Styles/Colors.xaml       [ok]  # por ora, cores default do template (design system: [plan])
+      Styles/Styles.xaml       [ok]
+    Sensors/
+      MauiAccelerometerSource.cs [ok] # adapter do Microsoft.Maui.Devices.Sensors
+    MauiProgram.cs             [ok]  # registro de DI (services, ViewModel, View)
+    Platforms/Android/         [ok]  # manifesto e permissões
   InclinationTest.Core.Tests/        # xUnit (net10.0)
-    Sensors/                         # SensorServiceTests
-    Processing/                      # FilterServiceTests, AngleConverterTests
-    ViewModels/                      # InclinationViewModelTests, RecorderViewModelTests
-    Recording/                       # StatisticsTests, RecordingSessionTests
-    Persistence/                     # ReportRepositoryTests
-    Components/                      # InclinometerViewTests (a escrever)
-    TestUtils/                       # fixtures e utilitários dos testes (NÃO é uma suite)
+    Sensors/                   [ok]  # SensorServiceTests
+    Processing/                [ok]  # FilterServiceTests, AngleConverterTests
+    ViewModels/                [ok]  # InclinationViewModelTests
+    Recording/                 [plan] # StatisticsTests, RecordingSessionTests
+    Persistence/               [plan] # ReportRepositoryTests
+    Components/                [plan] # InclinometerViewTests
+    TestUtils/                 [ok]  # fixtures e utilitários dos testes (NÃO é uma suite)
 ```
 
 - `InclinationTest.App/` — camada de apresentação (páginas e componentes). Consome o Core apenas pelo `InclinationViewModel`.
-- `InclinationTest.App/Components/Ui/` — componentes genéricos, sem vocabulário de domínio. Não dependem de `Features/`.
+- `InclinationTest.App/Components/Ui/` [plan] — componentes genéricos, sem vocabulário de domínio. Não dependem de `Features/`.
 - `InclinationTest.Core/` — lógica pura (captura, filtragem, cálculo de ângulo, ViewModel). Sem dependência de UI, testável na CLI (`dotnet test`) sem emulador nem dispositivo.
-- `Resources/Styles/Colors.xaml` — tokens do design system. Nenhum componente usa cor ou espaçamento literais.
+- `Resources/Styles/Colors.xaml` — hoje só as cores default do template; os tokens do design system são planejados.
 - `InclinationTest.Core.Tests/` — testes xUnit que exercitam o Core.
 - `TestUtils/` — fixtures compartilhadas entre as suites, mantidas fora dos diretórios de teste para não serem coletadas como suites (o runner xUnit descobre qualquer classe `*Tests`; utilitários ficam sem esse sufixo).
 
@@ -89,18 +137,18 @@ InclinationTest.sln
 
 ### Dependências de runtime e de teste
 
-| Pacote | Papel |
-|---|---|
-| `Microsoft.Maui.Controls` + workload `maui` | app (o `Microsoft.Maui.Essentials` vem no workload) |
-| `Microsoft.Maui.Devices.Sensors` (Essentials) | leitura do `Accelerometer` no `SensorService` |
-| `CommunityToolkit.Mvvm` | `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]` |
-| `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI |
-| `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView`) |
-| `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Components/Features/` |
-| `Microsoft.Data.Sqlite` | persistência local dos relatórios e da série temporal (`Core/Persistence/`) |
-| `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` | execução dos testes |
-| `FluentAssertions`, `NSubstitute` | asserções legíveis e mocks nos testes |
-| `coverlet.collector` | cobertura (`dotnet test --collect:"XPlat Code Coverage"`) |
+| Pacote | Papel | Estado |
+|---|---|---|
+| `Microsoft.Maui.Controls` + workload `maui` | app (o `Microsoft.Maui.Essentials` vem no workload) | ok |
+| `Microsoft.Maui.Devices.Sensors` (Essentials) | leitura do `Accelerometer` em `MauiAccelerometerSource` | ok |
+| `CommunityToolkit.Mvvm` | `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]` | ok |
+| `Microsoft.Data.Sqlite` | persistência local dos relatórios e da série temporal (`Core/Persistence/`) | referenciado, uso planejado |
+| `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI | planejado |
+| `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView`) | planejado |
+| `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Components/Features/` | planejado |
+| `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` | execução dos testes | ok |
+| `FluentAssertions`, `NSubstitute` | asserções legíveis e mocks nos testes | ok |
+| `coverlet.collector` | cobertura (`dotnet test --collect:"XPlat Code Coverage"`) | ok |
 
 > Pré-requisito de ambiente: `dotnet workload install maui`. O app compila para `net10.0-android`.
 
@@ -127,13 +175,16 @@ Os testes ficam em `src/InclinationTest.Core.Tests/`:
 InclinationTest.Core.Tests/
   Sensors/SensorServiceTests.cs            # 19 testes — assinatura, taxa, conversão de forma
   Processing/FilterServiceTests.cs         # 13 testes — contrato de forma + invariantes
-  Processing/AngleConverterTests.cs        # 37 testes — round-trip, golden vectors, fuzz
-  ViewModels/InclinationViewModelTests.cs  # 24 testes — orquestração do pipeline
-  Components/InclinometerViewTests.cs      # (a escrever)
+  Processing/AngleConverterTests.cs        # 30 testes — round-trip, golden vectors, fuzz
+  ViewModels/InclinationViewModelTests.cs  # 26 testes — orquestração do pipeline
+  Recording/                               # [plan] StatisticsTests, RecordingSessionTests
+  Persistence/                             # [plan] ReportRepositoryTests
+  Components/                              # [plan] InclinometerViewTests
 ```
 
-Total do `Core`: **93 testes**, todos escritos contra a implementação vazia — ou seja, todos
-vermelhos até o código existir. É o estado esperado do TDD, não uma falha.
+Total do `Core`: **88 testes** (19 + 13 + 30 + 26), escritos junto com a implementação que já
+existe — verde com o código atual. As suítes de `Recording/`, `Persistence/` e `Components/`
+acompanham as features ainda planejadas.
 
 ### 5.1 O que os testes travam — e o que eles deixam passar
 
@@ -170,7 +221,10 @@ Cada etapa tem um arquivo, uma responsabilidade e seus próprios testes:
 Accelerometer (Microsoft.Maui.Devices.Sensors)
   │
   ▼
-SensorService         captura e normaliza        → MotionSample bruto
+IAccelerometerSource   adapter nativo               → AccelerometerReading
+  │                   (App: MauiAccelerometerSource)
+  ▼
+SensorService         normaliza                    → MotionSample bruto
   │
   ▼
 FilterService         remove o ruído             → MotionSample filtrado
@@ -185,13 +239,14 @@ InclinationViewModel  ViewModel / mediador       → estado exposto para a UI
 Interface             Views + Components
 ```
 
-- **SensorService** (`Core/Sensors/SensorService.cs`) — assina o `Accelerometer` do `Microsoft.Maui.Devices.Sensors` e entrega uma `MotionSample` normalizada. A taxa é definida por `SensorSpeed` (`Game`, ~50 Hz, ou `Fastest`, ~200 Hz com decimação no pipeline); diferente do Expo, **não há intervalo configurável em ms**. Essa taxa é para a **visualização ao vivo**; a gravação da série temporal (Prova de Mar) rebaixa para **12 Hz** na ponta da gravação, sem ressuscitar o sensor. Não conhece filtragem, ângulos nem UI. Implementa `ISensorService` para permitir um fake nos testes.
+- **IAccelerometerSource** (`Core/Sensors/IAccelerometerSource.cs`) — abstração da fonte nativa: entrega `AccelerometerReading` (aceleração, rotação, atitude, timestamp). O `Core` só conhece a interface; o `App` fornece a implementação `MauiAccelerometerSource` (`App/Sensors/`), que assina o `Accelerometer` do `Microsoft.Maui.Devices.Sensors`. É o que permite ao `Core` ser testado headless com um fake (`FakeAccelerometerSource`) sem tocar no hardware.
+- **SensorService** (`Core/Sensors/SensorService.cs`) — consome um `IAccelerometerSource` e entrega uma `MotionSample` normalizada. A taxa é definida por `SensorSpeed` (`Game`, ~50 Hz, ou `Fastest`, ~200 Hz com decimação no pipeline); diferente do Expo, **não há intervalo configurável em ms**. Essa taxa é para a **visualização ao vivo**; a gravação da série temporal (Prova de Mar, [plan]) rebaixaria para **12 Hz** na ponta da gravação. Não conhece filtragem, ângulos nem UI. Implementa `ISensorService` para permitir um fake nos testes.
 - **FilterService** (`Core/Processing/FilterService.cs`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter.
 - **AngleConverter** (`Core/Processing/AngleConverter.cs`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
-- **InclinationViewModel** (`Core/ViewModels/InclinationViewModel.cs`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`Roll`, `Trim`, `IsRunning`, `IsCalibrated`) e expõe as ações (`Start`, `Stop`, `Calibrate`). A UI só conversa com ele. Expõe também um evento `OnSample(Angles angles, double tMs)`, disparado com o **mesmo** resultado de `ToAngles` que alimenta o estado — é por essa torneira que o gravador recebe a série, sem sensor próprio e sem segunda assinatura do `Accelerometer`.
-- **RecorderViewModel** (`Core/ViewModels/RecorderViewModel.cs`) — ViewModel do gravador, irmão do `InclinationViewModel` e não filho dele: conhece ângulos, não sensor. Encaminha cada amostra para um `RecordingSession`, publica estado no máximo a cada 100 ms (`DefaultTickMs`) para não arrastar a tela na taxa da visualização, e expõe `Start`, `Pause`, `Resume`, `Toggle`, `Save`, `Discard`.
-- **RecordingSession** (`Core/Recording/RecordingSession.cs`) — o gravador sem UI. Decide o que entra no disco: **decima de 60 Hz para 12 Hz** (`DefaultSampleIntervalMs = 83`, a mesma taxa do protótipo), acumula as estatísticas de Welford e **escreve em lotes de 2 s** (`DefaultFlushIntervalMs`). Um flush só grava o que está no buffer, então o custo de uma queda de energia é de no máximo 2 s.
-- **IReportRepository** (`Core/Persistence/IReportRepository.cs`) — o contrato de persistência, com duas implementações: `SqliteReportRepository` (`Microsoft.Data.Sqlite`, aberta por `RecordingStore`) e `InMemoryReportRepository`, que é o fake dos testes e a referência de semântica. O `PRIMARY KEY (recording_id, elapsed_ms)` é o que torna o retry de um lote idempotente.
+- **InclinationViewModel** (`Core/ViewModels/InclinationViewModel.cs`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`Roll`, `Trim`, `IsRunning`, `IsCalibrated`, `Error`) e expõe as ações (`Start`, `Stop`, `Calibrate`). A UI só conversa com ele. Expõe também um evento `OnSample(Angles angles, double tMs)`, disparado com o **mesmo** resultado de `ToAngles` que alimenta o estado — é por essa torneira que o gravador receberia a série, sem sensor próprio e sem segunda assinatura do `Accelerometer`.
+- **RecorderViewModel** (`Core/ViewModels/RecorderViewModel.cs`) — **[plan]** ViewModel do gravador, irmão do `InclinationViewModel` e não filho dele: conhece ângulos, não sensor. Encaminharia cada amostra para um `RecordingSession`, publicaria estado no máximo a cada 100 ms (`DefaultTickMs`) e exporia `Start`, `Pause`, `Resume`, `Toggle`, `Save`, `Discard`.
+- **RecordingSession** (`Core/Recording/RecordingSession.cs`) — **[plan]** o gravador sem UI. Decidiria o que entra no disco: **decima de 60 Hz para 12 Hz** (`DefaultSampleIntervalMs = 83`), acumularia as estatísticas de Welford e **escreveria em lotes de 2 s** (`DefaultFlushIntervalMs`).
+- **IReportRepository** (`Core/Persistence/IReportRepository.cs`) — **[plan]** o contrato de persistência, com duas implementações: `SqliteReportRepository` (`Microsoft.Data.Sqlite`, aberta por `RecordingStore`) e `InMemoryReportRepository` (fake dos testes / referência de semântica).
 
 **Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `Core/Models/`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
 
@@ -219,7 +274,8 @@ Função principal de cada módulo:
 
 | Módulo | Função principal | Entrada | Saída |
 |---|---|---|---|
-| `SensorService` | `Start(Action<MotionSample> cb)` | eventos `Accelerometer` (via MAUI Essentials) | `ISensorService { bool IsAvailable; void Start(Action<MotionSample> cb); void Stop(); }` |
+| `IAccelerometerSource` | `Start(Action<AccelerometerReading> cb)` | `Accelerometer` nativo (via MAUI Essentials) | `IAccelerometerSource { bool IsAvailable; void Start(...); void Stop(); }` |
+| `SensorService` | `Start(Action<MotionSample> cb)` | eventos de `IAccelerometerSource` | `ISensorService { bool IsAvailable; void Start(Action<MotionSample> cb); void Stop(); }` |
 | `FilterService` | `FilterService.Create()` | `MotionSample` bruto | `IFilter { MotionSample Process(MotionSample s); }` (mesma forma, filtrada) |
 | `AngleConverter` | `AngleConverter.ToAngles(MotionSample s, Calibration? calibration)` | `MotionSample` filtrada + offset opcional | `Angles { Roll, Trim }` (em graus, com sinal e faixas) |
 | `InclinationViewModel` | `new InclinationViewModel(...)` | — | `{ Roll, Trim, IsRunning, IsCalibrated, Error, Start(), Stop(), Calibrate() }` |
@@ -235,9 +291,13 @@ Decisões de projeto fixadas nos contratos:
 - **Apenas o acelerômetro** (e não uma fusão tipo `DeviceMotion`) porque o MAUI Essentials não oferece um evento fundido com `accelerationIncludingGravity`/`rotationRate`/Euler, e o cálculo de banda/trim depende só do vetor de gravidade — o acelerômetro basta para a medição. `Gyroscope`/`OrientationSensor` ficam como matéria-prima opcional para a filtragem.
 - **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dê uma volta completa no mostrador.
 - **Calibração como parâmetro do `AngleConverter`** (US-01): `ToAngles` aplica o offset do zero, continuando uma função pura.
-- **Interfaces + injeção de dependência** (não funções factory soltas): `ISensorService`, `IFilter` e o repositório são injetados pelos construtores via `MauiProgram` — fáceis de mockar e testar sem tocar no hardware.
+- **Interfaces + injeção de dependência** (não funções factory soltas): `IAccelerometerSource`, `ISensorService` e `IFilter` são injetados pelos construtores via `MauiProgram` — fáceis de mockar e testar sem tocar no hardware. O mesmo se aplica ao `IReportRepository` **[plan]**.
 
 ## 7. Gravação e persistência (Prova de Mar)
+
+> ⚠️ **Planejado — não implementado.** Esta seção é a especificação da funcionalidade futura
+> (`Core/Recording/`, `Core/Persistence/`). A Prova de Mar está **fora do escopo do MVP** no
+> `README.md`; nada aqui existe no código hoje (ver *Status atual do projeto*).
 
 A gravação entra pela **mesma** amostra que o mostrador. O `InclinationViewModel` publica
 `OnSample(angles, tMs)` logo depois do `ToAngles` que alimentou o estado, e o
@@ -286,7 +346,12 @@ referência interna faria o teste passar com um bug que só apareceria no aparel
 
 ## 8. A gravação na interface
 
-O núcleo grava desde o incremento anterior; aqui está como ele chega na tela.
+> ⚠️ **Planejado — não implementado.** Hoje o `App` tem apenas `HomePage` (protótipo com 3
+> labels e botões Iniciar/Parar/Calibrar). Não existem `AppShell`, `InclinometerView`,
+> `ChartView`, `RecordButton`, `RecordingBar` nem o `RecorderViewModel` singleton que esta
+> seção descreve. Trata-se do desenho-alvo para o Épico 3.
+
+Quando o núcleo gravar (seção 7), este é o desenho de como ele chegaria à tela.
 
 ```
 AppShell

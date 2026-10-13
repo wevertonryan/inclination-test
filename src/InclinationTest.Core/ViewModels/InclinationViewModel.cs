@@ -16,6 +16,8 @@ public sealed class InclinationViewModel : ObservableObject
     private bool _isRunning;
     private double _roll;
     private double _trim;
+    private double _uncalibratedRoll;
+    private double _uncalibratedTrim;
 
     public InclinationViewModel(ISensorService sensor, IFilter filter)
     {
@@ -88,15 +90,18 @@ public sealed class InclinationViewModel : ObservableObject
 
     public void Calibrate()
     {
-        _calibration = new Calibration(_roll, _trim);
+        _calibration = new Calibration(_uncalibratedRoll, _uncalibratedTrim);
         IsCalibrated = true;
     }
 
     private void HandleSample(MotionSample sample)
     {
         var filtered = _filter.Process(sample);
+        var raw = AngleConverter.ToAngles(filtered);
         var angles = AngleConverter.ToAngles(filtered, _calibration);
 
+        _uncalibratedRoll = raw.Roll;
+        _uncalibratedTrim = raw.Trim;
         Roll = angles.Roll;
         Trim = angles.Trim;
 

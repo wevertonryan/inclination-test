@@ -292,6 +292,39 @@ public class InclinationViewModelTests
         vm.Roll.Should().BeApproximately(0, 1e-6);
     }
 
+    [Fact]
+    public void Calibrate_SecondTime_ZeroesCurrentReading()
+    {
+        var (vm, sensor, _) = Create();
+        vm.Start();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(20, 10), 1));
+
+        vm.Calibrate();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(30, 5), 2));
+
+        vm.Calibrate();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(30, 5), 3));
+
+        vm.Roll.Should().BeApproximately(0, 1e-6);
+        vm.Trim.Should().BeApproximately(0, 1e-6);
+    }
+
+    [Fact]
+    public void Calibrate_SecondTime_SubsequentSamplesRelativeToNewZero()
+    {
+        var (vm, sensor, _) = Create();
+        vm.Start();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(20, 0), 1));
+
+        vm.Calibrate();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(30, 0), 2));
+
+        vm.Calibrate();
+        sensor.Emit(MotionFixtures.Sample(MotionFixtures.FromAngles(35, 0), 3));
+
+        vm.Roll.Should().BeApproximately(5, 1e-6);
+    }
+
     private static (InclinationViewModel ViewModel, FakeSensorService Sensor, FakeFilter Filter) Create(
         Func<MotionSample, MotionSample>? filterTransform = null)
     {
