@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.ChartView"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
+
+    <Border
+        BackgroundColor="{StaticResource SurfaceCard}"
+        Padding="12,10,12,6"
+        Stroke="{StaticResource SurfaceBorder}"
+        StrokeShape="RoundRectangle 16"
+        StrokeThickness="1">
+        <Grid RowDefinitions="Auto,*" RowSpacing="6">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="12"
+                    Text="Trim × Roll"
+                    TextColor="{StaticResource TextMuted}" />
+                <HorizontalStackLayout Grid.Column="1" Spacing="12">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="11"
+                        Text="● Trim"
+                        TextColor="{StaticResource TrimLine}" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="11"
+                        Text="● Roll"
+                        TextColor="{StaticResource Accent}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <lvc:CartesianChart
+                x:Name="Chart"
+                Grid.Row="1"
+                HeightRequest="150" />
+        </Grid>
+    </Border>
+</ContentView>

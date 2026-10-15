@@ -1,3 +1,4 @@
+using InclinationTest.Core.ViewModels;
 using UraniumUI.Icons.MaterialSymbols;
 using UraniumUI.Material.Controls;
 
@@ -6,6 +7,7 @@ namespace InclinationTest.App.Views;
 public partial class MainPage : ContentPage
 {
     public MainPage(
+        RecorderViewModel recorder,
         HomeView home,
         CalibragemView calibragem,
         RelatoriosView relatorios,
@@ -13,6 +15,8 @@ public partial class MainPage : ContentPage
         ConfiguracoesView configuracoes)
     {
         InitializeComponent();
+
+        BindingContext = recorder;
 
         AddTab(home, "Home", MaterialOutlined.Home);
         AddTab(calibragem, "Calibragem", MaterialOutlined.Tune);

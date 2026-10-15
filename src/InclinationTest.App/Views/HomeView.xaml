@@ -1,49 +1,108 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView
     x:Class="InclinationTest.App.Views.HomeView"
+    x:Name="RootView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:InclinationTest.App.Controls">
+    xmlns:controls="clr-namespace:InclinationTest.App.Controls"
+    xmlns:converters="clr-namespace:InclinationTest.App.Converters"
+    xmlns:features="clr-namespace:InclinationTest.App.Components.Features"
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="12">
+    <ContentView.Resources>
+        <converters:ElapsedMsToTimerConverter x:Key="Timer" />
+    </ContentView.Resources>
 
-            <Label
-                FontSize="32"
-                HorizontalTextAlignment="Center"
-                Text="Inclination Test" />
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource AppBackground}">
+
+        <!-- TOP SAFE -->
+        <VerticalStackLayout Grid.Row="0" Spacing="8">
+            <layout:ScreenHeader
+                x:Name="Header"
+                Title="Medição">
+                <layout:ScreenHeader.LeftContent>
+                    <Border
+                        x:Name="SensorChip"
+                        Padding="12,5"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="1">
+                        <Label
+                            x:Name="SensorChipLabel"
+                            FontAttributes="Bold"
+                            FontSize="11"
+                            Text="NÃO CALIBRADO" />
+                    </Border>
+                </layout:ScreenHeader.LeftContent>
+            </layout:ScreenHeader>
 
             <Border
-                Margin="0,12,0,0"
-                Padding="24"
-                StrokeShape="RoundRectangle 16">
-                <VerticalStackLayout Spacing="8">
-                    <controls:InclinometerControl
-                        Roll="{Binding Roll}"
-                        Trim="{Binding Trim}"
-                        Size="260" />
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
-                        <Label FontSize="20" Text="{Binding Trim, StringFormat='TRIM {0:F1}°'}" TextColor="#2196F3" />
-                        <Label FontSize="20" Text="{Binding Roll, StringFormat='ROLL {0:F1}°'}" TextColor="#FFB300" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Border>
-
-            <Label Text="{Binding IsRunning, StringFormat='Rodando: {0}'}" />
-            <Label Text="{Binding IsCalibrated, StringFormat='Calibrado: {0}'}" />
-
-            <Label
-                x:Name="ErrorLabel"
+                x:Name="TimerPill"
+                Margin="0,4,0,0"
+                Padding="18,8"
+                BackgroundColor="{StaticResource SurfaceElevated}"
+                HorizontalOptions="Center"
                 IsVisible="False"
-                Text="{Binding Error}"
-                TextColor="Red" />
-
-            <HorizontalStackLayout Spacing="12">
-                <Button Text="Iniciar" Clicked="OnIniciarClicked" />
-                <Button Text="Parar" Clicked="OnPararClicked" />
-                <Button Text="Calibrar" Clicked="OnCalibrarClicked" />
-            </HorizontalStackLayout>
-
+                Stroke="{StaticResource SurfaceBorder}"
+                StrokeShape="RoundRectangle 18"
+                StrokeThickness="1">
+                <Label
+                    FontFamily="monospace"
+                    FontSize="22"
+                    Text="{Binding ElapsedMs, Converter={StaticResource Timer}}"
+                    TextColor="{StaticResource TextPrimary}" />
+            </Border>
         </VerticalStackLayout>
-    </ScrollView>
+
+        <!-- CONTENT SAFE (centralizado) -->
+        <Grid Grid.Row="1" Padding="20,8,20,8">
+            <VerticalStackLayout Spacing="16" VerticalOptions="Center">
+                <controls:InclinometerControl
+                    HorizontalOptions="Center"
+                    Roll="{Binding Roll}"
+                    Size="260"
+                    Trim="{Binding Trim}" />
+
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="18">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="{Binding Trim, StringFormat='TRIM {0:F1}°'}"
+                        TextColor="{StaticResource TrimLine}" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="{Binding Roll, StringFormat='ROLL {0:F1}°'}"
+                        TextColor="{StaticResource Accent}" />
+                </HorizontalStackLayout>
+
+                <Label
+                    x:Name="ErrorLabel"
+                    FontSize="13"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="False"
+                    Text="{Binding Error}"
+                    TextColor="{StaticResource Danger}" />
+
+                <features:ChartView
+                    x:Name="Chart"
+                    IsVisible="{Binding IsImmersive}" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- BOTTOM SAFE -->
+        <Grid Grid.Row="2" Padding="0,6,0,10" MinimumHeightRequest="92">
+            <features:RecordButton
+                x:Name="IdleRecord"
+                Clicked="OnIdleRecordClicked"
+                HorizontalOptions="Center"
+                IsVisible="False" />
+
+            <features:RecordingBar
+                x:Name="RecordingBar"
+                CancelRequested="OnCancelRequested"
+                IsVisible="False"
+                SaveRequested="OnSaveRequested"
+                ToggleRequested="OnToggleRequested" />
+        </Grid>
+    </Grid>
 </ContentView>

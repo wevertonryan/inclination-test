@@ -10,38 +10,97 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
 ## Status atual do projeto
 
-> **Última verificação: 13/10/2026.** Este status reflete o que existe no código hoje e é a
+> **Última verificação: 14/10/2026.** Este status reflete o que existe no código hoje e é a
 > fonte de verdade sobre o andamento. As demais seções descrevem o desenho-alvo; o que ainda
 > não foi implementado está marcado como **Planejado** ao longo do documento.
 
 **Estágio:** Épico 1 / **EP2** concluído — Sensores, Cálculos, Calibração, Filtragem de Ruído e
 Testes. A camada de interface já tem o esqueleto de navegação (`AppShell` + `MainPage` com
-`material:TabView` da UraniumUI, 5 abas inferiores): a Home real e quatro telas placeholder. A
-gravação/persistência (Épico 2/3) ainda não começou.
+`material:TabView` da UraniumUI, 5 abas inferiores): a Home real e quatro telas placeholder.
+
+A **gravação/persistência (Épico 2/3) está em desenvolvimento por TDD**, em 3 etapas
+(1. testes → 2. código do Core → 3. visual). As **Etapas 1 e 2** já estão entregues: a Etapa 1
+escreveu os contratos e as suítes; a Etapa 2 implementou todos os corpos do Core, **fechando os
+93 testes antes vermelhos**. A suíte total (**201 testes**) está **verde**. Falta a **Etapa 3**
+(visual: telas reais + wiring do gravador no `App`).
 
 ### Implementado
 
 | Camada | O que existe |
 |---|---|
 | `Core/Models/` | `Vector3`, `MotionSample`, `Angles`, `Calibration` |
-| `Core/Sensors/` | `ISensorService`, `SensorService`, `IAccelerometerSource`, `AccelerometerReading` |
-| `Core/Processing/` | `IFilter`, `FilterService` (filtro EMA), `AngleConverter` |
-| `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`) |
+| `Core/Sensors/` | `ISensorService`, `SensorService`, `IAccelerometerSource`, `AccelerometerReading` (contratos em `Contracts/`) |
+| `Core/Processing/` | `IFilter` (em `Contracts/`), `FilterService` (filtro EMA), `AngleConverter` |
+| `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`); `RecorderViewModel` (máquina de estados, cronômetro, confirmação, série) e contratos `RecorderMode`, `ConfirmationRequest` (em `Contracts/`) |
+| `Core/Recording/` | `RecordingSession` (decimação 12 Hz, lotes de 2 s, pause/resume), `Statistics` (Welford), `RecordingWriter`, `ThreadSerialExecutor` (thread dedicada + fila); contratos em `Contracts/`: `IRecordingSession`, `ISerialExecutor`, `RecordedSample`, `RecordingSummary`, `RecordingOptions`, `RecordingEvents` |
+| `Core/Persistence/` | `InMemoryReportRepository` (referência de semântica); contratos em `Contracts/`: `IReportRepository`, `RecordingHeader`, `RecordingStatus` |
+| `Core/Platform/` | `IClock`, `ITicker` (abstrações de tempo; produção no App, fakes nos testes) |
 | `App` | `MauiProgram` (DI + UraniumUI), `MauiAccelerometerSource`, `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (3 campos + botões Iniciar/Parar/Calibrar) e 4 views placeholder (`CalibragemView`, `RelatoriosView`, `TestesView`, `ConfiguracoesView`), `Converters/SelectionColorConverter` |
-| Testes | **95** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26 |
+| Testes | **201** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26, `Statistics` 15, `RecordingSession` 33, `RecordingWriter` 7, `ThreadSerialExecutor` 4, `InMemoryReportRepository` 15, `RecorderViewModel` 32 — **todos verdes** |
 
 ### Planejado (não implementado)
 
 | Camada | Pendente |
 |---|---|
-| `Core/Recording/` | `RecordingSession` (decimação, lotes, pause/save) e `Statistics` (Welford) |
-| `Core/Persistence/` | `Schema`, `IReportRepository`, `InMemoryReportRepository`, `SqliteReportRepository`, `RecordingStore` |
-| `Core/ViewModels/` | `RecorderViewModel` |
-| `App` | Telas reais das seções (Calibração, Relatórios...) e `Components/` (Layout, Ui, Features), design system em `Colors.xaml` |
+| `Core/Persistence/` | **Etapa própria**: `Schema`, `SqliteReportRepository` (`Microsoft.Data.Sqlite`), `RecordingStore` (a semântica já é garantida por contrato via `InMemoryReportRepository`) |
+| `App` | **Etapa 3**: telas reais das seções (Calibração, Relatórios...), wiring do gravador (`RecorderViewModel` singleton, `ITicker`/`IClock` de produção), design system em `Colors.xaml` |
 | Stack de UI | LiveCharts2 e SkiaSharp (previstos para o Épico 3); UraniumUI já referenciada |
 
-> A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP** — por isso as
-> seções 7 e 8 abaixo são especificação futura, não estado atual.
+> A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP**. Ainda assim, por
+> decisão do time, o **Core** da gravação (seção 7) já foi antecipado e implementado; a **interface**
+> (seção 8) continua como desenho-alvo da Etapa 3.
+
+## Roadmap das etapas — o que foi feito e o que falta
+
+Legenda: ✅ concluído · ⬜ pendente.
+
+### Épico 1 — Medição (concluído)
+
+- ✅ **Sensores** — `IAccelerometerSource` + `SensorService` + adapter `MauiAccelerometerSource`.
+- ✅ **Cálculo** — `AngleConverter` (roll ±180, trim ±90, com sinal; convenção MAUI em G).
+- ✅ **Calibração** — offset de zero aplicado no `AngleConverter` (US-01).
+- ✅ **Filtragem** — `FilterService` (EMA).
+- ✅ **ViewModel** — `InclinationViewModel` (estado + `OnSample` como torneira da série).
+- ✅ **Testes** — 95 testes verdes (SensorService, FilterService, AngleConverter, InclinationViewModel).
+
+### Gravação / persistência (desenvolvida por TDD, em 3 etapas)
+
+**Etapa 0 — Preparação da estrutura ✅**
+
+- ✅ Criação dos contratos-esqueleto em `Core/Recording/`, `Core/Persistence/`, `Core/Platform/` e `Core/ViewModels/`.
+- ✅ Reorganização em subpastas `Contracts/` por módulo (`Recording`, `Persistence`, `ViewModels`, `Sensors`, `Processing`), sem alterar namespaces.
+
+**Etapa 1 — Testes (TDD "vermelho") ✅**
+
+- ✅ Suítes escritas: `StatisticsTests` (15), `RecordingSessionTests` (33), `RecordingWriterTests` (7), `ThreadSerialExecutorTests` (4), `ReportRepositoryContractTests` (15) + `InMemoryReportRepositoryTests`, `RecorderViewModelTests` (32).
+- ✅ Fakes de teste: `FakeClock`, `FakeTicker`, `InlineSerialExecutor`, `FakeRecordingSession`, `SpyReportRepository`.
+- ✅ Total: 201 testes (108 verdes + 93 vermelhos por `NotImplementedException`).
+
+**Etapa 2 — Implementação do Core ✅** *(esta entrega)*
+
+- ✅ `Statistics` — média/desvio populacional (÷N) por Welford, min/max, `ToSummary`.
+- ✅ `ThreadSerialExecutor` — thread dedicada + fila (`BlockingCollection`); mantém a UI livre.
+- ✅ `InMemoryReportRepository` — referência de semântica da persistência.
+- ✅ `RecordingSession` — decimação 12 Hz, lotes de 2 s, pause/resume sem contar o tempo pausado, save/discard.
+- ✅ `RecordingWriter` — traduz eventos da sessão em chamadas ao repositório, roteadas pelo executor.
+- ✅ `RecorderViewModel` — máquina de estados, cronômetro com *throttle* de 100 ms, série capada, confirmação.
+- ✅ **201 testes verdes**; `dotnet build` OK; `dotnet format` limpo em Core/Tests.
+- ⚠️ **Ponto em aberto (spec):** o `Statistics` trata `0.0` como "sem leitura" por canal (exigência de `ToSummary_MapsAllFields`), então uma leitura real de exatamente `0°` não entra na média/desvio/min/max. Revisar se 0 deve ser dado válido — exige ajustar aquele teste.
+
+**Etapa 3 — Visual + integração no `App` ⬜**
+
+- ⬜ `ITicker`/`IClock` de produção (relógio real e ticker periódico).
+- ⬜ `RecorderViewModel` singleton no DI (`MauiProgram`), do `InclinationViewModel.OnSample` até `CaptureAngle`.
+- ⬜ `RecordButton`, `RecordingBar`, `Timer`, `ChartView` (LiveCharts2) e os *popups* de cancelar/salvar.
+- ⬜ Telas reais das abas (Calibração, Relatórios...) e design system em `Colors.xaml`.
+- ⬜ Telas/relatórios de resultado lendo o repositório (US-05, US-07).
+
+**Etapa SQLite — Persistência real ⬜**
+
+- ⬜ `Schema.cs` (DDL `recordings` + `samples`, PK `(recording_id, elapsed_ms)`).
+- ⬜ `SqliteReportRepository` (prepared statements, transação por lote).
+- ⬜ `RecordingStore` (abre o banco e aplica o schema).
+- ⬜ Testes deste repositório reaproveitando o mesmo `ReportRepositoryContractTests` (headless, `Data Source=:memory:`).
 
 ## 2. Stack e ferramentas
 
@@ -71,30 +130,52 @@ Estrutura dentro de `src/`:
 
 Legenda: **[ok]** implementado · **[plan]** planejado (não implementado).
 
+Convenção: cada módulo com lógica tem uma subpasta **`Contracts/`** só com abstrações
+(interfaces, records, enums, eventos); o namespace é o do módulo (ex.: `InclinationTest.Core.Recording`).
+Módulos que já são 100% contrato não ganham a subpasta (`Platform/`, `Models/`).
+
 ```
 InclinationTest.sln
   InclinationTest.Core/              # biblioteca net10.0 — lógica pura, sem dependência de UI
     Sensors/
-      ISensorService.cs        [ok]  # contrato de captura
       SensorService.cs         [ok]  # normaliza a leitura do acelerômetro
-      IAccelerometerSource.cs  [ok]  # abstração da fonte nativa (fake nos testes)
-      AccelerometerReading.cs  [ok]  # forma crua entregue pela fonte
+      Contracts/
+        ISensorService.cs      [ok]  # contrato de captura
+        IAccelerometerSource.cs [ok] # abstração da fonte nativa (fake nos testes)
+        AccelerometerReading.cs [ok] # forma crua entregue pela fonte
     Processing/
-      IFilter.cs               [ok]  # contrato de filtragem
       FilterService.cs         [ok]  # filtragem de ruído (EMA)
       AngleConverter.cs        [ok]  # converte a amostra filtrada em ângulos
+      Contracts/
+        IFilter.cs             [ok]  # contrato de filtragem
     ViewModels/
       InclinationViewModel.cs  [ok]  # ViewModel: intermediário entre o Core e a UI
-      RecorderViewModel.cs     [plan] # ViewModel do gravador
+      RecorderViewModel.cs     [ok]  # ViewModel do gravador
+      Contracts/
+        RecorderMode.cs        [ok]  # Idle / Recording / Paused
+        ConfirmationRequest.cs [ok]  # None / Cancel / Save
     Recording/
-      RecordingSession.cs      [plan] # o gravador sem UI: decimação, lotes, pause/save
-      Statistics.cs            [plan] # média e desvio de Welford, sem lista de amostras
+      RecordingSession.cs      [ok]  # o gravador sem UI: decimação, lotes, pause/save
+      Statistics.cs            [ok]  # média e desvio de Welford, sem lista de amostras
+      ThreadSerialExecutor.cs  [ok]  # thread dedicada + fila (mantém a UI livre)
+      RecordingWriter.cs       [ok]  # traduz eventos da sessão em chamadas ao repositório
+      Contracts/
+        IRecordingSession.cs   [ok]  # contrato do gravador (fake nos testes)
+        ISerialExecutor.cs     [ok]  # contrato do executor serial
+        RecordedSample.cs      [ok]  # amostra gravada (elapsed, roll, trim)
+        RecordingSummary.cs    [ok]  # resumo (mean/std/min/max, abertura, duração)
+        RecordingOptions.cs    [ok]  # intervalos de amostragem e de lote
+        RecordingEvents.cs     [ok]  # SessionState, FinishReason, eventos
+    Platform/
+      IClock.cs                [ok]  # relógio injetável (produção no App, fake nos testes)
+      ITicker.cs               [ok]  # ticker periódico (cronômetro)
     Persistence/
-      Schema.cs                [plan] # DDL de recordings + samples
-      IReportRepository.cs     [plan] # contrato de persistência
-      InMemoryReportRepository.cs [plan] # fake dos testes / referência de semântica
-      SqliteReportRepository.cs [plan] # implementação (Microsoft.Data.Sqlite)
-      RecordingStore.cs        [plan] # abre o banco e aplica o schema
+      InMemoryReportRepository.cs [ok] # fake dos testes / referência de semântica
+      Contracts/
+        IReportRepository.cs   [ok]  # contrato de persistência
+        RecordingHeader.cs     [ok]  # cabeçalho da gravação (status, resumo, local)
+        RecordingStatus.cs     [ok]  # Recording / Saved
+      (Schema, SqliteReportRepository, RecordingStore) [plan] # Etapa própria
     Models/
       Vector3.cs               [ok]  # tipos compartilhados entre o pipeline (contratos)
       MotionSample.cs          [ok]
@@ -128,9 +209,9 @@ InclinationTest.sln
   InclinationTest.Core.Tests/        # xUnit (net10.0)
     Sensors/                   [ok]  # SensorServiceTests
     Processing/                [ok]  # FilterServiceTests, AngleConverterTests
-    ViewModels/                [ok]  # InclinationViewModelTests
-    Recording/                 [plan] # StatisticsTests, RecordingSessionTests
-    Persistence/               [plan] # ReportRepositoryTests
+    ViewModels/                [ok]  # InclinationViewModelTests + RecorderViewModelTests
+    Recording/                 [ok]  # StatisticsTests, RecordingSessionTests, RecordingWriterTests, ThreadSerialExecutorTests
+    Persistence/               [ok]  # ReportRepositoryContractTests + InMemoryReportRepositoryTests
     Components/                [plan] # InclinometerViewTests
     TestUtils/                 [ok]  # fixtures e utilitários dos testes (NÃO é uma suite)
 ```
@@ -187,14 +268,19 @@ InclinationTest.Core.Tests/
   Processing/FilterServiceTests.cs         # 13 testes — contrato de forma + invariantes
   Processing/AngleConverterTests.cs        # 37 testes — round-trip, golden vectors, fuzz
   ViewModels/InclinationViewModelTests.cs  # 26 testes — orquestração do pipeline
-  Recording/                               # [plan] StatisticsTests, RecordingSessionTests
-  Persistence/                             # [plan] ReportRepositoryTests
+  Recording/StatisticsTests.cs             # 15 testes — Welford (média/desvio pop., min/max)
+  Recording/RecordingSessionTests.cs       # 33 testes — decimação, lotes, pause/resume, save/discard
+  Recording/RecordingWriterTests.cs        # 7 testes — eventos da sessão → repositório via executor
+  Recording/ThreadSerialExecutorTests.cs   # 4 testes — thread dedicada + fila
+  Persistence/ReportRepositoryContractTests.cs  # 15 testes — contrato do repositório
+  Persistence/InMemoryReportRepositoryTests.cs  # roda o contrato contra o InMemory
+  ViewModels/RecorderViewModelTests.cs     # 32 testes — máquina de estados, cronômetro, confirmação
   Components/                              # [plan] InclinometerViewTests
 ```
 
-Total do `Core`: **95 testes** (19 + 13 + 37 + 26), escritos junto com a implementação que já
-existe — verde com o código atual. As suítes de `Recording/`, `Persistence/` e `Components/`
-acompanham as features ainda planejadas.
+Total do `Core`: **201 testes**, **todos verdes**. As Etapas 1 e 2 cobrem `Statistics`,
+`RecordingSession`, `RecordingWriter`, `ThreadSerialExecutor`, `InMemoryReportRepository` e
+`RecorderViewModel`. `Components/` acompanha a Etapa 3.
 
 ### 5.1 O que os testes travam — e o que eles deixam passar
 
@@ -254,9 +340,9 @@ Interface             Views + Components
 - **FilterService** (`Core/Processing/FilterService.cs`) — recebe a `MotionSample` bruta e devolve a mesma forma. Não sabe que existe Sensor nem o Angle Converter.
 - **AngleConverter** (`Core/Processing/AngleConverter.cs`) — recebe a `MotionSample` filtrada e devolve `Angles { roll, trim }` em graus. Não sabe que existe sensor nem interface.
 - **InclinationViewModel** (`Core/ViewModels/InclinationViewModel.cs`) — intermediário entre o `AngleConverter` e a interface (um ViewModel): orquestra `SensorService + FilterService + AngleConverter`, guarda o estado (`Roll`, `Trim`, `IsRunning`, `IsCalibrated`, `Error`) e expõe as ações (`Start`, `Stop`, `Calibrate`). A UI só conversa com ele. Expõe também um evento `OnSample(Angles angles, double tMs)`, disparado com o **mesmo** resultado de `ToAngles` que alimenta o estado — é por essa torneira que o gravador receberia a série, sem sensor próprio e sem segunda assinatura do `Accelerometer`.
-- **RecorderViewModel** (`Core/ViewModels/RecorderViewModel.cs`) — **[plan]** ViewModel do gravador, irmão do `InclinationViewModel` e não filho dele: conhece ângulos, não sensor. Encaminharia cada amostra para um `RecordingSession`, publicaria estado no máximo a cada 100 ms (`DefaultTickMs`) e exporia `Start`, `Pause`, `Resume`, `Toggle`, `Save`, `Discard`.
-- **RecordingSession** (`Core/Recording/RecordingSession.cs`) — **[plan]** o gravador sem UI. Decidiria o que entra no disco: **decima de 60 Hz para 12 Hz** (`DefaultSampleIntervalMs = 83`), acumularia as estatísticas de Welford e **escreveria em lotes de 2 s** (`DefaultFlushIntervalMs`).
-- **IReportRepository** (`Core/Persistence/IReportRepository.cs`) — **[plan]** o contrato de persistência, com duas implementações: `SqliteReportRepository` (`Microsoft.Data.Sqlite`, aberta por `RecordingStore`) e `InMemoryReportRepository` (fake dos testes / referência de semântica).
+- **RecorderViewModel** (`Core/ViewModels/RecorderViewModel.cs`) — **[ok]** ViewModel do gravador, irmão do `InclinationViewModel` e não filho dele: conhece ângulos, não sensor. Encaminha cada amostra aceita para o `RecordingSession` via `CaptureAngle`, publica o cronômetro no máximo a cada 100 ms (`DefaultTickMs`) e expõe `Record`, `Toggle`, `RequestCancel`, `RequestSave`, `Confirm`, `Dismiss` (máquina de estados `RecorderMode`) com série de `RecordedSample` limitada (`DefaultSeriesCapacity = 600`).
+- **RecordingSession** (`Core/Recording/RecordingSession.cs`) — **[ok]** o gravador sem UI. Decide o que entra no disco: **decima para 12 Hz** (`DefaultSampleIntervalMs = 83`), acumula as estatísticas de Welford (`Statistics`) e **escreve em lotes de 2 s** (`DefaultFlushIntervalMs`) via evento `BatchReady`, excluindo o tempo em pausa (`Pause`/`Resume`).
+- **IReportRepository** (`Core/Persistence/IReportRepository.cs`) — **[ok]** o contrato de persistência, com `InMemoryReportRepository` já implementado (fake dos testes / referência de semântica). `SqliteReportRepository` (`Microsoft.Data.Sqlite`, aberta por `RecordingStore`) fica para uma etapa própria **[plan]**.
 
 **Regra de independência:** cada etapa conhece apenas a forma de entrada/saída da vizinha (definida em `Core/Models/`). Por isso é possível trocar o `SensorService` (ou o algoritmo do `FilterService`) sem alterar o restante — basta manter o contrato e atualizar apenas os testes daquela etapa.
 
@@ -301,13 +387,15 @@ Decisões de projeto fixadas nos contratos:
 - **Apenas o acelerômetro** (e não uma fusão tipo `DeviceMotion`) porque o MAUI Essentials não oferece um evento fundido com `accelerationIncludingGravity`/`rotationRate`/Euler, e o cálculo de banda/trim depende só do vetor de gravidade — o acelerômetro basta para a medição. `Gyroscope`/`OrientationSensor` ficam como matéria-prima opcional para a filtragem.
 - **Ângulos com sinal** (roll −180..180, trim −90..90): é o que permite ao anel girar para os dois lados e à régua deslizar para cima e para baixo, como pede o protótipo (`PROTOTIPO.md`). O roll é envolvido em (−180, 180) para que a virada pela proa não dê uma volta completa no mostrador.
 - **Calibração como parâmetro do `AngleConverter`** (US-01): `ToAngles` aplica o offset do zero, continuando uma função pura.
-- **Interfaces + injeção de dependência** (não funções factory soltas): `IAccelerometerSource`, `ISensorService` e `IFilter` são injetados pelos construtores via `MauiProgram` — fáceis de mockar e testar sem tocar no hardware. O mesmo se aplica ao `IReportRepository` **[plan]**.
+- **Interfaces + injeção de dependência** (não funções factory soltas): `IAccelerometerSource`, `ISensorService` e `IFilter` são injetados pelos construtores via `MauiProgram` — fáceis de mockar e testar sem tocar no hardware. O mesmo se aplica ao `IReportRepository` **[ok]**.
 
 ## 7. Gravação e persistência (Prova de Mar)
 
-> ⚠️ **Planejado — não implementado.** Esta seção é a especificação da funcionalidade futura
-> (`Core/Recording/`, `Core/Persistence/`). A Prova de Mar está **fora do escopo do MVP** no
-> `README.md`; nada aqui existe no código hoje (ver *Status atual do projeto*).
+> ✅ **Core entregue (TDD).** Esta seção é a especificação da funcionalidade. As Etapas 1 e 2
+> (testes + implementação dos corpos em `Core/Recording/`, `Core/Persistence/` e `RecorderViewModel`)
+> já estão concluídas e verdes; falta a **Etapa 3** (visual) e a persistência SQLite. A Prova de Mar
+> é citada como **fora do escopo do MVP** no `README.md`; a série temporal foi antecipada por decisão
+> do time (ver *Status atual*).
 
 A gravação entra pela **mesma** amostra que o mostrador. O `InclinationViewModel` publica
 `OnSample(angles, tMs)` logo depois do `ToAngles` que alimentou o estado, e o
@@ -348,7 +436,7 @@ amostras.
 
 ### Por que o SQLite não roda na suíte
 
-`Microsoft.Data.Sqlite` é nativo. `ReportRepositoryTests` roda contra
+`Microsoft.Data.Sqlite` é nativo. `ReportRepositoryContractTests` roda contra
 `InMemoryReportRepository`, que é a **referência de semântica**: se ele fica
 verde e o SQLite divergir, o bug é do SQLite. Por isso o fake copia as linhas na
 leitura, como o SQLite materializa objetos novos a cada `SELECT` — devolver a
@@ -364,7 +452,7 @@ referência interna faria o teste passar com um bug que só apareceria no aparel
 > existem `ChartView`, `RecordButton`, `RecordingBar` nem o `RecorderViewModel` singleton que esta
 > seção descreve. Trata-se do desenho-alvo para o Épico 3.
 
-Quando o núcleo gravar (seção 7), este é o desenho de como ele chegaria à tela.
+O núcleo já grava (seção 7); este é o desenho de como ele chega à tela na Etapa 3.
 
 ```
 AppShell

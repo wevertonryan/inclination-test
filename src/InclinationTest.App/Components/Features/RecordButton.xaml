@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.RecordButton"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid>
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border
+            x:Name="Circle"
+            BackgroundColor="{StaticResource RecordRed}"
+            HeightRequest="68"
+            StrokeShape="RoundRectangle 34"
+            StrokeThickness="0"
+            WidthRequest="68">
+            <Border.Background>
+                <RadialGradientBrush Center="0.5,0.45" Radius="0.72">
+                    <GradientStop Color="{StaticResource RecordRedLight}" Offset="0" />
+                    <GradientStop Color="{StaticResource RecordRed}" Offset="0.78" />
+                </RadialGradientBrush>
+            </Border.Background>
+
+            <Grid>
+                <Ellipse
+                    x:Name="Core"
+                    Fill="White"
+                    HeightRequest="30"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="30" />
+                <Label
+                    x:Name="Icon"
+                    HorizontalOptions="Center"
+                    IsVisible="False"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</ContentView>

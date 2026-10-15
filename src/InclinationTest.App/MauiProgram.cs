@@ -1,10 +1,16 @@
+using InclinationTest.App.Platform;
 using InclinationTest.App.Sensors;
 using InclinationTest.App.Views;
+using InclinationTest.Core.Persistence;
+using InclinationTest.Core.Platform;
 using InclinationTest.Core.Processing;
+using InclinationTest.Core.Recording;
 using InclinationTest.Core.Sensors;
 using InclinationTest.Core.ViewModels;
+using LiveChartsCore.SkiaSharpView.Maui;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Hosting;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using UraniumUI;
@@ -19,6 +25,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseSkiaSharp()
+            .UseLiveCharts()
             .UseUraniumUI()
             .UseUraniumUIMaterial()
             .ConfigureFonts(fonts => fonts.AddMaterialSymbolsFonts());
@@ -28,6 +35,23 @@ public static class MauiProgram
             provider => new SensorService(provider.GetRequiredService<IAccelerometerSource>()));
         builder.Services.AddSingleton<IFilter>(_ => FilterService.Create());
         builder.Services.AddSingleton<InclinationViewModel>();
+
+        builder.Services.AddSingleton<IClock, SystemClock>();
+        builder.Services.AddSingleton<ITicker>(_ => new DispatcherTicker(
+            Application.Current?.Dispatcher ?? Dispatcher.GetForCurrentThread()!));
+        builder.Services.AddSingleton<ISerialExecutor, ThreadSerialExecutor>();
+        builder.Services.AddSingleton<IRecordingSession, RecordingSession>();
+        builder.Services.AddSingleton<IReportRepository, InMemoryReportRepository>();
+        builder.Services.AddSingleton<RecordingWriter>();
+        builder.Services.AddSingleton<RecorderViewModel>(provider =>
+        {
+            _ = provider.GetRequiredService<RecordingWriter>();
+
+            return new RecorderViewModel(
+                provider.GetRequiredService<IRecordingSession>(),
+                provider.GetRequiredService<ITicker>(),
+                provider.GetRequiredService<IClock>());
+        });
 
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<MainPage>();

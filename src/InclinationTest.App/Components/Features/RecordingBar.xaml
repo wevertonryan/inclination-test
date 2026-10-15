@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.RecordingBar"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:features="clr-namespace:InclinationTest.App.Components.Features">
+
+    <Grid
+        ColumnDefinitions="*,Auto,*"
+        HeightRequest="92"
+        Padding="0,14">
+
+        <Grid
+            Grid.Column="0"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCancel" />
+            </Grid.GestureRecognizers>
+            <Border
+                BackgroundColor="{StaticResource Danger}"
+                HeightRequest="60"
+                StrokeShape="RoundRectangle 30"
+                StrokeThickness="0"
+                WidthRequest="60">
+                <Label
+                    x:Name="CancelIcon"
+                    HorizontalOptions="Center"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <features:RecordButton
+            x:Name="Center"
+            Grid.Column="1"
+            Clicked="OnToggle"
+            Mode="{Binding Mode}"
+            VerticalOptions="Center" />
+
+        <Grid
+            Grid.Column="2"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSave" />
+            </Grid.GestureRecognizers>
+            <Border
+                BackgroundColor="{StaticResource Ok}"
+                HeightRequest="60"
+                StrokeShape="RoundRectangle 30"
+                StrokeThickness="0"
+                WidthRequest="60">
+                <Label
+                    x:Name="SaveIcon"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource TextOnAccent}"
+                    VerticalOptions="Center" />
+            </Border>
+        </Grid>
+    </Grid>
+</ContentView>

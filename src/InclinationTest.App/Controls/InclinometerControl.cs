@@ -101,8 +101,8 @@ public class InclinometerControl : SKCanvasView
         TrimStripRect = new SKPath();
         TrimStripRect.AddRoundRect(new SKRoundRect(new SKRect(Cx - StripWidth / 2f, Cy - StripHalf, Cx + StripWidth / 2f, Cy + StripHalf), 4f, 4f));
 
-        var rollLinesList = new List<(float x1,float y1,float x2,float y2,float w,SKColor c)>(1024);
-        var rollLabelsList = new List<(float x,float y,string t)>(24);
+        var rollLinesList = new List<(float x1, float y1, float x2, float y2, float w, SKColor c)>(1024);
+        var rollLabelsList = new List<(float x, float y, string t)>(24);
         for (int dir = 1; dir >= -1; dir -= 2)
         {
             for (int v = 0; v <= MaxRoll; v += MinorStep)
@@ -132,8 +132,8 @@ public class InclinometerControl : SKCanvasView
         RollLabelsText = new string[RollLabelCount];
         for (int i = 0; i < RollLabelCount; i++) { RollLabelsX[i] = rollLabelsList[i].x; RollLabelsY[i] = rollLabelsList[i].y; RollLabelsText[i] = rollLabelsList[i].t; }
 
-        var trimLinesList = new List<(float x1,float y1,float x2,float y2,float w,SKColor c)>(200);
-        var trimLabelsList = new List<(float x,float y,string t)>(12);
+        var trimLinesList = new List<(float x1, float y1, float x2, float y2, float w, SKColor c)>(200);
+        var trimLabelsList = new List<(float x, float y, string t)>(12);
         float spd = TrimTravel / MaxTrim;
         for (int v = 0; v <= MaxTrim; v += MinorStep)
         {

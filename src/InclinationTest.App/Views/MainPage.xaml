@@ -3,6 +3,7 @@
     x:Class="InclinationTest.App.Views.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:InclinationTest.App.Controls"
     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
     Title="Inclination Test">
@@ -12,10 +13,12 @@
             x:Key="SelectionColor"
             Selected="{StaticResource Primary}"
             Unselected="{StaticResource Gray400}" />
+        <converters:InverseBoolConverter x:Key="InverseBool" />
     </ContentPage.Resources>
 
-    <material:TabView
+    <controls:CollapsibleTabView
         x:Name="MainTabView"
+        HeaderVisible="{Binding IsImmersive, Converter={StaticResource InverseBool}}"
         TabPlacement="Bottom">
 
         <material:TabView.TabHeaderItemTemplate>
@@ -61,6 +64,6 @@
             </DataTemplate>
         </material:TabView.TabHeaderItemTemplate>
 
-    </material:TabView>
+    </controls:CollapsibleTabView>
 
 </ContentPage>
