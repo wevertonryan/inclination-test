@@ -21,6 +21,7 @@ public partial class ChartView : ContentView
 
     private RecorderViewModel? _recorder;
     private double _scale = ScaleFloor;
+    private long _lastRenderedMs = long.MinValue;
 
     public ChartView()
     {
@@ -72,7 +73,8 @@ public partial class ChartView : ContentView
             _recorder.PropertyChanged += OnRecorderChanged;
         }
 
-        Rebuild();
+        Reset();
+        Sync();
     }
 
     private static LineSeries<ObservablePoint> CreateSeries(
@@ -99,33 +101,79 @@ public partial class ChartView : ContentView
     {
         if (e.PropertyName == nameof(RecorderViewModel.SampleCount))
         {
-            Rebuild();
+            Sync();
         }
     }
 
-    private void Rebuild()
+    private void Sync()
+    {
+        if (_recorder is null || _recorder.SampleCount == 0)
+        {
+            Reset();
+            return;
+        }
+
+        var added = false;
+
+        foreach (var sample in _recorder.Series)
+        {
+            if (sample.ElapsedMs <= _lastRenderedMs)
+            {
+                continue;
+            }
+
+            var x = sample.ElapsedMs / 1000.0;
+            _trim.Add(new ObservablePoint(x, sample.Trim));
+            _roll.Add(new ObservablePoint(x, sample.Roll));
+            _lastRenderedMs = sample.ElapsedMs;
+            added = true;
+        }
+
+        if (!added)
+        {
+            return;
+        }
+
+        while (_trim.Count > RecorderViewModel.DefaultSeriesCapacity)
+        {
+            _trim.RemoveAt(0);
+            _roll.RemoveAt(0);
+        }
+
+        UpdateScale();
+    }
+
+    private void Reset()
     {
         _trim.Clear();
         _roll.Clear();
+        _lastRenderedMs = long.MinValue;
+        _scale = ScaleFloor;
+        _yAxis.MinLimit = -ScaleFloor;
+        _yAxis.MaxLimit = ScaleFloor;
+        _yAxis.MinStep = ScaleFloor;
+    }
 
+    private void UpdateScale()
+    {
         double maxAbs = 0;
 
-        if (_recorder is not null)
+        foreach (var sample in _recorder!.Series)
         {
-            foreach (var sample in _recorder.Series)
-            {
-                var x = sample.ElapsedMs / 1000.0;
-                _trim.Add(new ObservablePoint(x, sample.Trim));
-                _roll.Add(new ObservablePoint(x, sample.Roll));
-                maxAbs = Math.Max(maxAbs, Math.Max(Math.Abs(sample.Trim), Math.Abs(sample.Roll)));
-            }
+            maxAbs = Math.Max(maxAbs, Math.Max(Math.Abs(sample.Trim), Math.Abs(sample.Roll)));
         }
 
-        _scale = Math.Max(ScaleFloor, Math.Ceiling(maxAbs / ScaleFloor) * ScaleFloor);
-        _yAxis.MinLimit = -_scale;
-        _yAxis.MaxLimit = _scale;
-        _yAxis.MinStep = _scale <= 10 ? ScaleFloor : 10;
+        var scale = Math.Max(ScaleFloor, Math.Ceiling(maxAbs / ScaleFloor) * ScaleFloor);
 
+        if (scale == _scale)
+        {
+            return;
+        }
+
+        _scale = scale;
+        _yAxis.MinLimit = -scale;
+        _yAxis.MaxLimit = scale;
+        _yAxis.MinStep = scale <= 10 ? ScaleFloor : 10;
     }
 
     private static SKColor ThemeColor(string key, string fallback)

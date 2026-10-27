@@ -9,6 +9,7 @@ public sealed class InclinationViewModel : ObservableObject
 {
     private readonly IFilter _filter;
     private readonly ISensorService _sensor;
+    private readonly int _uiIntervalMs;
 
     private Calibration? _calibration;
     private string? _error;
@@ -18,11 +19,13 @@ public sealed class InclinationViewModel : ObservableObject
     private double _trim;
     private double _uncalibratedRoll;
     private double _uncalibratedTrim;
+    private double _lastPublishedMs;
 
-    public InclinationViewModel(ISensorService sensor, IFilter filter)
+    public InclinationViewModel(ISensorService sensor, IFilter filter, int uiIntervalMs = 0)
     {
         _sensor = sensor;
         _filter = filter;
+        _uiIntervalMs = uiIntervalMs;
     }
 
     public double Roll
@@ -97,13 +100,18 @@ public sealed class InclinationViewModel : ObservableObject
     private void HandleSample(MotionSample sample)
     {
         var filtered = _filter.Process(sample);
-        var raw = AngleConverter.ToAngles(filtered);
         var angles = AngleConverter.ToAngles(filtered, _calibration);
 
-        _uncalibratedRoll = raw.Roll;
-        _uncalibratedTrim = raw.Trim;
-        Roll = angles.Roll;
-        Trim = angles.Trim;
+        if (_uiIntervalMs <= 0 || filtered.Timestamp - _lastPublishedMs >= _uiIntervalMs)
+        {
+            _lastPublishedMs = filtered.Timestamp;
+
+            var raw = AngleConverter.ToAngles(filtered);
+            _uncalibratedRoll = raw.Roll;
+            _uncalibratedTrim = raw.Trim;
+            Roll = angles.Roll;
+            Trim = angles.Trim;
+        }
 
         OnSample?.Invoke(angles, filtered.Timestamp);
     }

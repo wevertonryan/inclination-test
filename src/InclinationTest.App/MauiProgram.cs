@@ -19,6 +19,12 @@ namespace InclinationTest.App;
 
 public static class MauiProgram
 {
+    /// <summary>
+    /// O sensor entrega ~50 Hz; a tela (inclinômetro, rótulos, gráfico) repinta a ~15 Hz.
+    /// A gravação continua recebendo todas as amostras via <c>OnSample</c>.
+    /// </summary>
+    private const int UiPublishIntervalMs = 66;
+
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
@@ -34,7 +40,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISensorService>(
             provider => new SensorService(provider.GetRequiredService<IAccelerometerSource>()));
         builder.Services.AddSingleton<IFilter>(_ => FilterService.Create());
-        builder.Services.AddSingleton<InclinationViewModel>();
+        builder.Services.AddSingleton<InclinationViewModel>(
+            provider => new InclinationViewModel(
+                provider.GetRequiredService<ISensorService>(),
+                provider.GetRequiredService<IFilter>(),
+                UiPublishIntervalMs));
 
         builder.Services.AddSingleton<IClock, SystemClock>();
         builder.Services.AddSingleton<ITicker>(_ => new DispatcherTicker(
