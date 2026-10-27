@@ -2,19 +2,172 @@
 <ContentView
     x:Class="InclinationTest.App.Views.RelatoriosView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:InclinationTest.App.Converters">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="8"
-        VerticalOptions="Center">
-        <Label
-            FontSize="24"
-            HorizontalTextAlignment="Center"
-            Text="Relatórios" />
-        <Label
-            HorizontalTextAlignment="Center"
-            Text="Em construção."
-            TextColor="{StaticResource Gray500}" />
-    </VerticalStackLayout>
+    <ContentView.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </ContentView.Resources>
+
+    <Grid BackgroundColor="{StaticResource AppBackground}">
+
+        <!--  LISTA  -->
+        <Grid
+            Padding="16,8,16,0"
+            IsVisible="{Binding HasSelection, Converter={StaticResource InverseBool}}"
+            RowDefinitions="Auto,*"
+            RowSpacing="10">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    Text="Relatórios"
+                    TextColor="{StaticResource TextPrimary}" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="12"
+                    Text="{Binding SummaryText}"
+                    TextColor="{StaticResource TextMuted}"
+                    VerticalOptions="Center" />
+            </Grid>
+
+            <CollectionView
+                x:Name="ReportsList"
+                Grid.Row="1"
+                ItemsSource="{Binding Reports}"
+                SelectionChanged="OnReportSelected"
+                SelectionMode="Single">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout
+                        Padding="24"
+                        Spacing="6"
+                        VerticalOptions="Center">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HorizontalTextAlignment="Center"
+                            Text="Nenhuma gravação"
+                            TextColor="{StaticResource TextPrimary}" />
+                        <Label
+                            FontSize="13"
+                            HorizontalTextAlignment="Center"
+                            Text="Grave uma medição na aba Home e toque em Salvar."
+                            TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Margin="0,0,0,8"
+                            Padding="14,12"
+                            BackgroundColor="{StaticResource SurfaceCard}"
+                            Stroke="{StaticResource SurfaceBorder}"
+                            StrokeShape="RoundRectangle 14"
+                            StrokeThickness="1">
+                            <Grid
+                                ColumnDefinitions="*,Auto"
+                                RowDefinitions="Auto,Auto"
+                                RowSpacing="2">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="15"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding Title}"
+                                    TextColor="{StaticResource TextPrimary}" />
+                                <Label
+                                    Grid.Row="1"
+                                    FontSize="12"
+                                    Text="{Binding DateText}"
+                                    TextColor="{StaticResource TextMuted}" />
+                                <Label
+                                    Grid.Column="1"
+                                    Grid.RowSpan="2"
+                                    FontFamily="monospace"
+                                    FontSize="14"
+                                    Text="{Binding DurationText}"
+                                    TextColor="{StaticResource Accent}"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!--  DETALHE  -->
+        <Grid
+            Padding="16,8,16,0"
+            IsVisible="{Binding HasSelection}"
+            RowDefinitions="Auto,Auto,Auto,*"
+            RowSpacing="12">
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Button
+                    Padding="0"
+                    BackgroundColor="Transparent"
+                    Clicked="OnBackClicked"
+                    FontSize="14"
+                    Text="‹ Voltar"
+                    TextColor="{StaticResource Accent}" />
+                <Label
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    LineBreakMode="TailTruncation"
+                    Text="{Binding Selected.Title}"
+                    TextColor="{StaticResource TextPrimary}"
+                    VerticalOptions="Center" />
+            </Grid>
+
+            <Label
+                Grid.Row="1"
+                FontSize="12"
+                Text="{Binding Selected.MetaText}"
+                TextColor="{StaticResource TextMuted}" />
+
+            <Border
+                Grid.Row="2"
+                Padding="14,12"
+                BackgroundColor="{StaticResource SurfaceCard}"
+                Stroke="{StaticResource SurfaceBorder}"
+                StrokeShape="RoundRectangle 14"
+                StrokeThickness="1">
+                <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="12"
+                    RowDefinitions="Auto,Auto"
+                    RowSpacing="4">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="11"
+                        Text="ROLL"
+                        TextColor="{StaticResource ChartRoll}" />
+                    <Label
+                        Grid.Column="1"
+                        FontAttributes="Bold"
+                        FontSize="11"
+                        Text="TRIM"
+                        TextColor="{StaticResource ChartTrim}" />
+
+                    <Label
+                        Grid.Row="1"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="{Binding Selected.RollText}"
+                        TextColor="{StaticResource TextPrimary}" />
+
+                    <Label
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="{Binding Selected.TrimText}"
+                        TextColor="{StaticResource TextPrimary}" />
+                </Grid>
+            </Border>
+
+            <Grid x:Name="ChartHost" Grid.Row="3" />
+        </Grid>
+    </Grid>
 </ContentView>

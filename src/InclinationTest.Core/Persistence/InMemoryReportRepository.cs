@@ -22,7 +22,10 @@ public sealed class InMemoryReportRepository : IReportRepository
             0,
             RecordingStatus.Recording,
             null,
-            location);
+            location)
+        {
+            StartedAtUtc = DateTimeOffset.UtcNow,
+        };
         _samples[id] = new SortedDictionary<long, RecordedSample>();
     }
 
@@ -53,6 +56,7 @@ public sealed class InMemoryReportRepository : IReportRepository
             FinishedAtMs = finishedAtMs,
             DurationMs = summary.DurationMs,
             Summary = summary,
+            SavedAtUtc = DateTimeOffset.UtcNow,
         };
     }
 
