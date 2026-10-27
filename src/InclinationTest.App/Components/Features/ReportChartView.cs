@@ -103,7 +103,7 @@ public sealed class ReportChartView : ContentView
         maxAbs = Math.Max(maxAbs, Math.Max(Math.Abs(sample.Trim), Math.Abs(sample.Roll)));
     }
 
-    private static LineSeries<ObservablePoint> CreateSeries(IEnumerable<ObservablePoint> values, SKColor color)
+    private static LineSeries<ObservablePoint> CreateSeries(IReadOnlyCollection<ObservablePoint> values, SKColor color)
         => new()
         {
             Values = values,

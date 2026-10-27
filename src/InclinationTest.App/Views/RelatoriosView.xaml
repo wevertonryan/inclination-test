@@ -52,7 +52,7 @@
                         <Label
                             FontSize="13"
                             HorizontalTextAlignment="Center"
-                            Text="Grave uma medição na aba Medição e toque em Salvar."
+                            Text="Grave uma medição na aba Home e toque em Salvar."
                             TextColor="{StaticResource TextMuted}" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
