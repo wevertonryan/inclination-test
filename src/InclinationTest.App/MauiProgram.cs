@@ -51,7 +51,9 @@ public static class MauiProgram
             Application.Current?.Dispatcher ?? Dispatcher.GetForCurrentThread()!));
         builder.Services.AddSingleton<ISerialExecutor, ThreadSerialExecutor>();
         builder.Services.AddSingleton<IRecordingSession, RecordingSession>();
-        builder.Services.AddSingleton<IReportRepository, InMemoryReportRepository>();
+        builder.Services.AddSingleton<IReportStorage, AppDataReportStorage>();
+        builder.Services.AddSingleton<IReportRepository, FileReportRepository>();
+        builder.Services.AddSingleton<ReportsViewModel>();
         builder.Services.AddSingleton<RecordingWriter>();
         builder.Services.AddSingleton<RecorderViewModel>(provider =>
         {

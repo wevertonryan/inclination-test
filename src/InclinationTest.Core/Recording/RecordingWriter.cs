@@ -22,6 +22,12 @@ public sealed class RecordingWriter : IDisposable
         _session.Finished += OnFinished;
     }
 
+    /// <summary>
+    /// Disparado (na thread do executor) depois que um relatório foi salvo no repositório.
+    /// A tela de Relatórios usa isso para se atualizar sem polling.
+    /// </summary>
+    public event Action<string>? Saved;
+
     public void Dispose()
     {
         if (_disposed)
@@ -35,7 +41,11 @@ public sealed class RecordingWriter : IDisposable
     }
 
     private void OnStarted(RecordingStarted started)
-        => _executor.Post(() => _repository.CreateRecording(started.Id, started.TimestampMs));
+    {
+        _finished = false;
+
+        _executor.Post(() => _repository.CreateRecording(started.Id, started.TimestampMs));
+    }
 
     private void OnBatchReady(SampleBatch batch)
     {
@@ -56,20 +66,20 @@ public sealed class RecordingWriter : IDisposable
 
         _finished = true;
 
+        var id = finished.Id;
+
         if (finished.Reason == FinishReason.Saved)
         {
-            _executor.Post(() => _repository.SaveRecording(
-                finished.Id,
-                finished.Title ?? string.Empty,
-                finished.Summary,
-                finished.TimestampMs));
+            _executor.Post(() =>
+            {
+                _repository.SaveRecording(id, finished.Title ?? string.Empty, finished.Summary, finished.TimestampMs);
+                Saved?.Invoke(id);
+            });
         }
         else
         {
-            _executor.Post(() => _repository.DeleteRecording(finished.Id));
+            _executor.Post(() => _repository.DeleteRecording(id));
         }
-
-        Unsubscribe();
     }
 
     private void Unsubscribe()

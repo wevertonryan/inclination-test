@@ -10,4 +10,14 @@ public sealed record RecordingHeader(
     long DurationMs,
     RecordingStatus Status,
     RecordingSummary? Summary,
-    string? Location);
+    string? Location)
+{
+    /// <summary>
+    /// Instante de parede em que a gravação começou. <see cref="StartedAtMs"/> vem do relógio
+    /// monotônico (<c>Environment.TickCount64</c>) e não serve para exibir data/hora.
+    /// </summary>
+    public DateTimeOffset? StartedAtUtc { get; init; }
+
+    /// <summary>Instante de parede em que a gravação foi salva.</summary>
+    public DateTimeOffset? SavedAtUtc { get; init; }
+}
