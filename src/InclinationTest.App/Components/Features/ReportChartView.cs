@@ -28,8 +28,10 @@ public sealed class ReportChartView : ContentView
             MinLimit = -ScaleFloor,
             MaxLimit = ScaleFloor,
             MinStep = ScaleFloor,
-            TextSize = 10,
+            TextSize = 9,
             Labeler = value => $"{value:0}°",
+            LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+            SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
         };
 
         _chart = new CartesianChart
@@ -40,8 +42,10 @@ public sealed class ReportChartView : ContentView
                 new Axis
                 {
                     MinLimit = 0,
-                    TextSize = 10,
+                    TextSize = 9,
                     Labeler = seconds => $"{seconds:0}s",
+                    LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+                    SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
                 },
             },
             YAxes = new[] { _yAxis },
@@ -49,6 +53,7 @@ public sealed class ReportChartView : ContentView
             TooltipPosition = TooltipPosition.Hidden,
             AnimationsSpeed = TimeSpan.Zero,
             EasingFunction = null,
+            BackgroundColor = Colors.Transparent,
         };
 
         Content = _chart;
@@ -80,8 +85,8 @@ public sealed class ReportChartView : ContentView
 
         _chart.Series = new ISeries[]
         {
-            CreateSeries(trim, ThemeColor("ChartTrim", "#4aa3ff")),
-            CreateSeries(roll, ThemeColor("ChartRoll", "#f5a623")),
+            CreateSeries(trim, "Trim", ThemeColor("ChartTrim", "#89ceff")),
+            CreateSeries(roll, "Roll", ThemeColor("ChartRoll", "#ffab32")),
         };
 
         var scale = Math.Max(ScaleFloor, Math.Ceiling(maxAbs / ScaleFloor) * ScaleFloor);
@@ -103,12 +108,16 @@ public sealed class ReportChartView : ContentView
         maxAbs = Math.Max(maxAbs, Math.Max(Math.Abs(sample.Trim), Math.Abs(sample.Roll)));
     }
 
-    private static LineSeries<ObservablePoint> CreateSeries(IReadOnlyCollection<ObservablePoint> values, SKColor color)
+    private static LineSeries<ObservablePoint> CreateSeries(
+        IReadOnlyCollection<ObservablePoint> values,
+        string name,
+        SKColor color)
         => new()
         {
             Values = values,
+            Name = name,
             Stroke = new SolidColorPaint(color, 2),
-            Fill = null,
+            Fill = new SolidColorPaint(color.WithAlpha(20)),
             GeometrySize = 0,
             GeometryStroke = null,
             GeometryFill = null,

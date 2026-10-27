@@ -34,7 +34,13 @@ public static class MauiProgram
             .UseLiveCharts()
             .UseUraniumUI()
             .UseUraniumUIMaterial()
-            .ConfigureFonts(fonts => fonts.AddMaterialSymbolsFonts());
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("SpaceGrotesk.ttf", "SpaceGrotesk");
+                fonts.AddFont("Inter.ttf", "Inter");
+                fonts.AddFont("JetBrainsMono.ttf", "JetBrainsMono");
+                fonts.AddMaterialSymbolsFonts();
+            });
 
         builder.Services.AddSingleton<IAccelerometerSource, MauiAccelerometerSource>();
         builder.Services.AddSingleton<ISensorService>(

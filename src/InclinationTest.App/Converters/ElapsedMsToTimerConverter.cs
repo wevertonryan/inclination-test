@@ -8,11 +8,13 @@ public sealed class ElapsedMsToTimerConverter : IValueConverter
     {
         var ms = value is null ? 0L : System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
 
-        var minutes = ms / 60000L;
-        var seconds = (ms % 60000L) / 1000L;
-        var millis = ms % 1000L;
+        var total = ms / 1000L;
+        var hours = total / 3600L;
+        var minutes = total / 60L % 60L;
+        var seconds = total % 60L;
+        var tenths = ms % 1000L / 100L;
 
-        return $"{minutes:00}:{seconds:00} · {millis:000}";
+        return $"{hours:00}:{minutes:00}:{seconds:00}.{tenths}";
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

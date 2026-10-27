@@ -4,20 +4,62 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
-        <Setter
-            Property="BackgroundColor"
-            Value="{AppThemeBinding Light={StaticResource LightBackground}, Dark={StaticResource DarkBackground}}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+    </Style>
+
+    <Style TargetType="ContentView">
+        <Setter Property="BackgroundColor" Value="Transparent" />
     </Style>
 
     <Style TargetType="Label">
-        <Setter
-            Property="TextColor"
-            Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+        <Setter Property="FontAutoScalingEnabled" Value="False" />
     </Style>
 
     <Style TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-        <Setter Property="TextColor" Value="White" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryContainer}" />
+        <Setter Property="TextColor" Value="{StaticResource OnPrimaryContainer}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource Outline}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontAutoScalingEnabled" Value="False" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+        <Setter Property="TitleColor" Value="{StaticResource Outline}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontAutoScalingEnabled" Value="False" />
+    </Style>
+
+    <Style TargetType="DatePicker">
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontAutoScalingEnabled" Value="False" />
+    </Style>
+
+    <Style TargetType="Switch">
+        <Setter Property="OnColor" Value="{StaticResource PrimaryContainer}" />
+        <Setter Property="ThumbColor" Value="{StaticResource OnPrimaryContainer}" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource Primary}" />
+    </Style>
+
+    <Style TargetType="RefreshView">
+        <Setter Property="RefreshColor" Value="{StaticResource Primary}" />
     </Style>
 
 </ResourceDictionary>

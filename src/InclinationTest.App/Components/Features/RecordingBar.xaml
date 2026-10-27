@@ -8,29 +8,29 @@
 
     <Grid
         ColumnDefinitions="*,Auto,*"
-        HeightRequest="92"
-        Padding="0,14">
+        HeightRequest="96"
+        Padding="24,10">
 
-        <Grid
+        <Border
             Grid.Column="0"
+            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+            HeightRequest="56"
             HorizontalOptions="Center"
-            VerticalOptions="Center">
-            <Grid.GestureRecognizers>
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="56">
+            <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnCancel" />
-            </Grid.GestureRecognizers>
-            <Border
-                BackgroundColor="{StaticResource Danger}"
-                HeightRequest="60"
-                StrokeShape="RoundRectangle 30"
-                StrokeThickness="0"
-                WidthRequest="60">
-                <Label
-                    x:Name="CancelIcon"
-                    HorizontalOptions="Center"
-                    TextColor="White"
-                    VerticalOptions="Center" />
-            </Border>
-        </Grid>
+            </Border.GestureRecognizers>
+            <Label
+                x:Name="CancelIcon"
+                FontFamily="{StaticResource FontIcons}"
+                FontSize="26"
+                HorizontalOptions="Center"
+                TextColor="{StaticResource Error}"
+                VerticalOptions="Center" />
+        </Border>
 
         <features:RecordButton
             x:Name="Center"
@@ -39,25 +39,25 @@
             Mode="{Binding Mode}"
             VerticalOptions="Center" />
 
-        <Grid
+        <Border
             Grid.Column="2"
+            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+            HeightRequest="56"
             HorizontalOptions="Center"
-            VerticalOptions="Center">
-            <Grid.GestureRecognizers>
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="56">
+            <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnSave" />
-            </Grid.GestureRecognizers>
-            <Border
-                BackgroundColor="{StaticResource Ok}"
-                HeightRequest="60"
-                StrokeShape="RoundRectangle 30"
-                StrokeThickness="0"
-                WidthRequest="60">
-                <Label
-                    x:Name="SaveIcon"
-                    HorizontalOptions="Center"
-                    TextColor="{StaticResource TextOnAccent}"
-                    VerticalOptions="Center" />
-            </Border>
-        </Grid>
+            </Border.GestureRecognizers>
+            <Label
+                x:Name="SaveIcon"
+                FontFamily="{StaticResource FontIcons}"
+                FontSize="26"
+                HorizontalOptions="Center"
+                TextColor="{StaticResource Primary}"
+                VerticalOptions="Center" />
+        </Border>
     </Grid>
 </ContentView>

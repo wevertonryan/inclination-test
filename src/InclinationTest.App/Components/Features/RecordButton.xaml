@@ -5,40 +5,69 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid>
+    <Grid
+        HeightRequest="96"
+        WidthRequest="96">
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnTapped" />
         </Grid.GestureRecognizers>
 
         <Border
-            x:Name="Circle"
-            BackgroundColor="{StaticResource RecordRed}"
-            HeightRequest="68"
-            StrokeShape="RoundRectangle 34"
+            x:Name="Glow"
+            BackgroundColor="#26ffb4ab"
+            HeightRequest="88"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
             StrokeThickness="0"
-            WidthRequest="68">
-            <Border.Background>
-                <RadialGradientBrush Center="0.5,0.45" Radius="0.72">
-                    <GradientStop Color="{StaticResource RecordRedLight}" Offset="0" />
-                    <GradientStop Color="{StaticResource RecordRed}" Offset="0.78" />
-                </RadialGradientBrush>
-            </Border.Background>
+            VerticalOptions="Center"
+            WidthRequest="88" />
 
-            <Grid>
-                <Ellipse
-                    x:Name="Core"
-                    Fill="White"
-                    HeightRequest="30"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    WidthRequest="30" />
-                <Label
-                    x:Name="Icon"
-                    HorizontalOptions="Center"
-                    IsVisible="False"
-                    TextColor="White"
-                    VerticalOptions="Center" />
-            </Grid>
+        <Border
+            x:Name="Circle"
+            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+            HeightRequest="80"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="80">
+            <Border.Shadow>
+                <Shadow
+                    Brush="#99000000"
+                    Offset="0,6"
+                    Radius="16" />
+            </Border.Shadow>
+
+            <Border
+                x:Name="Inner"
+                BackgroundColor="#66ffb4ab"
+                HeightRequest="64"
+                HorizontalOptions="Center"
+                StrokeShape="RoundRectangle 999"
+                StrokeThickness="0"
+                VerticalOptions="Center"
+                WidthRequest="64">
+                <Grid>
+                    <Border
+                        x:Name="Core"
+                        BackgroundColor="{StaticResource Error}"
+                        HeightRequest="28"
+                        HorizontalOptions="Center"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        VerticalOptions="Center"
+                        WidthRequest="28" />
+
+                    <Label
+                        x:Name="Icon"
+                        FontFamily="{StaticResource FontIcons}"
+                        FontSize="30"
+                        HorizontalOptions="Center"
+                        IsVisible="False"
+                        TextColor="{StaticResource OnPrimaryContainer}"
+                        VerticalOptions="Center" />
+                </Grid>
+            </Border>
         </Border>
     </Grid>
 </ContentView>

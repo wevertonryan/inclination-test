@@ -29,8 +29,8 @@ public partial class ChartView : ContentView
 
         Chart.Series = new ISeries[]
         {
-            CreateSeries(_trim, ThemeColor("ChartTrim", "#4aa3ff")),
-            CreateSeries(_roll, ThemeColor("ChartRoll", "#f5a623")),
+            CreateSeries(_trim, ThemeColor("ChartTrim", "#89ceff")),
+            CreateSeries(_roll, ThemeColor("ChartRoll", "#ffab32")),
         };
 
         _yAxis = new Axis
@@ -39,14 +39,18 @@ public partial class ChartView : ContentView
             MaxLimit = ScaleFloor,
             MinStep = ScaleFloor,
             Labeler = value => $"{value:0}°",
-            TextSize = 10,
+            TextSize = 9,
+            LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+            SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
         };
 
         _xAxis = new Axis
         {
             MinLimit = 0,
             Labeler = FormatClock,
-            TextSize = 10,
+            TextSize = 9,
+            LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+            SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
         };
 
         Chart.XAxes = new[] { _xAxis };
@@ -84,7 +88,8 @@ public partial class ChartView : ContentView
         {
             Values = values,
             Stroke = new SolidColorPaint(color, 2),
-            Fill = null,
+            Fill = new SolidColorPaint(color.WithAlpha(20)),
+            Name = color == ThemeColor("ChartTrim", "#89ceff") ? "Trim" : "Roll",
             GeometrySize = 0,
             GeometryStroke = null,
             GeometryFill = null,

@@ -7,90 +7,205 @@
     xmlns:controls="clr-namespace:InclinationTest.App.Controls"
     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
     xmlns:features="clr-namespace:InclinationTest.App.Components.Features"
+    xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
     xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
 
     <ContentView.Resources>
         <converters:ElapsedMsToTimerConverter x:Key="Timer" />
+        <converters:ElapsedMsToShortTimerConverter x:Key="ShortTimer" />
+        <converters:SignedAngleConverter x:Key="SignedAngle" />
     </ContentView.Resources>
 
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource AppBackground}">
+    <Grid
+        x:Name="RootGrid"
+        RowDefinitions="Auto,Auto,*,Auto"
+        BackgroundColor="{StaticResource Surface}">
 
-        <!-- TOP SAFE -->
-        <VerticalStackLayout Grid.Row="0" Spacing="8">
-            <layout:ScreenHeader
-                x:Name="Header"
-                Title="Medição">
-                <layout:ScreenHeader.LeftContent>
-                    <Border
-                        x:Name="SensorChip"
-                        Padding="12,5"
-                        StrokeShape="RoundRectangle 12"
-                        StrokeThickness="1">
+        <!--  HEADER  -->
+        <layout:ScreenHeader x:Name="Header" Grid.Row="0" Title="Home">
+            <layout:ScreenHeader.LeftContent>
+                <Border
+                    x:Name="SensorChip"
+                    Padding="8,5"
+                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                    StrokeShape="RoundRectangle 999"
+                    StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSensorChipTapped" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="18"
+                            Text="{x:Static icons:MaterialOutlined.Sensors}"
+                            TextColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                        <Ellipse
+                            x:Name="StatusDot"
+                            Fill="{StaticResource Primary}"
+                            HeightRequest="7"
+                            VerticalOptions="Center"
+                            WidthRequest="7" />
                         <Label
                             x:Name="SensorChipLabel"
+                            FontFamily="{StaticResource FontMono}"
                             FontAttributes="Bold"
-                            FontSize="11"
-                            Text="NÃO CALIBRADO" />
-                    </Border>
-                </layout:ScreenHeader.LeftContent>
-            </layout:ScreenHeader>
+                            FontSize="10"
+                            Text="CALIBRADO"
+                            TextColor="{StaticResource OnSurface}"
+                            VerticalOptions="Center"
+                            CharacterSpacing="0.8" />
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="14"
+                            Text="{x:Static icons:MaterialOutlined.Expand_more}"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </layout:ScreenHeader.LeftContent>
+        </layout:ScreenHeader>
 
-            <Border
-                x:Name="TimerPill"
-                Margin="0,4,0,0"
-                Padding="18,8"
-                BackgroundColor="{StaticResource SurfaceElevated}"
-                HorizontalOptions="Center"
-                IsVisible="False"
-                Stroke="{StaticResource SurfaceBorder}"
-                StrokeShape="RoundRectangle 18"
-                StrokeThickness="1">
+        <!--  RECORDING TIMER  -->
+        <Grid
+            x:Name="TimerHost"
+            Grid.Row="1"
+            Padding="16,8"
+            IsVisible="False">
+            <Grid RowDefinitions="Auto,1">
                 <Label
-                    FontFamily="monospace"
-                    FontSize="22"
+                    FontFamily="{StaticResource FontMono}"
+                    FontAttributes="Bold"
+                    FontSize="28"
+                    HorizontalTextAlignment="Center"
                     Text="{Binding ElapsedMs, Converter={StaticResource Timer}}"
-                    TextColor="{StaticResource TextPrimary}" />
-            </Border>
-        </VerticalStackLayout>
+                    TextColor="{StaticResource Primary}"
+                    CharacterSpacing="-0.6" />
+                <BoxView
+                    Grid.Row="1"
+                    Margin="0,8,0,0"
+                    BackgroundColor="#4d2f353d" />
+            </Grid>
+        </Grid>
 
-        <!-- CONTENT SAFE (centralizado) -->
-        <Grid Grid.Row="1" Padding="20,8,20,8">
-            <VerticalStackLayout Spacing="16" VerticalOptions="Center">
+        <!--  GAUGE + TELEMETRY  -->
+        <Grid
+            x:Name="ContentHost"
+            Grid.Row="2"
+            Padding="20,4,20,4">
+            <VerticalStackLayout
+                Spacing="14"
+                VerticalOptions="Center">
+
                 <controls:InclinometerControl
+                    x:Name="Gauge"
                     HorizontalOptions="Center"
                     Roll="{Binding Roll}"
-                    Size="260"
+                    Size="300"
                     Trim="{Binding Trim}" />
 
-                <HorizontalStackLayout HorizontalOptions="Center" Spacing="18">
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="18"
-                        Text="{Binding Trim, StringFormat='TRIM {0:F1}°'}"
-                        TextColor="{StaticResource TrimLine}" />
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="18"
-                        Text="{Binding Roll, StringFormat='ROLL {0:F1}°'}"
-                        TextColor="{StaticResource Accent}" />
-                </HorizontalStackLayout>
+                <Grid
+                    HorizontalOptions="Center"
+                    MaximumWidthRequest="330"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="8">
+                    <Border
+                        Padding="8,10"
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="0">
+                        <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="TRIM"
+                                TextColor="{StaticResource OnSurfaceVariant}"
+                                CharacterSpacing="1.2" />
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="2">
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="28"
+                                    FontAttributes="Bold"
+                                    Text="{Binding Trim, Converter={StaticResource SignedAngle}}"
+                                    TextColor="{StaticResource Secondary}"
+                                    CharacterSpacing="-0.6"
+                                    VerticalOptions="End" />
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="13"
+                                    Text="°"
+                                    TextColor="{StaticResource Secondary}"
+                                    VerticalOptions="End" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Padding="8,10"
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="0">
+                        <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="3">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="14"
+                                    Text="{x:Static icons:MaterialOutlined.Sync_alt}"
+                                    TextColor="{StaticResource Secondary}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="10"
+                                    FontAttributes="Bold"
+                                    Text="ROLL"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    VerticalOptions="Center"
+                                    CharacterSpacing="1.2" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="2">
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="28"
+                                    FontAttributes="Bold"
+                                    Text="{Binding Roll, Converter={StaticResource SignedAngle}}"
+                                    TextColor="{StaticResource TertiaryContainer}"
+                                    CharacterSpacing="-0.6"
+                                    VerticalOptions="End" />
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="13"
+                                    Text="°"
+                                    TextColor="{StaticResource TertiaryContainer}"
+                                    VerticalOptions="End" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
 
                 <Label
                     x:Name="ErrorLabel"
-                    FontSize="13"
+                    FontFamily="{StaticResource FontBody}"
+                    FontSize="12"
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
                     Text="{Binding Error}"
-                    TextColor="{StaticResource Danger}" />
+                    TextColor="{StaticResource Error}" />
 
                 <features:ChartView
                     x:Name="Chart"
-                    IsVisible="{Binding IsImmersive}" />
+                    IsVisible="False"
+                    BindingContext="{Binding Source={x:Reference RootView}, Path=BindingContext}" />
             </VerticalStackLayout>
         </Grid>
 
-        <!-- BOTTOM SAFE -->
-        <Grid Grid.Row="2" Padding="0,6,0,10" MinimumHeightRequest="92">
+        <!--  BOTTOM ACTION  -->
+        <Grid
+            Grid.Row="3"
+            Padding="0,8,0,14"
+            MinimumHeightRequest="96">
             <features:RecordButton
                 x:Name="IdleRecord"
                 Clicked="OnIdleRecordClicked"
@@ -103,6 +218,299 @@
                 IsVisible="False"
                 SaveRequested="OnSaveRequested"
                 ToggleRequested="OnToggleRequested" />
+        </Grid>
+
+        <!--  SENSOR INFO POPUP  -->
+        <Grid
+            x:Name="SensorPopup"
+            Grid.RowSpan="4"
+            IsVisible="False"
+            ZIndex="10">
+            <BoxView BackgroundColor="#33000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSensorPopupDismissed" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <Border
+                Margin="16,68,16,0"
+                Padding="16"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                HorizontalOptions="Start"
+                Stroke="{StaticResource OutlineVariant}"
+                StrokeShape="RoundRectangle 16"
+                StrokeThickness="1"
+                VerticalOptions="Start">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout Spacing="10">
+                        <Border
+                            Padding="8"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 999"
+                            StrokeThickness="0">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="20"
+                                Text="{x:Static icons:MaterialOutlined.Speed}"
+                                TextColor="{StaticResource Primary}" />
+                        </Border>
+                        <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="15"
+                                FontAttributes="Bold"
+                                Text="Acelerômetro" />
+                            <Label
+                                x:Name="SensorPopupStatus"
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                TextColor="{StaticResource Primary}"
+                                CharacterSpacing="0.8" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                    <Label
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        LineHeight="1.35"
+                        Text="Sensor de inclinação usado para calcular Trim e Roll em tempo real."
+                        TextColor="{StaticResource OnSurfaceVariant}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!--  SAVE MODAL  -->
+        <Grid
+            x:Name="SaveOverlay"
+            Grid.RowSpan="4"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="20">
+            <Border
+                Margin="16"
+                Padding="24"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                MaximumWidthRequest="420"
+                StrokeShape="RoundRectangle 24"
+                StrokeThickness="0"
+                VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border
+                            HeightRequest="32"
+                            BackgroundColor="#3348efef"
+                            StrokeShape="RoundRectangle 999"
+                            StrokeThickness="0"
+                            WidthRequest="32">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="18"
+                                HorizontalOptions="Center"
+                                Text="{x:Static icons:MaterialOutlined.Save_as}"
+                                TextColor="{StaticResource Primary}"
+                                VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                Text="Salvar gravação" />
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                Text="{Binding ElapsedMs, StringFormat='Duração total: {0}', Converter={StaticResource ShortTimer}}"
+                                TextColor="{StaticResource OnSurfaceVariant}" />
+                        </VerticalStackLayout>
+                        <Label
+                            Grid.Column="2"
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="20"
+                            Text="{x:Static icons:MaterialOutlined.Close}"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSaveDismissed" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="13"
+                            Text="Nome da gravação"
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                        <Border
+                            Padding="12,0,44,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Grid>
+                                <Entry
+                                    x:Name="TitleEntry"
+                                    HeightRequest="48"
+                                    Placeholder="Medição"
+                                    ReturnType="Done"
+                                    Text="{Binding Title, Mode=TwoWay}" />
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="18"
+                                    HorizontalOptions="End"
+                                    Text="{x:Static icons:MaterialOutlined.Backspace}"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    VerticalOptions="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnClearTitleTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border
+                            Padding="0"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSaveDismissed" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,14"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Voltar"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalTextAlignment="Center" />
+                        </Border>
+                        <Border
+                            Grid.Column="1"
+                            Padding="0"
+                            BackgroundColor="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSaveConfirmed" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout
+                                Padding="0,14"
+                                HorizontalOptions="Center"
+                                Spacing="4">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="18"
+                                    Text="{x:Static icons:MaterialOutlined.Check_circle}"
+                                    TextColor="{StaticResource OnPrimary}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    Text="Salvar"
+                                    TextColor="{StaticResource OnPrimary}"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!--  DISCARD MODAL  -->
+        <Grid
+            x:Name="CancelOverlay"
+            Grid.RowSpan="4"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="21">
+            <Border
+                Margin="16"
+                Padding="24"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                MaximumWidthRequest="420"
+                StrokeShape="RoundRectangle 24"
+                StrokeThickness="0"
+                VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Border
+                        HeightRequest="40"
+                        BackgroundColor="{StaticResource ErrorContainer}"
+                        HorizontalOptions="Start"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        WidthRequest="40">
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="24"
+                            HorizontalOptions="Center"
+                            Text="{x:Static icons:MaterialOutlined.Warning}"
+                            TextColor="{StaticResource Error}"
+                            VerticalOptions="Center" />
+                    </Border>
+                    <Label
+                        FontFamily="{StaticResource FontDisplay}"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        Text="Descartar gravação?" />
+                    <Label
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        Text="{Binding ElapsedMs, StringFormat='Todos os dados oscilatórios de {0} serão perdidos.', Converter={StaticResource ShortTimer}}"
+                        TextColor="{StaticResource OnSurfaceVariant}" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border
+                            Padding="0"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCancelDismissed" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,14"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Continuar"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalTextAlignment="Center" />
+                        </Border>
+                        <Border
+                            Grid.Column="1"
+                            Padding="0"
+                            BackgroundColor="{StaticResource ErrorContainer}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCancelConfirmed" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout
+                                Padding="0,14"
+                                HorizontalOptions="Center"
+                                Spacing="4">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="18"
+                                    Text="{x:Static icons:MaterialOutlined.Delete_forever}"
+                                    TextColor="{StaticResource Error}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    Text="Descartar"
+                                    TextColor="{StaticResource Error}"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
         </Grid>
     </Grid>
 </ContentView>

@@ -88,6 +88,33 @@ public class ReportsViewModelTests
     }
 
     [Fact]
+    public void DeleteSelected_RemovesReportAndClearsSelection()
+    {
+        var viewModel = Create(out var repository);
+        AddSaved(repository, "apagar", startedAtMs: 100);
+        AddSaved(repository, "manter", startedAtMs: 200);
+        viewModel.Refresh();
+        viewModel.Open(viewModel.Reports.Single(item => item.Title == "apagar"));
+
+        var deleted = viewModel.DeleteSelected();
+
+        deleted.Should().Be("apagar");
+        viewModel.HasSelection.Should().BeFalse();
+        viewModel.Selected.Should().BeNull();
+        viewModel.SelectedSamples.Should().BeEmpty();
+        viewModel.Reports.Select(item => item.Title).Should().Equal("manter");
+        repository.GetRecording("apagar").Should().BeNull();
+    }
+
+    [Fact]
+    public void DeleteSelected_WithoutSelection_ReturnsNull()
+    {
+        var viewModel = Create(out _);
+
+        viewModel.DeleteSelected().Should().BeNull();
+    }
+
+    [Fact]
     public void Refresh_FormatsDurationAndMeta()
     {
         var viewModel = Create(out var repository);

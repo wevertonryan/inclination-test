@@ -15,8 +15,6 @@ public partial class RecordButton : ContentView
     public RecordButton()
     {
         InitializeComponent();
-        Icon.FontFamily = "MaterialOutlined";
-        Icon.FontSize = 26;
         UpdateVisual();
     }
 
@@ -40,6 +38,34 @@ public partial class RecordButton : ContentView
 
         Core.IsVisible = idle;
         Icon.IsVisible = !idle;
-        Icon.Text = Mode == RecorderMode.Recording ? MaterialOutlined.Pause : MaterialOutlined.Play_arrow;
+
+        if (idle)
+        {
+            Glow.BackgroundColor = Color.FromArgb("#26ffb4ab");
+            Circle.BackgroundColor = ResourceColor("SurfaceContainerLowest", "#090f16");
+            Inner.BackgroundColor = Color.FromArgb("#66ffb4ab");
+            return;
+        }
+
+        Glow.BackgroundColor = Color.FromArgb("#2648efef");
+        Circle.BackgroundColor = ResourceColor("SurfaceContainerLowest", "#090f16");
+
+        if (Mode == RecorderMode.Recording)
+        {
+            Inner.BackgroundColor = ResourceColor("PrimaryContainer", "#00d2d3");
+            Icon.Text = MaterialOutlined.Pause;
+            Icon.TextColor = ResourceColor("OnPrimaryContainer", "#005556");
+        }
+        else
+        {
+            Inner.BackgroundColor = ResourceColor("TertiaryContainer", "#ffab32");
+            Icon.Text = MaterialOutlined.Play_arrow;
+            Icon.TextColor = ResourceColor("OnTertiaryContainer", "#6c4300");
+        }
     }
+
+    private static Color ResourceColor(string key, string fallback)
+        => Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color
+            ? color
+            : Color.FromArgb(fallback);
 }

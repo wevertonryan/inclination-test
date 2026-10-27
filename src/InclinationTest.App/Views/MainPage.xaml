@@ -6,64 +6,76 @@
     xmlns:controls="clr-namespace:InclinationTest.App.Controls"
     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    BackgroundColor="{StaticResource Surface}"
     Title="Inclination Test">
 
     <ContentPage.Resources>
         <converters:SelectionColorConverter
             x:Key="SelectionColor"
             Selected="{StaticResource Primary}"
-            Unselected="{StaticResource Gray400}" />
+            Unselected="{StaticResource OnSurfaceVariant}" />
         <converters:InverseBoolConverter x:Key="InverseBool" />
     </ContentPage.Resources>
 
-    <controls:CollapsibleTabView
-        x:Name="MainTabView"
-        HeaderVisible="{Binding IsImmersive, Converter={StaticResource InverseBool}}"
-        TabPlacement="Bottom">
+    <Grid BackgroundColor="{StaticResource Surface}">
+        <controls:CollapsibleTabView
+            x:Name="MainTabView"
+            BackgroundColor="{StaticResource Surface}"
+            TabPlacement="Bottom">
 
-        <material:TabView.TabHeaderItemTemplate>
-            <DataTemplate>
-                <Grid
-                    BackgroundColor="Transparent"
-                    HeightRequest="56"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill">
+            <material:TabView.TabHeaderItemTemplate>
+                <DataTemplate>
+                    <Grid
+                        BackgroundColor="{StaticResource SurfaceNav}"
+                        HeightRequest="64"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill">
 
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding Command}" />
-                    </Grid.GestureRecognizers>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Command}" />
+                        </Grid.GestureRecognizers>
 
-                    <VerticalStackLayout
-                        HorizontalOptions="Center"
-                        Spacing="2"
-                        VerticalOptions="Center">
-                        <Image
-                            HeightRequest="24"
+                        <BoxView
+                            HeightRequest="1"
+                            BackgroundColor="#33515d5c"
+                            VerticalOptions="Start" />
+
+                        <VerticalStackLayout
+                            Padding="0,8,0,7"
                             HorizontalOptions="Center"
-                            WidthRequest="24">
-                            <Image.Source>
-                                <FontImageSource
-                                    Color="{Binding IsSelected, Converter={StaticResource SelectionColor}}"
-                                    FontFamily="MaterialOutlined"
-                                    Glyph="{Binding Data}"
-                                    Size="24" />
-                            </Image.Source>
-                        </Image>
-                        <Label
-                            FontAutoScalingEnabled="False"
-                            FontSize="10"
-                            HorizontalOptions="Center"
-                            HorizontalTextAlignment="Center"
-                            LineBreakMode="TailTruncation"
-                            MaxLines="1"
-                            Text="{Binding Title}"
-                            TextColor="{Binding IsSelected, Converter={StaticResource SelectionColor}}" />
-                    </VerticalStackLayout>
+                            Spacing="3"
+                            VerticalOptions="Center">
+                            <Image
+                                HeightRequest="22"
+                                HorizontalOptions="Center"
+                                WidthRequest="22">
+                                <Image.Source>
+                                    <FontImageSource
+                                        Color="{Binding IsSelected, Converter={StaticResource SelectionColor}}"
+                                        FontFamily="MaterialOutlined"
+                                        Glyph="{Binding Data}"
+                                        Size="22" />
+                                </Image.Source>
+                            </Image>
+                            <Label
+                                FontAutoScalingEnabled="False"
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
+                                Text="{Binding Title}"
+                                TextColor="{Binding IsSelected, Converter={StaticResource SelectionColor}}"
+                                TextTransform="Uppercase"
+                                CharacterSpacing="0.8" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </material:TabView.TabHeaderItemTemplate>
 
-                </Grid>
-            </DataTemplate>
-        </material:TabView.TabHeaderItemTemplate>
-
-    </controls:CollapsibleTabView>
+        </controls:CollapsibleTabView>
+    </Grid>
 
 </ContentPage>

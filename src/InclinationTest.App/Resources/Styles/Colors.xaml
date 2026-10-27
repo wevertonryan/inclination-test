@@ -3,26 +3,27 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Color x:Key="Primary">#512BD4</Color>
-    <Color x:Key="PrimaryDark">#ac99ea</Color>
-    <Color x:Key="PrimaryDarkText">#242424</Color>
-    <Color x:Key="Secondary">#DFD8F7</Color>
-    <Color x:Key="SecondaryDarkText">#9880e5</Color>
-    <Color x:Key="Tertiary">#2B0B98</Color>
-    <Color x:Key="White">White</Color>
-    <Color x:Key="Black">Black</Color>
-    <Color x:Key="Magenta">#D600AA</Color>
-    <Color x:Key="MidnightBlue">#190649</Color>
-    <Color x:Key="OffBlack">#1f1f1f</Color>
-    <Color x:Key="Gray100">#E1E1E1</Color>
-    <Color x:Key="Gray200">#C8C8C8</Color>
-    <Color x:Key="Gray300">#ACACAC</Color>
-    <Color x:Key="Gray400">#919191</Color>
-    <Color x:Key="Gray500">#6E6E6E</Color>
-    <Color x:Key="Gray600">#404040</Color>
-    <Color x:Key="Gray900">#212121</Color>
-    <Color x:Key="Gray950">#141414</Color>
-    <Color x:Key="LightBackground">White</Color>
-    <Color x:Key="DarkBackground">#0b0b0c</Color>
+    <!-- Material/UraniumUI compatibility keys -->
+    <Color x:Key="Primary">#48efef</Color>
+    <Color x:Key="PrimaryDark">#26dcdd</Color>
+    <Color x:Key="PrimaryDarkText">#002020</Color>
+    <Color x:Key="Secondary">#89ceff</Color>
+    <Color x:Key="SecondaryDarkText">#00344d</Color>
+    <Color x:Key="Tertiary">#ffab32</Color>
+    <Color x:Key="White">#ffffff</Color>
+    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="Magenta">#d600aa</Color>
+    <Color x:Key="MidnightBlue">#090f16</Color>
+    <Color x:Key="OffBlack">#0e141b</Color>
+    <Color x:Key="Gray100">#dde3ed</Color>
+    <Color x:Key="Gray200">#bacac9</Color>
+    <Color x:Key="Gray300">#859493</Color>
+    <Color x:Key="Gray400">#859493</Color>
+    <Color x:Key="Gray500">#6f7e7e</Color>
+    <Color x:Key="Gray600">#3b4949</Color>
+    <Color x:Key="Gray900">#161c23</Color>
+    <Color x:Key="Gray950">#090f16</Color>
+    <Color x:Key="LightBackground">#0e141b</Color>
+    <Color x:Key="DarkBackground">#0e141b</Color>
 
 </ResourceDictionary>

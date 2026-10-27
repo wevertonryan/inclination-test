@@ -272,7 +272,7 @@ A barra de navegação é ocultada na tela de Relatório e durante a gravação 
 ### Dados brutos
 - Título de seção "Dados brutos".
 - Indicação da quantidade de leituras e do intervalo entre elas.
-- Tabela com colunas **Nº**, **X**, **Y** e **Z**.
+- Tabela com colunas **Nº**, **X (Trim)** e **Y (Roll)**; Yaw/Z não é persistido.
 - Cabeçalho fixo da tabela.
 - Lista de leituras.
 
@@ -282,7 +282,7 @@ A barra de navegação é ocultada na tela de Relatório e durante a gravação 
   - **Excluir**.
   - **Exportar PDF**.
 - A opção Excluir abre o diálogo de confirmação.
-- A opção Exportar PDF fecha o menu e exibe a mensagem temporária "PDF exportado".
+- A opção Exportar PDF fecha o menu e exibe "Exportação PDF indisponível neste build" enquanto o recurso não existir.
 
 ### Diálogo de confirmação de exclusão
 - Título: "Excluir relatório?"

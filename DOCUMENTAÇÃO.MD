@@ -15,14 +15,15 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 > não foi implementado está marcado como **Planejado** ao longo do documento.
 
 **Estágio:** Épico 1 / **EP2** concluído — Sensores, Cálculos, Calibração, Filtragem de Ruído e
-Testes. A camada de interface tem navegação completa (`AppShell` + `MainPage` com
-`material:TabView` da UraniumUI, 5 abas inferiores), com **Home**, **Relatórios** e o wiring do
-gravador reais; Calibração, Testes e Configurações seguem como placeholder.
+Testes. A interface foi migrada para o design system do Stitch: navegação completa (`AppShell` +
+`MainPage` com `material:TabView` da UraniumUI, 5 abas inferiores), **Home** de gravação,
+**Relatórios** (lista, busca/filtro, detalhe, dados brutos e exclusão) e **Calibragem** do
+acelerômetro integrados; **Testes** e **Ajustes** seguem como telas visuais, sem dados fictícios.
 
 A **gravação/persistência (Épico 2/3) está concluída nas 3 etapas** (1. testes → 2. código do
 Core → 3. visual). A Etapa 1 escreveu os contratos e as suítes; a Etapa 2 implementou os corpos do
-Core; a **Etapa 3** entregou a tela de Relatórios e a **persistência em arquivo**, então as
-gravações sobrevivem a fechar o app. A suíte total (**233 testes**) está **verde**.
+Core; a **Etapa 3** entregou a interface e a **persistência em arquivo**, então as gravações
+sobrevivem a fechar o app. A suíte total (**235 testes**) está **verde**.
 
 
 ### Implementado
@@ -36,15 +37,15 @@ gravações sobrevivem a fechar o app. A suíte total (**233 testes**) está **v
 | `Core/Recording/` | `RecordingSession` (decimação 12 Hz, lotes de 2 s, pause/resume), `Statistics` (Welford), `RecordingWriter` (ponte gravador → repositório, **multi-gravação**, evento `Saved`), `ThreadSerialExecutor` (thread dedicada + fila); contratos em `Contracts/`: `IRecordingSession`, `ISerialExecutor`, `RecordedSample`, `RecordingSummary`, `RecordingOptions`, `RecordingEvents` |
 | `Core/Persistence/` | `InMemoryReportRepository` (referência de semântica, usada pelos testes) e `FileReportRepository` (**persistência real** em `.hdr` + `.csv`); `HeaderFormat` (serialização texto do cabeçalho); contratos em `Contracts/`: `IReportRepository`, `IReportStorage`, `RecordingHeader`, `RecordingStatus` |
 | `Core/Platform/` | `IClock`, `ITicker` (abstrações de tempo; produção no App, fakes nos testes) |
-| `App` | `MauiProgram` (DI + UraniumUI), `MauiAccelerometerSource`, `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (inclinômetro + labels TRIM/ROLL + botões Iniciar/Parar/Calibrar + gráfico), **`Views/RelatoriosView`** (cards + detalhe com estatísticas e gráfico), `Views/CalibragemView`/`TestesView`/`ConfiguracoesView` (placeholder), `Controls/InclinometerControl` (Skia), `Controls/CollapsibleTabView`, `Components/Features/ChartView` (LiveCharts2, streaming) e `ReportChartView` (relatório salvo, decimado), `RecordButton`, `RecordingBar`, `Platform/DispatcherTicker`, `Platform/SystemClock`, `Platform/AppDataReportStorage`, `Converters/` |
-| Testes | **233** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26, `InclinationViewModelPublish` 3, `Statistics` 15, `RecordingSession` 33, `RecordingWriter` 7, `RecordingWriterMultiple` 3, `ThreadSerialExecutor` 4, `InMemoryReportRepository` 15, `FileReportRepository` 19, `ReportsViewModel` 7, `RecorderViewModel` 32 — **todos verdes** |
+| `App` | `MauiProgram` (DI + UraniumUI + fontes Space Grotesk/Inter/JetBrains Mono/Material Symbols), `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (gravação integrada, inclinômetro + TRIM/ROLL + gráfico + modais), **`Views/RelatoriosView`** (cards, busca/filtro, detalhe, estatísticas, gráfico, dados brutos e exclusão), `Views/CalibragemView` (calibragem real do acelerômetro; demais sensores indicados como não identificados), `Views/TestesView`/`ConfiguracoesView` (visuais, sem dados fictícios), `Controls/InclinometerControl` e `RangeGaugeControl` (Skia), `Controls/CollapsibleTabView`, `Components/Features/ChartView` (LiveCharts2, streaming) e `ReportChartView` (relatório salvo, decimado), `RecordButton`, `RecordingBar`, `ScreenHeader`, `Platform/DispatcherTicker`, `Platform/SystemClock`, `Platform/AppDataReportStorage`, `Converters/` |
+| Testes | **235** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26, `InclinationViewModelPublish` 3, `Statistics` 15, `RecordingSession` 33, `RecordingWriter` 7, `RecordingWriterMultiple` 3, `ThreadSerialExecutor` 4, `InMemoryReportRepository` 15, `FileReportRepository` 19, `ReportsViewModel` 9, `RecorderViewModel` 32 — **todos verdes** |
 
 ### Planejado (não implementado)
 
 | Camada | Pendente |
 |---|---|
 | `Core/Persistence/` | Evolução opcional: `SqliteReportRepository` (`Microsoft.Data.Sqlite`) para consultas/índices. A semântica já é garantida por contrato e coberta por `FileReportRepository` |
-| `App` | Telas reais de Calibração, Testes e Configurações; exportação/eliminação de relatórios |
+| `App` | Telas reais de Testes e Configurações; exportação de PDF; sensores além do acelerômetro. A exclusão de relatórios já está implementada |
 | Stack de UI | UraniumUI, LiveCharts2 e SkiaSharp **já em uso** (gráfico Trim × Roll, inclinômetro e gráfico de relatório) |
 | Build | APK de **Debug** via GitHub Actions (`.github/workflows/apk.yml`, artifact `inclination-test-apk`); falta assinatura fixa e um perfil Release |
 
@@ -89,13 +90,14 @@ Legenda: ✅ concluído · ⬜ pendente.
 - ✅ **201 testes verdes**; `dotnet build` OK; `dotnet format` limpo em Core/Tests.
 - ⚠️ **Ponto em aberto (spec):** o `Statistics` trata `0.0` como "sem leitura" por canal (exigência de `ToSummary_MapsAllFields`), então uma leitura real de exatamente `0°` não entra na média/desvio/min/max. Revisar se 0 deve ser dado válido — exige ajustar aquele teste.
 
-**Etapa 3 — Visual + integração no `App` ⬜**
+**Etapa 3 — Visual + integração no `App` ✅**
 
-- ⬜ `ITicker`/`IClock` de produção (relógio real e ticker periódico).
-- ⬜ `RecorderViewModel` singleton no DI (`MauiProgram`), do `InclinationViewModel.OnSample` até `CaptureAngle`.
-- ⬜ `RecordButton`, `RecordingBar`, `Timer`, `ChartView` (LiveCharts2) e os *popups* de cancelar/salvar.
-- ⬜ Telas reais das abas (Calibração, Relatórios...) e design system em `Colors.xaml`.
-- ⬜ Telas/relatórios de resultado lendo o repositório (US-05, US-07).
+- ✅ `ITicker`/`IClock` de produção (relógio real e ticker periódico).
+- ✅ `RecorderViewModel` singleton no DI (`MauiProgram`), do `InclinationViewModel.OnSample` até `CaptureAngle`.
+- ✅ `RecordButton`, `RecordingBar`, `Timer`, `ChartView` (LiveCharts2) e os *popups* de cancelar/salvar.
+- ✅ Design system do Stitch em `Resources/Themes/Theme.xaml` + `Colors.xaml`, com fontes reais e navegação inferior.
+- ✅ Home de gravação e Relatórios lendo o repositório (lista, detalhe, gráfico, dados brutos e exclusão).
+- ✅ Calibragem do acelerômetro; Testes e Ajustes permanecem visuais até a especificação funcional.
 
 **Etapa SQLite — Persistência real ⬜**
 
@@ -192,17 +194,18 @@ InclinationTest.sln
     Views/
       MainPage.xaml(.cs)       [ok]  # host com material:TabView (NavBar inferior, 5 abas)
       HomeView.xaml(.cs)       [ok]  # conteúdo real da Home (3 campos + Iniciar/Parar/Calibrar)
-      CalibragemView.xaml(.cs) [ok]  # placeholder
-      RelatoriosView.xaml(.cs) [ok]  # placeholder
-      TestesView.xaml(.cs)     [ok]  # placeholder
-      ConfiguracoesView.xaml(.cs) [ok] # placeholder
+      CalibragemView.xaml(.cs) [ok]  # acelerômetro real; demais sensores indisponíveis
+      RelatoriosView.xaml(.cs) [ok]  # lista, busca/filtro, detalhe, dados brutos, exclusão
+      TestesView.xaml(.cs)     [ok]  # visual, aguardando especificação
+      ConfiguracoesView.xaml(.cs) [ok] # visual, aguardando especificação
       (RelatorioPage, ...)     [plan] # telas de detalhe empilhadas
     Components/
-      Layout/                  [plan] # ScreenHeader, Card, ScreenContainer
-      Ui/                      [plan] # Button, Chip, Modal, Input, ListRow, ...
-      Features/                [plan] # InclinometerView, ChartView, GaugeView, RecordButton, ...
+      Layout/                  [ok]  # ScreenHeader
+      Ui/                      [plan] # Card, Modal, Input, ListRow, ...
+      Features/                [ok]  # ChartView, ReportChartView, RecordButton, RecordingBar
     Resources/
-      Styles/Colors.xaml       [ok]  # por ora, cores default do template (design system: [plan])
+      Styles/Colors.xaml       [ok]  # aliases Material/UraniumUI
+      Themes/Theme.xaml        [ok]  # tokens, tipografia e estilos do Stitch
       Styles/Styles.xaml       [ok]
     Sensors/
       MauiAccelerometerSource.cs [ok] # adapter do Microsoft.Maui.Devices.Sensors
@@ -221,7 +224,7 @@ InclinationTest.sln
 - `InclinationTest.App/` — camada de apresentação (páginas e componentes). Consome o Core apenas pelo `InclinationViewModel`.
 - `InclinationTest.App/Components/Ui/` [plan] — componentes genéricos, sem vocabulário de domínio. Não dependem de `Features/`.
 - `InclinationTest.Core/` — lógica pura (captura, filtragem, cálculo de ângulo, ViewModel). Sem dependência de UI, testável na CLI (`dotnet test`) sem emulador nem dispositivo.
-- `Resources/Styles/Colors.xaml` — hoje só as cores default do template; os tokens do design system são planejados.
+- `Resources/Themes/Theme.xaml` — tokens, tipografia e estilos do design system do Stitch; `Resources/Styles/Colors.xaml` mantém os aliases exigidos pelo Material/UraniumUI.
 - `InclinationTest.Core.Tests/` — testes xUnit que exercitam o Core.
 - `TestUtils/` — fixtures compartilhadas entre as suites, mantidas fora dos diretórios de teste para não serem coletadas como suites (o runner xUnit descobre qualquer classe `*Tests`; utilitários ficam sem esse sufixo).
 
@@ -237,8 +240,8 @@ InclinationTest.sln
 | `Microsoft.Data.Sqlite` | persistência local dos relatórios e da série temporal (`Core/Persistence/`) | referenciado, uso planejado |
 | `UraniumUI` + `UraniumUI.Material` | componentes e theming da UI (`TabView` usado como NavBar) | referenciado |
 | `UraniumUI.Icons.MaterialSymbols` | fonte de ícones (glyphs) da NavBar via `FontImageSource` | referenciado |
-| `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView`) | planejado |
-| `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Components/Features/` | planejado |
+| `LiveChartsCore.SkiaSharpView.Maui` | gráficos de série temporal (`ChartView` e `ReportChartView`) | em uso |
+| `SkiaSharp.Views.Maui.Controls` | desenho do inclinômetro e do gauge em `Controls/` | em uso |
 | `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` | execução dos testes | ok |
 | `FluentAssertions`, `NSubstitute` | asserções legíveis e mocks nos testes | ok |
 | `coverlet.collector` | cobertura (`dotnet test --collect:"XPlat Code Coverage"`) | ok |
@@ -446,15 +449,13 @@ referência interna faria o teste passar com um bug que só apareceria no aparel
 
 ## 8. A gravação na interface
 
-> ⚠️ **Parcialmente implementado.** Hoje o `App` tem `AppShell` e `MainPage` (NavBar inferior via
-> `material:TabView`, 5 abas), com a `HomeView` real (inclinômetro + labels TRIM/ROLL + botões
-> Iniciar/Parar/Calibrar) e views placeholder nas demais abas. O inclinômetro já existe, desenhado
-> em SkiaSharp como `InclinometerControl` (`Controls/`, ligado aos valores `Roll`/`Trim` do
-> `InclinationViewModel`); o nome abaixo, `InclinometerView`, é o do desenho-alvo. `ChartView`,
-> `RecordButton`, `RecordingBar` e o `RecorderViewModel` singleton **já existem**; o diagrama abaixo
-> segue sendo o desenho-alvo de referência.
+> **Implementado.** O `App` tem `AppShell` e `MainPage` (NavBar inferior via `material:TabView`,
+> 5 abas). A `HomeView` concentra a gravação real: inclinômetro Skia (`InclinometerControl`),
+> TRIM/ROLL, timer, `ChartView`, `RecordButton`, `RecordingBar` e os modais de salvar/descartar.
+> As demais abas usam o mesmo design system; Calibragem controla o acelerômetro, Relatórios lê o
+> repositório e Testes/Ajustes permanecem visuais.
 
-O núcleo já grava (seção 7); este é o desenho de como ele chega à tela na Etapa 3.
+O núcleo grava (seção 7) e a interface apenas encaminha as amostras e comandos.
 
 ```
 AppShell
@@ -463,30 +464,31 @@ AppShell
           ├── HomeView
           │    ├── ScreenHeader IsVisible={!immersive}
           │    ├── Timer            (só quando imersivo)
-          │    ├── InclinometerView OnSample={captureAngle}
+          │    ├── InclinometerControl OnSample={captureAngle}
           │    │    └── InclinationViewModel.OnSample   ← 1ª e única assinatura
           │    ├── ChartView (LiveCharts2)  (só quando imersivo)
           │    ├── RecordButton      (só quando idle)
-          │    └── Popup ×2          (cancelar / salvar)
-          ├── TabView (nav inferior) IsVisible={!immersive}
-          └── RecordingBar IsVisible={immersive}
+          │    ├── RecordingBar      (só quando imersivo)
+          │    └── Popups ×2         (cancelar / salvar)
+          ├── CalibragemView
+          ├── RelatoriosView
+          ├── TestesView
+          └── ConfiguracoesView
 ```
 
 ### Por que o `RecorderViewModel` precisa ser singleton
 
-A `RecordingBar` mora no `AppShell`, irmã da `TabView` que ela substitui, mas o botão que
-**inicia** a gravação mora na `HomeView`. Os dois precisam do mesmo `Mode`, e instanciar o
-gravador nos dois daria duas sessões, dois lotes e duas linhas em `recordings`. Por isso o
-`RecorderViewModel` é registrado como **singleton no DI** (`AddSingleton<RecorderViewModel>()`)
-e resolvido tanto pela barra quanto pela página.
+A `HomeView` desenha a barra e o botão que inicia a gravação, mas a `MainPage` também observa o
+estado para esconder a `TabView` durante a prova. Todos precisam do mesmo `Mode`; instanciar o
+gravador mais de uma vez criaria sessões, lotes e linhas duplicadas. Por isso o
+`RecorderViewModel` é registrado como **singleton no DI** (`AddSingleton<RecorderViewModel>()`).
 
 Durante a gravação a `TabView` está oculta, então ninguém navega para fora da Home no meio de uma
 prova — o diálogo de confirmação, que fica na Home, sempre tem quem o mostre.
 
-O **pedido** de confirmação (`None | Cancel | Save`) mora no ViewModel pelo mesmo motivo: o botão
-`X` está na barra e o diálogo está na página. Guardar o estado aqui mantém cada componente com
-uma responsabilidade só — o `AppShell` desenha a barra, a `HomeView` desenha o diálogo, nenhum
-conhece o detalhe do outro.
+O **pedido** de confirmação (`None | Cancel | Save`) mora no ViewModel pelo mesmo motivo: a barra
+e o diálogo estão na Home, mas o estado precisa sobreviver à troca de modo. Guardar o estado aqui
+mantém cada componente com uma responsabilidade só.
 
 ### A torneira continua sendo o `InclinometerView`
 
@@ -643,13 +645,19 @@ O `Saved` foi adicionado no mesmo lugar para a tela saber que pode recarregar se
 ### A tela
 
 `ReportsViewModel` (Core, testável) lista via `IReportRepository.ListReports()`, formata duração,
-data e resumo, e carrega as amostras ao abrir. `RelatoriosView` mostra cards (título, data,
-duração), e ao tocar troca para o detalhe: estatísticas de ROLL/TRIM e o gráfico.
+data e resumo, carrega as amostras ao abrir, aplica busca/filtro por localização, ordena por data
+e exclui a gravação selecionada. `RelatoriosView` mostra cards (título, localização e data); ao
+tocar, troca para o detalhe com metadados, gauge de faixa de Roll, estatísticas de ROLL/TRIM,
+gráfico, dados brutos e menu de opções.
 
 O gráfico do relatório é diferente do gráfico da Home: a Home é *streaming* (janela deslizante de
 600 amostras), o relatório é o histórico **inteiro** montado uma única vez. Para não travar com
 gravações longas, `ReportChartView` decima para no máximo ~900 pontos (mantendo o último) e ajusta
 a escala Y ao maior valor absoluto da série.
+
+A exportação de PDF aparece no menu, mas ainda **não existe**: o app informa que o recurso está
+indisponível em vez de simular sucesso. Os dados brutos exibem apenas Trim e Roll, que são os eixos
+persistidos; não há Yaw/Z no arquivo.
 
 ### Onde os arquivos ficam (e como inspecionar)
 

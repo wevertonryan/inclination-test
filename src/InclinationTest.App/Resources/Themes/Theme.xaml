@@ -1,49 +1,193 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--
-    Arquivo único de design (design override).
-    Para reestilizar o app inteiro, altere somente os valores deste arquivo.
-    Todas as telas/componentes referenciam estas chaves semânticas via StaticResource.
--->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Superfícies -->
-    <Color x:Key="AppBackground">#0b1220</Color>
-    <Color x:Key="SurfaceElevated">#111a2e</Color>
-    <Color x:Key="SurfaceCard">#16203a</Color>
-    <Color x:Key="SurfaceBorder">#22304f</Color>
+    <!-- ===== Stitch design tokens ===== -->
+    <Color x:Key="Surface">#0e141b</Color>
+    <Color x:Key="SurfaceDim">#0e141b</Color>
+    <Color x:Key="SurfaceBright">#343a42</Color>
+    <Color x:Key="SurfaceContainerLowest">#090f16</Color>
+    <Color x:Key="SurfaceContainerLow">#161c23</Color>
+    <Color x:Key="SurfaceContainer">#1a2027</Color>
+    <Color x:Key="SurfaceContainerHigh">#252a32</Color>
+    <Color x:Key="SurfaceContainerHighest">#2f353d</Color>
+    <Color x:Key="SurfaceVariant">#2f353d</Color>
 
-    <!-- Texto -->
-    <Color x:Key="TextPrimary">#e8edf6</Color>
-    <Color x:Key="TextMuted">#8b98b4</Color>
-    <Color x:Key="TextOnAccent">#05150d</Color>
+    <Color x:Key="OnSurface">#dde3ed</Color>
+    <Color x:Key="OnSurfaceVariant">#bacac9</Color>
+    <Color x:Key="InverseSurface">#dde3ed</Color>
+    <Color x:Key="InverseOnSurface">#2b3139</Color>
+    <Color x:Key="Outline">#859493</Color>
+    <Color x:Key="OutlineVariant">#3b4949</Color>
 
-    <!-- Cores de marca / acao -->
-    <Color x:Key="Accent">#f5a623</Color>
-    <Color x:Key="AccentStrong">#ffb93f</Color>
-    <Color x:Key="Ok">#34c98a</Color>
-    <Color x:Key="Warn">#f5a623</Color>
-    <Color x:Key="Danger">#ff5c5c</Color>
-    <Color x:Key="RecordRed">#d92b2b</Color>
-    <Color x:Key="RecordRedLight">#ff6b6b</Color>
+    <Color x:Key="Primary">#48efef</Color>
+    <Color x:Key="OnPrimary">#003737</Color>
+    <Color x:Key="PrimaryContainer">#00d2d3</Color>
+    <Color x:Key="OnPrimaryContainer">#005556</Color>
+    <Color x:Key="PrimaryFixedDim">#26dcdd</Color>
+    <Color x:Key="SurfaceTint">#26dcdd</Color>
 
-    <!-- Grafico -->
-    <Color x:Key="ChartTrim">#4aa3ff</Color>
-    <Color x:Key="ChartRoll">#f5a623</Color>
+    <Color x:Key="Secondary">#89ceff</Color>
+    <Color x:Key="OnSecondary">#00344d</Color>
+    <Color x:Key="SecondaryContainer">#00a2e6</Color>
+    <Color x:Key="OnSecondaryContainer">#00344e</Color>
 
-    <!-- Compatibilidade de nomes usados nos componentes -->
-    <Color x:Key="TrimLine">#4aa3ff</Color>
+    <Color x:Key="Tertiary">#ffd09b</Color>
+    <Color x:Key="OnTertiary">#472a00</Color>
+    <Color x:Key="TertiaryContainer">#ffab32</Color>
+    <Color x:Key="OnTertiaryContainer">#6c4300</Color>
 
-    <!-- Espacamentos -->
+    <Color x:Key="Error">#ffb4ab</Color>
+    <Color x:Key="OnError">#690005</Color>
+    <Color x:Key="ErrorContainer">#93000a</Color>
+    <Color x:Key="OnErrorContainer">#ffdad6</Color>
+
+    <!-- ===== Semantic aliases used by the app ===== -->
+    <Color x:Key="AppBackground">#0e141b</Color>
+    <Color x:Key="SurfaceElevated">#161c23</Color>
+    <Color x:Key="SurfaceCard">#1a2027</Color>
+    <Color x:Key="SurfaceBorder">#3b4949</Color>
+    <Color x:Key="SurfaceHeader">#e60e141b</Color>
+    <Color x:Key="SurfaceNav">#e60e141b</Color>
+    <Color x:Key="Scrim">#cc090f16</Color>
+
+    <Color x:Key="TextPrimary">#dde3ed</Color>
+    <Color x:Key="TextMuted">#bacac9</Color>
+    <Color x:Key="TextSubtle">#859493</Color>
+    <Color x:Key="TextOnAccent">#003737</Color>
+
+    <Color x:Key="Accent">#48efef</Color>
+    <Color x:Key="AccentStrong">#26dcdd</Color>
+    <Color x:Key="Ok">#48efef</Color>
+    <Color x:Key="Warn">#ffd09b</Color>
+    <Color x:Key="Danger">#ffb4ab</Color>
+    <Color x:Key="RecordRed">#ffb4ab</Color>
+    <Color x:Key="RecordRedLight">#ffdad6</Color>
+    <Color x:Key="RecordWell">#663b3030</Color>
+
+    <Color x:Key="ChartTrim">#89ceff</Color>
+    <Color x:Key="ChartRoll">#ffab32</Color>
+    <Color x:Key="TrimLine">#89ceff</Color>
+
+    <!-- ===== Typography ===== -->
+    <x:String x:Key="FontDisplay">SpaceGrotesk</x:String>
+    <x:String x:Key="FontBody">Inter</x:String>
+    <x:String x:Key="FontMono">JetBrainsMono</x:String>
+    <x:String x:Key="FontIcons">MaterialOutlined</x:String>
+
+    <!-- ===== Spacing ===== -->
     <x:Double x:Key="SpacingXs">4</x:Double>
     <x:Double x:Key="SpacingSm">8</x:Double>
     <x:Double x:Key="SpacingMd">16</x:Double>
     <x:Double x:Key="SpacingLg">24</x:Double>
+    <x:Double x:Key="SpacingXl">40</x:Double>
 
-    <!-- Raios -->
-    <x:Double x:Key="RadiusSm">12</x:Double>
-    <x:Double x:Key="RadiusMd">16</x:Double>
-    <x:Double x:Key="RadiusPill">18</x:Double>
+    <!-- ===== Radii ===== -->
+    <x:Double x:Key="RadiusSm">4</x:Double>
+    <x:Double x:Key="RadiusMd">8</x:Double>
+    <x:Double x:Key="RadiusLg">12</x:Double>
+    <x:Double x:Key="RadiusXl">16</x:Double>
+    <x:Double x:Key="Radius2Xl">24</x:Double>
+    <x:Double x:Key="RadiusPill">999</x:Double>
+
+    <!-- ===== Text styles ===== -->
+    <Style x:Key="HeadlineSm" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontDisplay}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+        <Setter Property="CharacterSpacing" Value="0.4" />
+    </Style>
+    <Style x:Key="HeadlineMd" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontDisplay}" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+    </Style>
+    <Style x:Key="HeadlineLgMobile" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontDisplay}" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+    </Style>
+    <Style x:Key="BodyMd" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+    </Style>
+    <Style x:Key="BodySm" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontBody}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurfaceVariant}" />
+    </Style>
+    <Style x:Key="LabelData" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+    </Style>
+    <Style x:Key="LabelMicro" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CharacterSpacing" Value="1.2" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurfaceVariant}" />
+    </Style>
+    <Style x:Key="TelemetryDisplay" TargetType="Label">
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CharacterSpacing" Value="-0.6" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurface}" />
+    </Style>
+
+    <!-- ===== Surfaces ===== -->
+    <Style x:Key="TechnicalCard" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceContainer}" />
+        <Setter Property="Stroke" Value="{StaticResource OutlineVariant}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+    <Style x:Key="TechnicalCardFlat" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceContainerHigh}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="8" />
+    </Style>
+
+    <!-- ===== Buttons ===== -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryContainer}" />
+        <Setter Property="TextColor" Value="{StaticResource OnPrimaryContainer}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="HeightRequest" Value="48" />
+        <Setter Property="Padding" Value="18,0" />
+    </Style>
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource OnSurfaceVariant}" />
+        <Setter Property="BorderColor" Value="{StaticResource OutlineVariant}" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="HeightRequest" Value="48" />
+        <Setter Property="Padding" Value="18,0" />
+    </Style>
+    <Style x:Key="DangerButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource ErrorContainer}" />
+        <Setter Property="TextColor" Value="{StaticResource OnErrorContainer}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="HeightRequest" Value="48" />
+        <Setter Property="Padding" Value="18,0" />
+    </Style>
 
 </ResourceDictionary>

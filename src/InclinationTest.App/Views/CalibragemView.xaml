@@ -2,19 +2,413 @@
 <ContentView
     x:Class="InclinationTest.App.Views.CalibragemView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="8"
-        VerticalOptions="Center">
-        <Label
-            FontSize="24"
-            HorizontalTextAlignment="Center"
-            Text="Calibragem" />
-        <Label
-            HorizontalTextAlignment="Center"
-            Text="Em construção."
-            TextColor="{StaticResource Gray500}" />
-    </VerticalStackLayout>
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource Surface}">
+        <layout:ScreenHeader Grid.Row="0" Title="Calibragem" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16,16,16,112" Spacing="16">
+                <Border
+                    BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="#55000000"
+                            Offset="0,3"
+                            Radius="10" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="0">
+                        <Grid
+                            Padding="16,8"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            ColumnDefinitions="*,Auto">
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                FontAttributes="Bold"
+                                Text="SENSOR"
+                                TextColor="{StaticResource OnSurfaceVariant}"
+                                CharacterSpacing="1.2" />
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                FontAttributes="Bold"
+                                Text="STATUS"
+                                TextColor="{StaticResource OnSurfaceVariant}"
+                                CharacterSpacing="1.2" />
+                        </Grid>
+
+                        <!--  Acelerômetro  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="16">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAccelerometerTapped" />
+                            </Grid.GestureRecognizers>
+                            <Border
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                WidthRequest="40">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Speed}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                Text="Acelerômetro"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="2"
+                                HeightRequest="36"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center"
+                                WidthRequest="36">
+                                <Label
+                                    x:Name="AccelStatusIcon"
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#223b4949" />
+
+                        <!--  Giroscópio  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="{StaticResource SurfaceContainerLow}"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="16">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnUnsupportedSensorTapped" CommandParameter="Giroscópio" />
+                            </Grid.GestureRecognizers>
+                            <Border
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                WidthRequest="40">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Screen_rotation}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                Text="Giroscópio"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="2"
+                                HeightRequest="36"
+                                BackgroundColor="#183b4949"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center"
+                                WidthRequest="36">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Help}"
+                                    TextColor="{StaticResource Outline}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#223b4949" />
+
+                        <!--  Magnetômetro  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="16">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnUnsupportedSensorTapped" CommandParameter="Magnetômetro" />
+                            </Grid.GestureRecognizers>
+                            <Border
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                WidthRequest="40">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Explore_nearby}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                Text="Magnetômetro"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="2"
+                                HeightRequest="36"
+                                BackgroundColor="#18ffd09b"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center"
+                                WidthRequest="36">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Warning}"
+                                    TextColor="{StaticResource Tertiary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#223b4949" />
+
+                        <!--  Barômetro  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="{StaticResource SurfaceContainerLow}"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="16">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnUnsupportedSensorTapped" CommandParameter="Barômetro" />
+                            </Grid.GestureRecognizers>
+                            <Border
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                WidthRequest="40">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Airwave}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                Text="Barômetro"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="2"
+                                HeightRequest="36"
+                                BackgroundColor="#183b4949"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center"
+                                WidthRequest="36">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Help}"
+                                    TextColor="{StaticResource Outline}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#223b4949" />
+
+                        <!--  GPS  -->
+                        <Grid
+                            Padding="16,12"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="16">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnUnsupportedSensorTapped" CommandParameter="GPS" />
+                            </Grid.GestureRecognizers>
+                            <Border
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                WidthRequest="40">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.My_location}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                            <Label
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                Text="GPS"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="2"
+                                HeightRequest="36"
+                                BackgroundColor="#18ffd09b"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center"
+                                WidthRequest="36">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Warning}"
+                                    TextColor="{StaticResource Tertiary}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Padding="16"
+                    BackgroundColor="{StaticResource SurfaceContainerLow}"
+                    Stroke="{StaticResource OutlineVariant}"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="1">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="20"
+                            Text="{x:Static icons:MaterialOutlined.Info}"
+                            TextColor="{StaticResource Primary}"
+                            VerticalOptions="Start" />
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource FontBody}"
+                            FontSize="12"
+                            LineHeight="1.35"
+                            Text="A calibragem usa a posição atual como referência zero do acelerômetro. Os demais sensores não estão disponíveis nesta versão."
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                    </HorizontalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border
+            Grid.Row="2"
+            Margin="0,0,0,20"
+            BackgroundColor="{StaticResource PrimaryContainer}"
+            HeightRequest="56"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="End"
+            WidthRequest="56">
+            <Border.Shadow>
+                <Shadow
+                    Brush="#6600d2d3"
+                    Offset="0,4"
+                    Radius="16" />
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCalibrateTapped" />
+            </Border.GestureRecognizers>
+            <Label
+                x:Name="CalibrateIcon"
+                FontFamily="{StaticResource FontIcons}"
+                FontSize="28"
+                HorizontalOptions="Center"
+                Text="{x:Static icons:MaterialOutlined.Build}"
+                TextColor="{StaticResource OnPrimaryContainer}"
+                VerticalOptions="Center" />
+        </Border>
+
+        <!--  STATUS POPOVER  -->
+        <Grid
+            x:Name="StatusPopover"
+            Grid.RowSpan="3"
+            IsVisible="False"
+            ZIndex="10">
+            <BoxView BackgroundColor="#22000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnPopoverDismissed" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <Border
+                Margin="24"
+                Padding="16"
+                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                StrokeShape="RoundRectangle 12"
+                StrokeThickness="0"
+                VerticalOptions="End">
+                <Border.Shadow>
+                    <Shadow
+                        Brush="#77000000"
+                        Offset="0,4"
+                        Radius="16" />
+                </Border.Shadow>
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Border
+                        HeightRequest="36"
+                        BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 8"
+                        StrokeThickness="0"
+                        VerticalOptions="Start"
+                        WidthRequest="36">
+                        <Label
+                            x:Name="PopoverIcon"
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="20"
+                            HorizontalOptions="Center"
+                            Text="{x:Static icons:MaterialOutlined.Info}"
+                            TextColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label
+                            x:Name="PopoverTitle"
+                            FontFamily="{StaticResource FontDisplay}"
+                            FontSize="17"
+                            FontAttributes="Bold"
+                            Text="Sensor" />
+                        <Label
+                            x:Name="PopoverDescription"
+                            FontFamily="{StaticResource FontBody}"
+                            FontSize="13"
+                            LineHeight="1.35"
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentView>

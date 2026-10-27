@@ -8,12 +8,7 @@ public partial class RecordingBar : ContentView
     {
         InitializeComponent();
 
-        CancelIcon.FontFamily = "MaterialOutlined";
-        CancelIcon.FontSize = 26;
         CancelIcon.Text = MaterialOutlined.Close;
-
-        SaveIcon.FontFamily = "MaterialOutlined";
-        SaveIcon.FontSize = 26;
         SaveIcon.Text = MaterialOutlined.Check;
     }
 
