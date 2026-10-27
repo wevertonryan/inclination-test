@@ -4,7 +4,7 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Calibragem</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin space-y-space-md">
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Relatórios</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin space-y-space-md">
 <!-- Interactive Quick Status & Telemetry Pulse Bar -->
 
 <!-- Search & Filter Controls -->
@@ -16,10 +16,9 @@
 <span class="material-symbols-outlined text-[16px]">close</span>
 </button>
 </div>
-<button aria-label="Filtrar relatórios" class="w-11 h-11 shrink-0 rounded-full bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface flex items-center justify-center transition-all shadow-sm relative" id="filter-btn">
-<span class="material-symbols-outlined text-[20px]">filter_list</span>
-<span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary-container" id="filter-pip"></span>
-</button>
+  <button aria-label="Filtrar relatórios" class="w-11 h-11 shrink-0 rounded-full bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface flex items-center justify-center transition-all shadow-sm relative" id="filter-btn">
+    <span class="material-symbols-outlined text-[20px]">filter_list</span>
+  </button>
 </div>
 <!-- Filter Category Chips (Tactile Micro-Filter) -->
 
@@ -67,147 +66,102 @@
         </span>
 </div>
 </article>
-<!-- Card 2 -->
-<article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="Baía de Guanabara - RJ" data-title="Ensaio de Mar — Rebocador Almirante" role="button" tabindex="0">
-<!-- Linha Superior -->
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex flex-col min-w-0 flex-1">
-<div class="flex items-center gap-space-xs mb-1">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span>
-<span class="font-label-micro text-label-micro text-secondary uppercase tracking-wider">Bollard Pull / Roll</span>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
-            Ensaio de Mar — Rebocador Almirante
-          </h2>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-xs">
-<span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
-            18/10/2024 • 09:15
-          </span>
-<span class="font-label-micro text-label-micro text-on-surface-variant mt-0.5">
-            LOG #RB-409
-          </span>
-</div>
-</div>
-<!-- Hydrodynamic Mini Preview Badge -->
-<div class="w-full bg-surface-container-lowest/80 rounded-lg px-space-sm py-space-xs flex items-center justify-between">
-<div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-[15px] text-primary">waves</span>
-<span class="font-label-micro text-label-micro text-on-surface-variant">Período Roll:</span>
-<span class="font-label-data text-label-data text-primary font-bold">8.4 s</span>
-</div>
-<div class="flex items-center gap-1 font-label-micro text-label-micro text-secondary">
-<span class="">APROVADO</span>
-<span class="material-symbols-outlined text-[14px]">verified</span>
-</div>
-</div>
-<!-- Linha Inferior -->
-<div class="flex items-center justify-between pt-0.5">
-<div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_on</span>
-<span class="font-body-md text-body-md text-on-surface-variant truncate">
-            Baía de Guanabara - RJ
-          </span>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
-          chevron_right
+  <!-- Card 2 -->
+  <article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="Baía de Guanabara - RJ" data-title="Ensaio de Mar — Rebocador Almirante" role="button" tabindex="0">
+    <!-- Linha Superior -->
+    <div class="flex items-start justify-between gap-space-sm">
+      <div class="flex flex-col min-w-0 flex-1">
+
+        <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
+          Ensaio de Mar — Rebocador Almirante
+        </h2>
+      </div>
+      <div class="flex flex-col items-end shrink-0 pl-space-xs">
+        <span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
+          18/10/2024
         </span>
-</div>
-</article>
-<!-- Card 3 -->
-<article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="—" data-title="Teste de Estabilidade — Balsa Graneleira 04" role="button" tabindex="0">
-<!-- Linha Superior -->
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex flex-col min-w-0 flex-1">
-<div class="flex items-center gap-space-xs mb-1">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0"></span>
-<span class="font-label-micro text-label-micro text-tertiary uppercase tracking-wider">Estabilidade Intacta</span>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
-            Teste de Estabilidade — Balsa Graneleira 04
-          </h2>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-xs">
-<span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
-            05/10/2024 • 16:45
-          </span>
-<span class="font-label-micro text-label-micro text-on-surface-variant mt-0.5">
-            LOG #BG-004
-          </span>
-</div>
-</div>
-<!-- Hydrodynamic Mini Preview Badge -->
-<div class="w-full bg-surface-container-lowest/80 rounded-lg px-space-sm py-space-xs flex items-center justify-between">
-<div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-[15px] text-tertiary-container">speed</span>
-<span class="font-label-micro text-label-micro text-on-surface-variant">Heel Máx:</span>
-<span class="font-label-data text-label-data text-tertiary-container font-bold">2.1°</span>
-</div>
-<div class="flex items-center gap-1 font-label-micro text-label-micro text-outline">
-<span class="">EM ANÁLISE</span>
-<span class="material-symbols-outlined text-[14px]">hourglass_empty</span>
-</div>
-</div>
-<!-- Linha Inferior -->
-<div class="flex items-center justify-between pt-0.5">
-<div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_off</span>
-<span class="font-body-md text-body-md text-on-surface-variant truncate font-label-data">
-            —
-          </span>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
-          chevron_right
+
+      </div>
+    </div>
+    <!-- Hydrodynamic Mini Preview Badge -->
+
+    <!-- Linha Inferior -->
+    <div class="flex items-center justify-between pt-0.5">
+      <div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_on</span>
+        <span class="font-body-md text-body-md text-on-surface-variant truncate">
+          Baía de Guanabara - RJ
         </span>
-</div>
-</article>
-<!-- Card 4 -->
-<article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="Porto de Santos - SP" data-title="Calibração Dinâmica Trim — Escuna Mistral" role="button" tabindex="0">
-<!-- Linha Superior -->
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex flex-col min-w-0 flex-1">
-<div class="flex items-center gap-space-xs mb-1">
-<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed shrink-0"></span>
-<span class="font-label-micro text-label-micro text-primary-fixed uppercase tracking-wider">Trim Sensor Array</span>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
-            Calibração Dinâmica Trim — Escuna Mistral
-          </h2>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-xs">
-<span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
-            28/09/2024 • 11:20
-          </span>
-<span class="font-label-micro text-label-micro text-on-surface-variant mt-0.5">
-            LOG #EM-912
-          </span>
-</div>
-</div>
-<!-- Hydrodynamic Mini Preview Badge -->
-<div class="w-full bg-surface-container-lowest/80 rounded-lg px-space-sm py-space-xs flex items-center justify-between">
-<div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-[15px] text-primary-fixed">straighten</span>
-<span class="font-label-micro text-label-micro text-on-surface-variant">Ajuste Zero:</span>
-<span class="font-label-data text-label-data text-primary-fixed font-bold">+0.04°</span>
-</div>
-<div class="flex items-center gap-1 font-label-micro text-label-micro text-primary">
-<span class="">CALIBRADO</span>
-<span class="material-symbols-outlined text-[14px]">tune</span>
-</div>
-</div>
-<!-- Linha Inferior -->
-<div class="flex items-center justify-between pt-0.5">
-<div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_on</span>
-<span class="font-body-md text-body-md text-on-surface-variant truncate">
-            Porto de Santos - SP
-          </span>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
-          chevron_right
+      </div>
+      <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
+        chevron_right
+      </span>
+    </div>
+  </article>
+  <!-- Card 3 -->
+  <article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="—" data-title="Teste de Estabilidade — Balsa Graneleira 04" role="button" tabindex="0">
+    <!-- Linha Superior -->
+    <div class="flex items-start justify-between gap-space-sm">
+      <div class="flex flex-col min-w-0 flex-1">
+
+        <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
+          Teste de Estabilidade — Balsa Graneleira 04
+        </h2>
+      </div>
+      <div class="flex flex-col items-end shrink-0 pl-space-xs">
+        <span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
+          05/10/2024
         </span>
-</div>
-</article>
+
+      </div>
+    </div>
+    <!-- Hydrodynamic Mini Preview Badge -->
+
+    <!-- Linha Inferior -->
+    <div class="flex items-center justify-between pt-0.5">
+      <div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_off</span>
+        <span class="font-body-md text-body-md text-on-surface-variant truncate font-label-data">
+          —
+        </span>
+      </div>
+      <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
+        chevron_right
+      </span>
+    </div>
+  </article>
+  <!-- Card 4 -->
+  <article class="report-card group w-full bg-surface-container hover:bg-surface-container-high active:scale-[0.99] rounded-2xl p-space-md flex flex-col gap-space-sm transition-all duration-200 shadow-md cursor-pointer select-none" data-location="Porto de Santos - SP" data-title="Calibração Dinâmica Trim — Escuna Mistral" role="button" tabindex="0">
+    <!-- Linha Superior -->
+    <div class="flex items-start justify-between gap-space-sm">
+      <div class="flex flex-col min-w-0 flex-1">
+
+        <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-fixed transition-colors truncate">
+          Calibração Dinâmica Trim — Escuna Mistral
+        </h2>
+      </div>
+      <div class="flex flex-col items-end shrink-0 pl-space-xs">
+        <span class="font-label-data text-label-data text-secondary-fixed-dim font-medium">
+          28/09/2024
+        </span>
+
+      </div>
+    </div>
+    <!-- Hydrodynamic Mini Preview Badge -->
+
+    <!-- Linha Inferior -->
+    <div class="flex items-center justify-between pt-0.5">
+      <div class="flex items-center gap-1.5 min-w-0 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px] text-outline shrink-0">location_on</span>
+        <span class="font-body-md text-body-md text-on-surface-variant truncate">
+          Porto de Santos - SP
+        </span>
+      </div>
+      <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all text-[20px] shrink-0 ml-2">
+        chevron_right
+      </span>
+    </div>
+  </article>
 </div>
 <!-- Clever Empty State (Hidden by default, triggered on no search results) -->
 <div class="hidden flex-col items-center justify-center p-space-xl bg-surface-container-low rounded-2xl text-center space-y-space-md" id="empty-state">

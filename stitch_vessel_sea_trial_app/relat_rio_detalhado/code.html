@@ -4,7 +4,7 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="flex items-center min-w-[44px] h-[44px] z-10"><button aria-label="Voltar" class="w-[44px] h-[44px] -ml-2 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button></div><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Relatórios</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"><button aria-label="Ações" class="w-[44px] h-[44px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-10">
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="flex items-center min-w-[44px] h-[44px] z-10"><button aria-label="Voltar" class="w-[44px] h-[44px] -ml-2 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button></div><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Relatório</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"><button aria-label="Ações" class="w-[44px] h-[44px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-10">
 <!-- Modal / Overlay de Opções Contextuais -->
 <div class="fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm items-end sm:items-center justify-center p-margin transition-opacity hidden" id="options-menu-overlay">
 <div class="w-full max-w-sm bg-surface-container-high rounded-xl p-space-md shadow-xl flex flex-col gap-space-sm animate-in fade-in zoom-in-95 duration-150">
@@ -39,14 +39,9 @@
 <div class="px-margin pt-space-md flex flex-col gap-space-md">
 <!-- Header de Identificação -->
 <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm">
-<div class="flex items-center gap-space-xs mb-space-xs">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="font-label-micro text-label-micro text-primary uppercase">Certificado Hidrostático Oficial</span>
-</div>
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold tracking-tight">
         Prova de Inclinação — Navio Tanque Bravo
       </h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Registro de Ensaio de Estabilidade Estática e Inclinometria</p>
 </div>
 <!-- Grade de Metadados -->
 <div class="grid grid-cols-2 gap-space-sm">
@@ -77,8 +72,7 @@
 <span class="font-label-data text-label-data text-on-surface">14:30</span>
 </div>
 </div>
-<div class="col-span-2 bg-surface-container rounded-lg p-space-sm flex items-center justify-between">
-<div class="flex items-center gap-space-sm">
+<div class="col-span-2 bg-surface-container rounded-lg p-space-sm flex items-center gap-space-sm">
 <div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
 <span class="material-symbols-outlined text-[20px]">timer</span>
 </div>
@@ -87,15 +81,12 @@
 <span class="font-telemetry-display-mobile text-telemetry-display-mobile text-primary">00:18:42</span>
 </div>
 </div>
-<span class="px-space-sm py-1 bg-surface-variant text-on-surface-variant font-label-micro text-label-micro rounded">1.122 PTS</span>
-</div>
 </div>
 </div>
 <!-- Seção: Informações da Gravação com Medidor Angular de Arco Aberto -->
 <div class="px-margin mt-space-lg flex flex-col gap-space-sm">
 <div class="flex items-center justify-between">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Informações da gravação</h3>
-<span class="font-label-micro text-label-micro text-secondary uppercase">Range Operacional</span>
 </div>
 <div class="bg-surface-container rounded-xl p-space-md flex flex-col items-center shadow-sm">
 <!-- Mostrador em Arco Aberto na Parte Superior -->
@@ -122,12 +113,12 @@
   <span class="">0.0° REF</span>
 </div>
 <!-- Rótulo MÍNIMO alinhado à esquerda -->
-<div class="absolute bottom-2 left-2 flex flex-col items-center">
+<div class="absolute bottom-1 left-0 flex flex-col items-center">
 <span class="font-label-micro text-label-micro text-on-surface-variant">MÍNIMO</span>
 <span class="font-label-data text-label-data text-secondary font-bold">-4.2°</span>
 </div>
 <!-- Rótulo MÁXIMO alinhado à direita -->
-<div class="absolute bottom-2 right-2 flex flex-col items-center">
+<div class="absolute bottom-1 right-0 flex flex-col items-center">
 <span class="font-label-micro text-label-micro text-on-surface-variant">MÁXIMO</span>
 <span class="font-label-data text-label-data text-tertiary font-bold">+5.8°</span>
 </div>
@@ -196,7 +187,6 @@
 <div class="px-margin mt-space-lg flex flex-col gap-space-sm">
 <div class="flex items-center justify-between">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Medidas</h3>
-<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Estatística Amostral</span>
 </div>
 <div class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
 <table class="w-full text-left">
@@ -238,9 +228,9 @@
 </div>
 <!-- Seção: Dados Brutos -->
 <div class="px-margin mt-space-lg flex flex-col gap-space-sm">
-<div class="flex flex-col">
+<div class="flex items-center justify-between">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Dados brutos</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant">1.122 leituras (intervalo de 1.000 ms)</p>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1.122 leituras</span>
 </div>
 <!-- Tabela com Cabeçalho Fixo e Scroll Interno -->
 <div class="bg-surface-container rounded-xl overflow-hidden shadow-sm flex flex-col">
@@ -372,6 +362,9 @@
     if (quickDeleteBtn) quickDeleteBtn.addEventListener('click', triggerDelete);
   })();
 </script></main>
+<script>
+  (function(){ const nav = document.querySelector('nav'); if(nav) nav.remove(); })();
+</script>
 
 
 
