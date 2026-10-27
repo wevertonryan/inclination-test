@@ -31,7 +31,12 @@ jobs:
         run: dotnet workload install maui-android
 
       - name: Compilar APK (Debug, assinado com debug keystore)
-        run: dotnet build InclinationTest.App/InclinationTest.App.csproj -f net10.0-android -c Debug -p:AndroidPackageFormat=apk
+        run: >
+          dotnet build InclinationTest.App/InclinationTest.App.csproj
+          -f net10.0-android -c Debug
+          -p:AndroidPackageFormat=apk
+          -p:EmbedAssembliesIntoApk=true
+          -p:AndroidFastDeploymentType=None
 
       - uses: actions/upload-artifact@v4
         with:
