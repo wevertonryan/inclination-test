@@ -10,19 +10,20 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
 ## Status atual do projeto
 
-> **Última verificação: 14/10/2026.** Este status reflete o que existe no código hoje e é a
+> **Última verificação: 27/10/2026.** Este status reflete o que existe no código hoje e é a
 > fonte de verdade sobre o andamento. As demais seções descrevem o desenho-alvo; o que ainda
 > não foi implementado está marcado como **Planejado** ao longo do documento.
 
 **Estágio:** Épico 1 / **EP2** concluído — Sensores, Cálculos, Calibração, Filtragem de Ruído e
-Testes. A camada de interface já tem o esqueleto de navegação (`AppShell` + `MainPage` com
-`material:TabView` da UraniumUI, 5 abas inferiores): a Home real e quatro telas placeholder.
+Testes. A camada de interface tem navegação completa (`AppShell` + `MainPage` com
+`material:TabView` da UraniumUI, 5 abas inferiores), com **Home**, **Relatórios** e o wiring do
+gravador reais; Calibração, Testes e Configurações seguem como placeholder.
 
-A **gravação/persistência (Épico 2/3) está em desenvolvimento por TDD**, em 3 etapas
-(1. testes → 2. código do Core → 3. visual). As **Etapas 1 e 2** já estão entregues: a Etapa 1
-escreveu os contratos e as suítes; a Etapa 2 implementou todos os corpos do Core, **fechando os
-93 testes antes vermelhos**. A suíte total (**201 testes**) está **verde**. Falta a **Etapa 3**
-(visual: telas reais + wiring do gravador no `App`).
+A **gravação/persistência (Épico 2/3) está concluída nas 3 etapas** (1. testes → 2. código do
+Core → 3. visual). A Etapa 1 escreveu os contratos e as suítes; a Etapa 2 implementou os corpos do
+Core; a **Etapa 3** entregou a tela de Relatórios e a **persistência em arquivo**, então as
+gravações sobrevivem a fechar o app. A suíte total (**233 testes**) está **verde**.
+
 
 ### Implementado
 
@@ -31,20 +32,20 @@ escreveu os contratos e as suítes; a Etapa 2 implementou todos os corpos do Cor
 | `Core/Models/` | `Vector3`, `MotionSample`, `Angles`, `Calibration` |
 | `Core/Sensors/` | `ISensorService`, `SensorService`, `IAccelerometerSource`, `AccelerometerReading` (contratos em `Contracts/`) |
 | `Core/Processing/` | `IFilter` (em `Contracts/`), `FilterService` (filtro EMA), `AngleConverter` |
-| `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`); `RecorderViewModel` (máquina de estados, cronômetro, confirmação, série) e contratos `RecorderMode`, `ConfirmationRequest` (em `Contracts/`) |
-| `Core/Recording/` | `RecordingSession` (decimação 12 Hz, lotes de 2 s, pause/resume), `Statistics` (Welford), `RecordingWriter`, `ThreadSerialExecutor` (thread dedicada + fila); contratos em `Contracts/`: `IRecordingSession`, `ISerialExecutor`, `RecordedSample`, `RecordingSummary`, `RecordingOptions`, `RecordingEvents` |
-| `Core/Persistence/` | `InMemoryReportRepository` (referência de semântica); contratos em `Contracts/`: `IReportRepository`, `RecordingHeader`, `RecordingStatus` |
+| `Core/ViewModels/` | `InclinationViewModel` (Start/Stop/Calibrate, `OnSample`, `Error`); `RecorderViewModel` (máquina de estados, cronômetro, confirmação, série); `ReportsViewModel` (lista/abre/fecha relatórios); contratos `RecorderMode`, `ConfirmationRequest` (em `Contracts/`) e `ReportItem` (`Contracts/ReportItem.cs`) |
+| `Core/Recording/` | `RecordingSession` (decimação 12 Hz, lotes de 2 s, pause/resume), `Statistics` (Welford), `RecordingWriter` (ponte gravador → repositório, **multi-gravação**, evento `Saved`), `ThreadSerialExecutor` (thread dedicada + fila); contratos em `Contracts/`: `IRecordingSession`, `ISerialExecutor`, `RecordedSample`, `RecordingSummary`, `RecordingOptions`, `RecordingEvents` |
+| `Core/Persistence/` | `InMemoryReportRepository` (referência de semântica, usada pelos testes) e `FileReportRepository` (**persistência real** em `.hdr` + `.csv`); `HeaderFormat` (serialização texto do cabeçalho); contratos em `Contracts/`: `IReportRepository`, `IReportStorage`, `RecordingHeader`, `RecordingStatus` |
 | `Core/Platform/` | `IClock`, `ITicker` (abstrações de tempo; produção no App, fakes nos testes) |
-| `App` | `MauiProgram` (DI + UraniumUI), `MauiAccelerometerSource`, `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (inclinômetro + labels TRIM/ROLL + botões Iniciar/Parar/Calibrar + gráfico) e 4 views placeholder (`CalibragemView`, `RelatoriosView`, `TestesView`, `ConfiguracoesView`), `Controls/InclinometerControl` (Skia), `Controls/CollapsibleTabView`, `Components/Features/ChartView` (LiveCharts2), `RecordButton`, `RecordingBar`, `Platform/DispatcherTicker`, `Platform/SystemClock`, `Converters/` |
-| Testes | **204** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26, `InclinationViewModelPublish` 3, `Statistics` 15, `RecordingSession` 33, `RecordingWriter` 7, `ThreadSerialExecutor` 4, `InMemoryReportRepository` 15, `RecorderViewModel` 32 — **todos verdes** |
+| `App` | `MauiProgram` (DI + UraniumUI), `MauiAccelerometerSource`, `AppShell`, `Views/MainPage` (`material:TabView` com 5 abas), `Views/HomeView` (inclinômetro + labels TRIM/ROLL + botões Iniciar/Parar/Calibrar + gráfico), **`Views/RelatoriosView`** (cards + detalhe com estatísticas e gráfico), `Views/CalibragemView`/`TestesView`/`ConfiguracoesView` (placeholder), `Controls/InclinometerControl` (Skia), `Controls/CollapsibleTabView`, `Components/Features/ChartView` (LiveCharts2, streaming) e `ReportChartView` (relatório salvo, decimado), `RecordButton`, `RecordingBar`, `Platform/DispatcherTicker`, `Platform/SystemClock`, `Platform/AppDataReportStorage`, `Converters/` |
+| Testes | **233** xUnit: `SensorService` 19, `FilterService` 13, `AngleConverter` 37, `InclinationViewModel` 26, `InclinationViewModelPublish` 3, `Statistics` 15, `RecordingSession` 33, `RecordingWriter` 7, `RecordingWriterMultiple` 3, `ThreadSerialExecutor` 4, `InMemoryReportRepository` 15, `FileReportRepository` 19, `ReportsViewModel` 7, `RecorderViewModel` 32 — **todos verdes** |
 
 ### Planejado (não implementado)
 
 | Camada | Pendente |
 |---|---|
-| `Core/Persistence/` | **Etapa própria**: `Schema`, `SqliteReportRepository` (`Microsoft.Data.Sqlite`), `RecordingStore` (a semântica já é garantida por contrato via `InMemoryReportRepository`) |
-| `App` | **Etapa 3**: telas reais das seções (Calibração, Relatórios...), wiring do gravador (`RecorderViewModel` singleton, `ITicker`/`IClock` de produção), design system em `Colors.xaml` |
-| Stack de UI | UraniumUI, LiveCharts2 e SkiaSharp **já em uso** (gráfico Trim × Roll e inclinômetro) |
+| `Core/Persistence/` | Evolução opcional: `SqliteReportRepository` (`Microsoft.Data.Sqlite`) para consultas/índices. A semântica já é garantida por contrato e coberta por `FileReportRepository` |
+| `App` | Telas reais de Calibração, Testes e Configurações; exportação/eliminação de relatórios |
+| Stack de UI | UraniumUI, LiveCharts2 e SkiaSharp **já em uso** (gráfico Trim × Roll, inclinômetro e gráfico de relatório) |
 | Build | APK de **Debug** via GitHub Actions (`.github/workflows/apk.yml`, artifact `inclination-test-apk`); falta assinatura fixa e um perfil Release |
 
 > A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP**. Ainda assim, por
@@ -575,3 +576,93 @@ gravação inteira seria preciso decimar (ex.: 1 ponto a cada 500 ms).
 Medição depois (app visível, mesmo aparelho): ~**22 fps** contra ~8,5 fps antes. Ainda há jank
 porque o APK é **Debug** (JIT sem otimização, sem AOT/trimming) — um perfil Release muda bastante
 esse número.
+
+## 10. Relatórios — da gravação à tela
+
+Até a Etapa 3, o "Salvar" gravava a série num `Dictionary` em memória que ninguém lia: a aba
+Relatórios era um placeholder e o relatório morria junto com o processo (o HyperOS mata o app com
+frequência). Esta seção descreve o caminho que passou a existir.
+
+### O caminho completo
+
+```
+HomeView "Salvar" → DisplayPromptAsync(título) → RecorderViewModel.RequestSave() + Confirm()
+   └─ RecordingSession.Save(title)
+        ├─ RecordingSummary (média, desvio, mín, máx de roll/trim)
+        ├─ Flush() do último lote
+        └─ Finished(Saved)
+             └─ RecordingWriter (thread do ThreadSerialExecutor)
+                  ├─ IReportRepository.AppendSamples(...)   → {id}.csv (append)
+                  ├─ IReportRepository.SaveRecording(...)   → {id}.hdr (reescrito)
+                  └─ Saved?.Invoke(id)                      → RelatoriosView.Refresh()
+```
+
+A ordem importa: `RecordingSession.Save` faz `Flush()` **antes** de disparar `Finished`, e todas as
+operações passam pelo mesmo `ThreadSerialExecutor`, então o último lote é gravado antes do
+cabeçalho ser marcado como salvo.
+
+### Formato em disco
+
+Um diretório (`FileSystem.AppDataDirectory/reports`), dois arquivos por gravação:
+
+| Arquivo | Conteúdo | Escrita |
+|---|---|---|
+| `{id}.hdr` | cabeçalho em `chave=valor` (título, status, resumo, timestamps) | uma vez ao criar, reescrito ao salvar |
+| `{id}.csv` | amostras `elapsedMs;roll;trim` | **só append**, a cada lote de 2 s |
+
+O append é o ponto central: reescrever o arquivo inteiro a cada lote seria o mesmo O(n²) que
+travava o gráfico. Como cada lote só acrescenta, o custo por lote é constante, e uma gravação
+interrompida por queda de energia continua legível (`FindInterrupted` lê o `status=recording`).
+
+O cabeçalho é texto puro de propósito. JSON exigiria reflexão (ou source generation) para
+serializar; texto `chave=valor` não depende de nada e sobrevive a trimming/AOT, o que importa para
+um futuro APK Release. Strings (título, local) passam por `Uri.EscapeDataString`, então `=`, `%` e
+quebras de linha não quebram o parser. Números usam `CultureInfo.InvariantCulture` com formatos
+`"R"`/`"O"` — o arquivo não depende do idioma do aparelho.
+
+Cabeçalho corrompido (queda no meio da escrita) é ignorado na leitura: um arquivo ruim não derruba
+a lista inteira.
+
+### Relógio monotônico × relógio de parede
+
+`RecordingHeader.StartedAtMs` vem de `Environment.TickCount64` — milissegundos desde o boot.
+É ótimo para medir duração (não salta com mudança de fuso/horário), mas **não é data**. Por isso o
+header ganhou `StartedAtUtc` e `SavedAtUtc` (`DateTimeOffset`), preenchidos pelo repositório na
+criação e no salvamento. A lista usa `SavedAtUtc` e converte para o fuso local só na formatação.
+
+### O bug que escondia tudo
+
+`RecordingWriter.OnFinished` fazia `_finished = true` **e** `Unsubscribe()`. Como o writer é
+singleton, a partir da segunda gravação os handlers já não existiam: `OnBatchReady` e `OnFinished`
+caíam no `if (_finished) return;` e nada era salvo. Um app que só persiste o primeiro relatório é
+pior do que um sem relatórios, porque parece funcionar.
+
+Correção: `OnStarted` volta `_finished` para `false` e a inscrição só é removida em `Dispose`.
+O `Saved` foi adicionado no mesmo lugar para a tela saber que pode recarregar sem polling.
+
+### A tela
+
+`ReportsViewModel` (Core, testável) lista via `IReportRepository.ListReports()`, formata duração,
+data e resumo, e carrega as amostras ao abrir. `RelatoriosView` mostra cards (título, data,
+duração), e ao tocar troca para o detalhe: estatísticas de ROLL/TRIM e o gráfico.
+
+O gráfico do relatório é diferente do gráfico da Home: a Home é *streaming* (janela deslizante de
+600 amostras), o relatório é o histórico **inteiro** montado uma única vez. Para não travar com
+gravações longas, `ReportChartView` decima para no máximo ~900 pontos (mantendo o último) e ajusta
+a escala Y ao maior valor absoluto da série.
+
+### Onde os arquivos ficam (e como inspecionar)
+
+Em produção, `FileSystem.AppDataDirectory` no Android é `/data/user/0/com.inclinationtest.app/files`.
+Como o APK é Debug, dá para ler sem root:
+
+```bash
+adb shell run-as com.inclinationtest.app ls files/reports
+adb shell run-as com.inclinationtest.app cat files/reports/<id>.hdr
+```
+
+Apagar tudo (para uma demonstração limpa):
+
+```bash
+adb shell run-as com.inclinationtest.app rm -rf files/reports
+```
