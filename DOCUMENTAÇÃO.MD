@@ -666,3 +666,12 @@ Apagar tudo (para uma demonstração limpa):
 ```bash
 adb shell run-as com.inclinationtest.app rm -rf files/reports
 ```
+
+### Limite conhecido: estatísticas e o zero
+
+`Statistics.Add` ignora, **por eixo**, valores exatamente `0.0` (`if (roll != 0)`). Isso está travado
+por teste (`ToSummary_MapsAllFields` usa `0` como "eixo não medido"), então foi preservado. Na
+prática o efeito é pequeno: um acelerômetro real raramente entrega `0,0` exato, e o ruído faz o
+valor oscilar em torno de zero. Se o aparelho ficar perfeitamente nivelado (roll exato 0), esses
+pontos saem da média e do desvio do eixo. Mudar a semântica exige atualizar aquele teste — é uma
+decisão de produto, não um ajuste silencioso.
