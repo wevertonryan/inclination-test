@@ -1,0 +1,251 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-variant": "#2f353d", "secondary-fixed": "#c9e6ff", "on-surface": "#dde3ed", "error-container": "#93000a", "secondary-fixed-dim": "#89ceff", "surface-container-highest": "#2f353d", "secondary-container": "#00a2e6", "on-tertiary": "#472a00", "inverse-primary": "#006a6a", "on-secondary-fixed": "#001e2f", "tertiary-container": "#ffab32", "on-background": "#dde3ed", "surface-dim": "#0e141b", "primary": "#48efef", "background": "#0e141b", "surface-tint": "#26dcdd", "on-error": "#690005", "primary-container": "#00d2d3", "inverse-surface": "#dde3ed", "secondary": "#89ceff", "error": "#ffb4ab", "surface-bright": "#343a42", "on-surface-variant": "#bacac9", "on-error-container": "#ffdad6", "on-primary-container": "#005556", "surface": "#0e141b", "tertiary": "#ffd09b", "outline": "#859493", "surface-container": "#1a2027", "on-primary-fixed-variant": "#004f50", "inverse-on-surface": "#2b3139", "primary-fixed": "#56f9f9", "outline-variant": "#3b4949", "tertiary-fixed": "#ffddb8", "surface-container-high": "#252a32", "surface-container-lowest": "#090f16", "on-secondary-fixed-variant": "#004c6e", "on-primary-fixed": "#002020", "on-secondary": "#00344d", "on-tertiary-fixed-variant": "#653e00", "on-secondary-container": "#00344e", "on-tertiary-container": "#6c4300", "primary-fixed-dim": "#26dcdd", "on-primary": "#003737", "surface-container-low": "#161c23", "tertiary-fixed-dim": "#ffb95f", "on-tertiary-fixed": "#2a1700" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop": "1.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin": "1rem", "margin-tablet": "1.5rem", "gutter": "1rem", "margin-desktop": "2.5rem", "space-xl": "2.5rem" }, "fontFamily": { "label-micro": ["JetBrains Mono"], "headline-md": ["Space Grotesk"], "telemetry-display": ["JetBrains Mono"], "headline-lg-mobile": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "headline-xl-mobile": ["Space Grotesk"], "body-sm": ["Inter"], "body-lg": ["Inter"], "telemetry-display-mobile": ["JetBrains Mono"], "body-md": ["Inter"], "label-data": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"], "headline-xl": ["Space Grotesk"] }, "fontSize": { "label-micro": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "telemetry-display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "telemetry-display-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-data": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } }</script></head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="flex items-center min-w-[44px] h-[44px] z-10"><button class="flex items-center gap-space-xs bg-surface-container-high hover:bg-surface-bright active:scale-95 transition-all px-space-sm py-space-xs rounded-full shadow-md cursor-pointer" id="sensor-modal-trigger"><span class="material-symbols-outlined text-primary text-[18px]">sensors</span><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary animate-ping"></span><span class="font-label-micro text-label-micro text-on-surface uppercase tracking-wider">CALIBRADO</span></div><span class="material-symbols-outlined text-on-surface-variant text-[14px]">expand_more</span></button></div><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Home</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-1 flex-col items-center justify-center w-full relative select-none">
+<!-- Central Dynamic Gauge Chamber -->
+<div class="flex flex-col items-center justify-center w-full px-margin py-space-md my-auto">
+<!-- Outer Inclinometer Bezel -->
+<div class="relative w-[90vw] h-[90vw] max-w-[420px] max-h-[420px] rounded-full bg-surface-container-lowest shadow-2xl flex items-center justify-center p-3">
+<!-- Ambient Glow Behind Bezel -->
+<div class="absolute inset-0 rounded-full bg-gradient-to-b from-primary/10 via-transparent to-secondary/5 pointer-events-none"></div>
+<!-- Outer Roll Scale (Ring 0° to 180° / -180°) -->
+<div class="absolute inset-2 rounded-full flex items-center justify-center">
+<!-- SVG Roll Scale with Tick Marks & Notches -->
+<svg class="w-full h-full transform transition-transform duration-300 ease-out" id="roll-disc-svg" viewBox="0 0 300 300" style="transform: rotate(-0.9deg);">
+<circle cx="150" cy="150" fill="none" r="142" stroke="#252a32" stroke-width="4"></circle>
+<!-- Tick Marks & Labels -->
+<!-- 0° Top Apex -->
+<line stroke="#ffffff" stroke-width="2.5" x1="150" x2="150" y1="8" y2="22"></line>
+<!-- 30° / -30° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="217" x2="210" y1="34.1" y2="46.2"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="204" y="58">30°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="83" x2="90" y1="34.1" y2="46.2"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="96" y="58">30°</text>
+<!-- 60° / -60° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="265.9" x2="253.8" y1="83" y2="90"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="242" y="99">60°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="34.1" x2="46.2" y1="83" y2="90"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="58" y="99">60°</text>
+<!-- 90° / -90° (Port / Starboard Max Criticals) -->
+<line stroke="#ffffff" stroke-width="2.5" x1="292" x2="278" y1="150" y2="150"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="264" y="153">90°</text>
+<line stroke="#ffffff" stroke-width="2.5" x1="8" x2="22" y1="150" y2="150"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="36" y="153">90°</text>
+<!-- 120° / -120° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="265.9" x2="253.8" y1="217" y2="210"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="242" y="209">120°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="34.1" x2="46.2" y1="217" y2="210"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="58" y="209">120°</text>
+<!-- 150° / -150° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="217" x2="210" y1="265.9" y2="253.8"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="204" y="249">150°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="83" x2="90" y1="265.9" y2="253.8"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="96" y="249">150°</text>
+<!-- 180° Bottom Center Keel Line -->
+<line stroke="#ffffff" stroke-width="2.5" x1="150" x2="150" y1="292" y2="278"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="150" y="271">180°</text>
+<!-- Subtle 10-degree intermediate subdivisions -->
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="174" x2="171.8" y1="10" y2="18"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="197" x2="193.5" y1="18.5" y2="26"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="126" x2="128.2" y1="10" y2="18"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="103" x2="106.5" y1="18.5" y2="26"></line>
+</svg>
+</div>
+<!-- Roll Needle / Pointer: Static Top Indicator Pointing Inward -->
+<div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+<div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"></div>
+</div>
+<!-- Inner Well for Trim Displacement Scale -->
+<div class="relative w-[63.3%] h-[63.3%] rounded-full bg-surface-container-high overflow-hidden shadow-inner flex items-center justify-center">
+<!-- Technical Grid Background Pattern in Well -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:12px_12px]"></div>
+<!-- Vertical Trim Displacement Carrier (Sliding ±90° Scale) -->
+<div class="absolute flex flex-col items-center justify-center transition-transform duration-300 ease-out" id="trim-slider-rack" style="transform: translateY(-7.28px);">
+<!-- Positive Trim Ticks (+90 down to +15) -->
+<div class="flex flex-col items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="w-3 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+90°</span>
+<span class="w-3 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+60°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+45°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-5 h-[1.5px] bg-white"></span>
+<span class="font-label-micro text-[14px] text-white font-mono font-bold">+30°</span>
+<span class="w-5 h-[1.5px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+15°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+</div>
+<!-- Neutral Zero Plane with Horizontal Alignment Markers -->
+<div class="flex items-center justify-between w-32 my-3">
+<div class="flex items-center gap-1">
+<span class="w-4 h-[2px] bg-white"></span>
+<span class="w-2 h-[2px] bg-white"></span>
+</div>
+<span class="font-label-data text-[15px] text-white font-bold px-2 py-0.5 rounded bg-surface-container-lowest">0°</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-[2px] bg-white"></span>
+<span class="w-4 h-[2px] bg-white"></span>
+</div>
+</div>
+<!-- Negative Trim Ticks (-15 down to -90) -->
+<div class="flex flex-col items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-15°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-5 h-[1.5px] bg-white"></span>
+<span class="font-label-micro text-[14px] text-white font-mono font-bold">-30°</span>
+<span class="w-5 h-[1.5px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-45°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-60°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-90°</span>
+<span class="w-3 h-[1px] bg-white"></span>
+</div>
+</div>
+</div>
+<!-- Fixed Center Reference Crosshair/Horizon Line -->
+<div class="absolute inset-x-0 h-[2px] bg-white/80 pointer-events-none flex items-center justify-between px-2 shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+<div class="w-3 h-3 -ml-1 border-t-2 border-l-2 border-white rotate-45"></div>
+<div class="w-3 h-3 -mr-1 border-t-2 border-r-2 border-white -rotate-45"></div>
+</div>
+</div>
+</div>
+<!-- Telemetry Readout Legend Card (Trim & Roll Direct Live Values) -->
+<div class="mt-space-lg w-full max-w-[320px] grid grid-cols-2 gap-space-sm">
+<!-- TRIM Telemetry Module -->
+<div class="flex flex-col items-center justify-center p-space-sm rounded-xl bg-surface-container-high shadow-md">
+<div class="flex items-center gap-1 mb-0.5">
+<span class="material-symbols-outlined text-secondary text-[16px]">swap_vert</span>
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant tracking-wider">TRIM</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-telemetry-display-mobile text-telemetry-display-mobile font-bold text-secondary tracking-tight" id="trim-val-display">+1.4</span>
+<span class="font-label-data text-label-data text-secondary font-mono">°</span>
+</div>
+
+</div>
+<!-- ROLL Telemetry Module -->
+<div class="flex flex-col items-center justify-center p-space-sm rounded-xl bg-surface-container-high shadow-md">
+<div class="flex items-center gap-1 mb-0.5">
+<span class="material-symbols-outlined text-secondary text-[16px]">sync_alt</span>
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant tracking-wider">ROLL</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-telemetry-display-mobile text-telemetry-display-mobile font-bold text-tertiary-container tracking-tight" id="roll-val-display">-0.5</span>
+<span class="font-label-data text-label-data text-tertiary-container font-mono">°</span>
+</div>
+
+</div>
+</div>
+</div>
+<!-- Floating Hydrodynamic Recording Trigger (Tactile Circular FAB) -->
+<div class="fixed inset-x-0 z-30 flex items-center justify-center" style="bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem);">
+<div class="relative group">
+<div class="absolute -inset-1 rounded-full bg-error/15 blur-sm pointer-events-none"></div>
+<!-- Tactical Marine Rec Button -->
+<button class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-surface-container-lowest flex flex-col items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] active:scale-90 transition-all cursor-pointer" id="rec-action-button">
+<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-error-container/40 flex items-center justify-center">
+<div class="w-7 h-7 rounded-full bg-error shadow-[0_0_12px_rgba(255,180,171,0.9)] transition-all flex items-center justify-center" id="rec-dot-icon"></div>
+</div>
+</button>
+</div>
+</div>
+<!-- Interactive Telemetry Emulation for Field Fidelity -->
+<script>
+    (function initMarineInclinometer() {
+      const trimElem = document.getElementById('trim-val-display');
+      const rollElem = document.getElementById('roll-val-display');
+      const rollDisc = document.getElementById('roll-disc-svg');
+      const trimRack = document.getElementById('trim-slider-rack');
+      const recBtn = document.getElementById('rec-action-button');
+      const recDot = document.getElementById('rec-dot-icon');
+      
+      let baseTrim = 1.4;
+      let baseRoll = -0.8;
+      let isRecording = false;
+
+      // Realistic Micro-Buoyancy Wave Motion Simulation (Per-Frame Subtle Swell)
+      let t = 0;
+      function renderSwell() {
+        t += 0.04;
+        const waveTrimDelta = Math.sin(t) * 0.18 + Math.cos(t * 0.6) * 0.08;
+        const waveRollDelta = Math.cos(t * 0.9) * 0.22 + Math.sin(t * 0.4) * 0.12;
+
+        const liveTrim = (baseTrim + waveTrimDelta).toFixed(1);
+        const liveRoll = (baseRoll + waveRollDelta).toFixed(1);
+
+        if (trimElem) trimElem.textContent = (liveTrim >= 0 ? '+' : '') + liveTrim;
+        if (rollElem) rollElem.textContent = (liveRoll >= 0 ? '+' : '') + liveRoll;
+
+        // Displace Trim Vertical Axis (Approx 4.5px per degree)
+        if (trimRack) {
+          const displacementY = -1 * (parseFloat(liveTrim) * 5.2);
+          trimRack.style.transform = `translateY(${displacementY}px)`;
+        }
+
+        // Rotate Roll Dial Angularly
+        if (rollDisc) {
+          const rotationAngle = parseFloat(liveRoll) * 1.8;
+          rollDisc.style.transform = `rotate(${rotationAngle}deg)`;
+        }
+
+        requestAnimationFrame(renderSwell);
+      }
+      requestAnimationFrame(renderSwell);
+
+      // Recording State Micro-Interaction
+      if (recBtn && recDot) {
+        recBtn.addEventListener('click', () => {
+          isRecording = !isRecording;
+          if (isRecording) {
+            recDot.className = "w-5 h-5 rounded-sm bg-primary shadow-[0_0_14px_rgba(72,239,239,0.9)] transition-all";
+            recDot.innerHTML = "";
+          } else {
+            recDot.className = "w-7 h-7 rounded-full bg-error shadow-[0_0_12px_rgba(255,180,171,0.9)] transition-all";
+            recDot.innerHTML = "";
+          }
+        });
+      }
+
+      // Ensure Navigation Bar Item 0 (Home/Medição) has Active Styling
+      try {
+        const homeNav = document.querySelector('nav a[data-path="home-medicao"]');
+        if (homeNav) {
+          homeNav.classList.remove('text-on-surface-variant');
+          homeNav.classList.add('text-primary');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_12px_rgba(0,0,0,0.25)]" data-active-classes="text-primary"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-space-xs gap-space-xs text-on-surface-variant transition-colors" data-path="home-medicao" href="#"><span class="material-symbols-outlined text-[22px]">explore</span><span class="font-label-micro text-label-micro uppercase tracking-wider">Medição</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-space-xs gap-space-xs text-on-surface-variant transition-colors" data-path="calibragem" href="#"><span class="material-symbols-outlined text-[22px]">straighten</span><span class="font-label-micro text-label-micro uppercase tracking-wider">Calibragem</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-space-xs gap-space-xs text-on-surface-variant transition-colors" data-path="relatorios" href="#"><span class="material-symbols-outlined text-[22px]">description</span><span class="font-label-micro text-label-micro uppercase tracking-wider">Relatórios</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-space-xs gap-space-xs text-on-surface-variant transition-colors" data-path="testes" href="#"><span class="material-symbols-outlined text-[22px]">science</span><span class="font-label-micro text-label-micro uppercase tracking-wider">Testes</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-space-xs gap-space-xs text-on-surface-variant transition-colors" data-path="configuracoes" href="#"><span class="material-symbols-outlined text-[22px]">settings</span><span class="font-label-micro text-label-micro uppercase tracking-wider">Ajustes</span></a></div></nav>
+
+
+
+
+
+</body></html>

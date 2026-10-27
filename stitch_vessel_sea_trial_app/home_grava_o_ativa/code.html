@@ -1,0 +1,431 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-variant": "#2f353d", "secondary-fixed": "#c9e6ff", "on-surface": "#dde3ed", "error-container": "#93000a", "secondary-fixed-dim": "#89ceff", "surface-container-highest": "#2f353d", "secondary-container": "#00a2e6", "on-tertiary": "#472a00", "inverse-primary": "#006a6a", "on-secondary-fixed": "#001e2f", "tertiary-container": "#ffab32", "on-background": "#dde3ed", "surface-dim": "#0e141b", "primary": "#48efef", "background": "#0e141b", "surface-tint": "#26dcdd", "on-error": "#690005", "primary-container": "#00d2d3", "inverse-surface": "#dde3ed", "secondary": "#89ceff", "error": "#ffb4ab", "surface-bright": "#343a42", "on-surface-variant": "#bacac9", "on-error-container": "#ffdad6", "on-primary-container": "#005556", "surface": "#0e141b", "tertiary": "#ffd09b", "outline": "#859493", "surface-container": "#1a2027", "on-primary-fixed-variant": "#004f50", "inverse-on-surface": "#2b3139", "primary-fixed": "#56f9f9", "outline-variant": "#3b4949", "tertiary-fixed": "#ffddb8", "surface-container-high": "#252a32", "surface-container-lowest": "#090f16", "on-secondary-fixed-variant": "#004c6e", "on-primary-fixed": "#002020", "on-secondary": "#00344d", "on-tertiary-fixed-variant": "#653e00", "on-secondary-container": "#00344e", "on-tertiary-container": "#6c4300", "primary-fixed-dim": "#26dcdd", "on-primary": "#003737", "surface-container-low": "#161c23", "tertiary-fixed-dim": "#ffb95f", "on-tertiary-fixed": "#2a1700" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop": "1.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin": "1rem", "margin-tablet": "1.5rem", "gutter": "1rem", "margin-desktop": "2.5rem", "space-xl": "2.5rem" }, "fontFamily": { "label-micro": ["JetBrains Mono"], "headline-md": ["Space Grotesk"], "telemetry-display": ["JetBrains Mono"], "headline-lg-mobile": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "headline-xl-mobile": ["Space Grotesk"], "body-sm": ["Inter"], "body-lg": ["Inter"], "telemetry-display-mobile": ["JetBrains Mono"], "body-md": ["Inter"], "label-data": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"], "headline-xl": ["Space Grotesk"] }, "fontSize": { "label-micro": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "telemetry-display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "telemetry-display-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-data": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><main class="flex flex-col relative w-full pb-safe bg-surface min-h-screen pt-safe"><div class="flex flex-col w-full text-on-surface select-none pb-24">
+<!-- Immersive Telemetry Top Banner: Rec Status & Real-time Chronometer -->
+<div class="relative w-full px-margin pt-2 pb-4 flex flex-col items-center justify-center"><div class="w-full flex items-center justify-center py-2 border-b border-surface-variant/30"><div class="flex items-center gap-1"><span class="font-telemetry-display-mobile text-telemetry-display-mobile text-primary tracking-tight font-bold" id="rec-timer">00:04:33.2</span></div></div></div>
+<!-- Main Telemetry Body -->
+<div class="flex flex-col gap-space-md px-margin w-full">
+<!-- Maritime Inclinometer Module -->
+<div class="flex flex-col items-center justify-center w-full">
+<!-- Outer Inclinometer Bezel -->
+<div class="relative w-[76vw] h-[76vw] max-w-[330px] max-h-[330px] rounded-full bg-surface-container-lowest shadow-2xl flex items-center justify-center p-3">
+<!-- Ambient Glow Behind Bezel -->
+<div class="absolute inset-0 rounded-full bg-gradient-to-b from-primary/10 via-transparent to-secondary/5 pointer-events-none"></div>
+<!-- Outer Roll Scale (Ring 0° to 180° / -180°) -->
+<div class="absolute inset-2 rounded-full flex items-center justify-center">
+<!-- SVG Roll Scale with Tick Marks & Notches -->
+<svg class="w-full h-full transform transition-transform duration-300 ease-out" id="roll-disc-svg" viewBox="0 0 300 300" style="transform: rotate(-3.4deg);">
+<circle cx="150" cy="150" fill="none" r="142" stroke="#252a32" stroke-width="4"></circle>
+<!-- Tick Marks & Labels -->
+<!-- 0° Top Apex -->
+<line stroke="#ffffff" stroke-width="2.5" x1="150" x2="150" y1="8" y2="22"></line>
+<!-- 30° / -30° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="217" x2="210" y1="34.1" y2="46.2"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="204" y="58">30°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="83" x2="90" y1="34.1" y2="46.2"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="96" y="58">30°</text>
+<!-- 60° / -60° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="265.9" x2="253.8" y1="83" y2="90"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="242" y="99">60°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="34.1" x2="46.2" y1="83" y2="90"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="58" y="99">60°</text>
+<!-- 90° / -90° (Port / Starboard Max Criticals) -->
+<line stroke="#ffffff" stroke-width="2.5" x1="292" x2="278" y1="150" y2="150"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="264" y="153">90°</text>
+<line stroke="#ffffff" stroke-width="2.5" x1="8" x2="22" y1="150" y2="150"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="36" y="153">90°</text>
+<!-- 120° / -120° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="265.9" x2="253.8" y1="217" y2="210"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="242" y="209">120°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="34.1" x2="46.2" y1="217" y2="210"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="58" y="209">120°</text>
+<!-- 150° / -150° -->
+<line stroke="#ffffff" stroke-width="1.5" x1="217" x2="210" y1="265.9" y2="253.8"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="204" y="249">150°</text>
+<line stroke="#ffffff" stroke-width="1.5" x1="83" x2="90" y1="265.9" y2="253.8"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle" x="96" y="249">150°</text>
+<!-- 180° Bottom Center Keel Line -->
+<line stroke="#ffffff" stroke-width="2.5" x1="150" x2="150" y1="292" y2="278"></line>
+<text fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle" x="150" y="271">180°</text>
+<!-- Subtle 10-degree intermediate subdivisions -->
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="174" x2="171.8" y1="10" y2="18"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="197" x2="193.5" y1="18.5" y2="26"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="126" x2="128.2" y1="10" y2="18"></line>
+<line stroke="#ffffff" stroke-opacity="0.5" stroke-width="1" x1="103" x2="106.5" y1="18.5" y2="26"></line>
+</svg>
+</div>
+<!-- Roll Needle / Pointer: Static Top Indicator Pointing Inward -->
+<div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+<div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"></div>
+</div>
+<!-- Inner Well for Trim Displacement Scale -->
+<div class="relative w-[63.3%] h-[63.3%] rounded-full bg-surface-container-high overflow-hidden shadow-inner flex items-center justify-center">
+<!-- Technical Grid Background Pattern in Well -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:12px_12px]"></div>
+<!-- Vertical Trim Displacement Carrier (Sliding ±90° Scale) -->
+<div class="absolute flex flex-col items-center justify-center transition-transform duration-300 ease-out" id="trim-slider-rack" style="transform: translateY(-10.92px);">
+<!-- Positive Trim Ticks (+90 down to +15) -->
+<div class="flex flex-col items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="w-3 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+90°</span>
+<span class="w-3 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+60°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+45°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-5 h-[1.5px] bg-white"></span>
+<span class="font-label-micro text-[14px] text-white font-mono font-bold">+30°</span>
+<span class="w-5 h-[1.5px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">+15°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+</div>
+<!-- Neutral Zero Plane with Horizontal Alignment Markers -->
+<div class="flex items-center justify-between w-32 my-3">
+<div class="flex items-center gap-1">
+<span class="w-4 h-[2px] bg-white"></span>
+<span class="w-2 h-[2px] bg-white"></span>
+</div>
+<span class="font-label-data text-[15px] text-white font-bold px-2 py-0.5 rounded bg-surface-container-lowest">0°</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-[2px] bg-white"></span>
+<span class="w-4 h-[2px] bg-white"></span>
+</div>
+</div>
+<!-- Negative Trim Ticks (-15 down to -90) -->
+<div class="flex flex-col items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-15°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-5 h-[1.5px] bg-white"></span>
+<span class="font-label-micro text-[14px] text-white font-mono font-bold">-30°</span>
+<span class="w-5 h-[1.5px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-45°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-60°</span>
+<span class="w-4 h-[1px] bg-white"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-[1px] bg-white"></span>
+<span class="font-label-micro text-[12px] text-white font-mono">-90°</span>
+<span class="w-3 h-[1px] bg-white"></span>
+</div>
+</div>
+</div>
+<!-- Fixed Center Reference Crosshair/Horizon Line -->
+<div class="absolute inset-x-0 h-[2px] bg-white/80 pointer-events-none flex items-center justify-between px-2 shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+<div class="w-3 h-3 -ml-1 border-t-2 border-l-2 border-white rotate-45"></div>
+<div class="w-3 h-3 -mr-1 border-t-2 border-r-2 border-white -rotate-45"></div>
+</div>
+</div>
+</div>
+<!-- Telemetry Readout Legend Card (Trim & Roll Direct Live Values) -->
+<div class="mt-space-md w-full max-w-[320px] grid grid-cols-2 gap-space-sm">
+<!-- TRIM Telemetry Module -->
+<div class="flex flex-col items-center justify-center p-space-sm rounded-xl bg-surface-container-high shadow-md">
+<div class="flex items-center gap-1 mb-0.5">
+<span class="material-symbols-outlined text-secondary text-[16px]">swap_vert</span>
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant tracking-wider">TRIM</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-telemetry-display-mobile text-telemetry-display-mobile font-bold text-secondary tracking-tight" id="trim-val-display">+2.1</span>
+<span class="font-label-data text-label-data text-secondary font-mono">°</span>
+</div>
+</div>
+<!-- ROLL Telemetry Module -->
+<div class="flex flex-col items-center justify-center p-space-sm rounded-xl bg-surface-container-high shadow-md">
+<div class="flex items-center gap-1 mb-0.5">
+<span class="material-symbols-outlined text-secondary text-[16px]">sync_alt</span>
+<span class="font-label-micro text-label-micro uppercase text-on-surface-variant tracking-wider">ROLL</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-telemetry-display-mobile text-telemetry-display-mobile font-bold text-tertiary-container tracking-tight" id="roll-val-display">-3.4</span>
+<span class="font-label-data text-label-data text-tertiary-container font-mono">°</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Hydrodynamic Line Chart Module: Trim x Roll -->
+<div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">show_chart</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Variação Angular Trim × Roll</span>
+</div>
+</div>
+<!-- Real-Time Waveform Graph Canvas Area -->
+<div class="relative w-full h-32 bg-surface-container-low rounded-lg p-2 overflow-hidden shadow-inner flex">
+<!-- Vertical Y-Axis Scale (-15° to +15°) -->
+<div class="flex flex-col justify-between items-end pr-2 text-on-surface-variant font-label-micro text-label-micro py-1 select-none w-8">
+<span class="">+15°</span>
+<span class="">+7.5°</span>
+<span class="text-primary font-bold">0°</span>
+<span class="">-7.5°</span>
+<span class="">-15°</span>
+</div>
+<!-- Graph Plotting Space -->
+<div class="relative flex-1 h-full flex flex-col justify-between">
+<!-- Horizontal Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-surface-variant/40"></div>
+<div class="w-full h-px bg-surface-variant/40"></div>
+<!-- Central Reference Line 0° (Highlighted) -->
+<div class="w-full h-0.5 bg-primary/30"></div>
+<div class="w-full h-px bg-surface-variant/40"></div>
+<div class="w-full h-px bg-surface-variant/40"></div>
+</div>
+<!-- Vertical Time Grid Columns -->
+<div class="absolute inset-0 flex justify-between pointer-events-none">
+<div class="h-full w-px bg-surface-variant/30"></div>
+<div class="h-full w-px bg-surface-variant/30"></div>
+<div class="h-full w-px bg-surface-variant/30"></div>
+<div class="h-full w-px bg-surface-variant/30"></div>
+<div class="h-full w-px bg-surface-variant/30"></div>
+</div>
+<!-- Oscillation SVG Waves (Trim blue & Roll yellow) -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 300 120">
+<!-- Roll Harmonic Damped Curve (Yellow) -->
+<path d="M 0,68 Q 20,40 45,74 T 90,82 T 135,52 T 180,78 T 225,60 T 270,72 L 300,74" fill="none" stroke="#ffab32" stroke-linecap="round" stroke-width="2.2"></path>
+<!-- Current Tip Marker Roll -->
+<circle class="animate-pulse" cx="300" cy="74" fill="#ffab32" r="3.5"></circle>
+<!-- Trim Long-period Oscillation Curve (Blue) -->
+<path d="M 0,55 Q 35,46 70,52 T 140,48 T 210,46 T 260,49 L 300,47" fill="none" stroke="#89ceff" stroke-linecap="round" stroke-width="2.2"></path>
+<!-- Current Tip Marker Trim -->
+<circle class="animate-pulse" cx="300" cy="47" fill="#89ceff" r="3.5"></circle>
+</svg>
+</div>
+</div>
+<!-- Horizontal X-Axis Scale (Time 0s - 60s) -->
+<div class="flex justify-between pl-8 pr-1 font-label-micro text-label-micro text-on-surface-variant select-none">
+<span class="">0s</span>
+<span class="">15s</span>
+<span class="">30s</span>
+<span class="">45s</span>
+<span class="text-primary font-semibold">60s (Agora)</span>
+</div>
+</div>
+</div>
+<!-- Persistent Floating Tactical Action Bar (Cancela, Pausa/Retoma, Salva) -->
+<div class="fixed bottom-6 inset-x-0 mx-auto max-w-sm px-6 flex items-center justify-between z-40">
+<!-- 1. Cancel Recording FAB (Opens Cancel Warning Modal) -->
+<button aria-label="Cancelar gravação" class="w-14 h-14 rounded-full bg-surface-container-high text-error flex items-center justify-center shadow-lg active:scale-95 transition-transform" id="btn-cancel">
+<span class="material-symbols-outlined text-[26px]">close</span>
+</button>
+<!-- 2. Pause / Resume Recording Large Central FAB -->
+<button aria-label="Pausar gravação" class="w-16 h-16 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-transform bg-primary-container text-on-primary-container" id="btn-toggle-pause">
+<span class="material-symbols-outlined text-[32px]" id="pause-icon">pause</span>
+</button>
+<!-- 3. Save Recording FAB (Opens Save Modal) -->
+<button aria-label="Salvar gravação" class="w-14 h-14 rounded-full bg-surface-container-high text-primary flex items-center justify-center shadow-lg active:scale-95 transition-transform" id="btn-save">
+<span class="material-symbols-outlined text-[26px]">check</span>
+</button>
+</div>
+<!-- Elegant Technical Save Modal Dialog (Hidden by default, triggered by FAB Salvar) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-surface-dim/80 backdrop-blur-md p-4 hidden" id="save-modal">
+<div class="w-full max-w-md bg-surface-container rounded-2xl p-space-lg shadow-2xl flex flex-col gap-space-md">
+<!-- Modal Header -->
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">save_as</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Salvar gravação</h2>
+<p class="font-label-micro text-label-micro text-on-surface-variant">Duração total: 00:04:32.8</p>
+</div>
+</div>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface" id="modal-close-icon">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Text Input Form -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-data text-label-data text-on-surface-variant" for="recording-name-input">
+          Nome da gravação
+        </label>
+<div class="relative w-full">
+<input class="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md rounded-lg px-3 py-3 focus:outline-none focus:bg-surface-container-high transition-colors" id="recording-name-input" placeholder="Ex: Prova de Inclinação - Tanque 3" type="text" value="Prova de Inclinação - Tanque 3">
+<button aria-label="Limpar campo" class="absolute right-3 top-3 text-on-surface-variant hover:text-on-surface" id="clear-input-btn">
+<span class="material-symbols-outlined text-[18px]">backspace</span>
+</button>
+</div>
+</div>
+<!-- Modal Action Buttons -->
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<button class="w-full py-3 rounded-lg bg-surface-container-high text-on-surface font-body-md text-body-md font-semibold text-center hover:bg-surface-variant transition-colors" id="modal-cancel-btn">
+          Voltar
+        </button>
+<button class="w-full py-3 rounded-lg bg-primary text-on-primary font-body-md text-body-md font-semibold text-center shadow-md hover:bg-primary-fixed transition-colors flex items-center justify-center gap-1.5" id="modal-confirm-save-btn">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+          Salvar
+        </button>
+</div>
+</div>
+</div>
+<!-- Cancel Confirmation Modal (Safety Catch for critical marine survey data) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-surface-dim/80 backdrop-blur-md p-4 hidden" id="cancel-modal">
+<div class="w-full max-w-md bg-surface-container rounded-2xl p-space-lg shadow-2xl flex flex-col gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">warning</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Descartar gravação?</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Todos os dados oscilatórios de 00:04:32 serão perdidos.</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<button class="w-full py-3 rounded-lg bg-surface-container-high text-on-surface font-body-md text-body-md font-semibold" id="cancel-dismiss-btn">
+          Continuar
+        </button>
+<button class="w-full py-3 rounded-lg bg-error-container text-error font-body-md text-body-md font-semibold flex items-center justify-center gap-1" id="cancel-confirm-btn">
+<span class="material-symbols-outlined text-[18px]">delete_forever</span>
+          Descartar
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initRecordingView() {
+    let isPaused = false;
+    let seconds = 272.8;
+    const timerElem = document.getElementById('rec-timer');
+    const pauseBtn = document.getElementById('btn-toggle-pause');
+    const pauseIcon = document.getElementById('pause-icon');
+    const trimElem = document.getElementById('trim-val-display');
+    const rollElem = document.getElementById('roll-val-display');
+    const rollDisc = document.getElementById('roll-disc-svg');
+    const trimRack = document.getElementById('trim-slider-rack');
+
+    const saveModal = document.getElementById('save-modal');
+    const btnSave = document.getElementById('btn-save');
+    const modalCloseIcon = document.getElementById('modal-close-icon');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalConfirmSaveBtn = document.getElementById('modal-confirm-save-btn');
+    const clearInputBtn = document.getElementById('clear-input-btn');
+    const recordingInput = document.getElementById('recording-name-input');
+
+    const cancelModal = document.getElementById('cancel-modal');
+    const btnCancel = document.getElementById('btn-cancel');
+    const cancelDismissBtn = document.getElementById('cancel-dismiss-btn');
+    const cancelConfirmBtn = document.getElementById('cancel-confirm-btn');
+
+    // Chronometer runtime
+    setInterval(() => {
+      if (!isPaused) {
+        seconds += 0.1;
+        const totalSecs = Math.floor(seconds);
+        const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSecs % 60).padStart(2, '0');
+        const tenths = Math.floor((seconds % 1) * 10);
+        timerElem.textContent = `${hrs}:${mins}:${secs}.${tenths}`;
+      }
+    }, 100);
+
+    // Live Inclinometer Simulation
+    let baseTrim = 2.1;
+    let baseRoll = -3.4;
+    let t = 0;
+    function renderSwell() {
+      if (!isPaused) {
+        t += 0.04;
+        const waveTrimDelta = Math.sin(t) * 0.18 + Math.cos(t * 0.6) * 0.08;
+        const waveRollDelta = Math.cos(t * 0.9) * 0.22 + Math.sin(t * 0.4) * 0.12;
+        const liveTrim = (baseTrim + waveTrimDelta).toFixed(1);
+        const liveRoll = (baseRoll + waveRollDelta).toFixed(1);
+
+        if (trimElem) trimElem.textContent = (liveTrim >= 0 ? '+' : '') + liveTrim;
+        if (rollElem) rollElem.textContent = (liveRoll >= 0 ? '+' : '') + liveRoll;
+        if (trimRack) {
+          const displacementY = -1 * (parseFloat(liveTrim) * 5.2);
+          trimRack.style.transform = `translateY(${displacementY}px)`;
+        }
+        if (rollDisc) {
+          const rotationAngle = parseFloat(liveRoll) * 1.8;
+          rollDisc.style.transform = `rotate(${rotationAngle}deg)`;
+        }
+      }
+      requestAnimationFrame(renderSwell);
+    }
+    requestAnimationFrame(renderSwell);
+
+    // Toggle Pause/Resume
+    pauseBtn.addEventListener('click', () => {
+      isPaused = !isPaused;
+      if (isPaused) {
+        pauseIcon.textContent = 'play_arrow';
+        pauseBtn.classList.remove('bg-primary-container', 'text-on-primary-container');
+        pauseBtn.classList.add('bg-tertiary-container', 'text-on-tertiary-container');
+      } else {
+        pauseIcon.textContent = 'pause';
+        pauseBtn.classList.remove('bg-tertiary-container', 'text-on-tertiary-container');
+        pauseBtn.classList.add('bg-primary-container', 'text-on-primary-container');
+      }
+    });
+
+    // Save Modal Handlers
+    btnSave.addEventListener('click', () => {
+      saveModal.classList.remove('hidden');
+    });
+
+    function closeSaveModal() {
+      saveModal.classList.add('hidden');
+    }
+
+    modalCloseIcon.addEventListener('click', closeSaveModal);
+    modalCancelBtn.addEventListener('click', closeSaveModal);
+
+    modalConfirmSaveBtn.addEventListener('click', () => {
+      closeSaveModal();
+      window.history.back();
+    });
+
+    clearInputBtn.addEventListener('click', () => {
+      recordingInput.value = '';
+      recordingInput.focus();
+    });
+
+    // Cancel Modal Handlers
+    btnCancel.addEventListener('click', () => {
+      cancelModal.classList.remove('hidden');
+    });
+
+    cancelDismissBtn.addEventListener('click', () => {
+      cancelModal.classList.add('hidden');
+    });
+
+    cancelConfirmBtn.addEventListener('click', () => {
+      cancelModal.classList.add('hidden');
+      window.history.back();
+    });
+  })();
+</script></main>
+
+</body></html>

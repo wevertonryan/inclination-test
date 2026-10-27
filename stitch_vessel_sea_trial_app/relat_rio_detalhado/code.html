@@ -1,0 +1,378 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-variant": "#2f353d", "secondary-fixed": "#c9e6ff", "on-surface": "#dde3ed", "error-container": "#93000a", "secondary-fixed-dim": "#89ceff", "surface-container-highest": "#2f353d", "secondary-container": "#00a2e6", "on-tertiary": "#472a00", "inverse-primary": "#006a6a", "on-secondary-fixed": "#001e2f", "tertiary-container": "#ffab32", "on-background": "#dde3ed", "surface-dim": "#0e141b", "primary": "#48efef", "background": "#0e141b", "surface-tint": "#26dcdd", "on-error": "#690005", "primary-container": "#00d2d3", "inverse-surface": "#dde3ed", "secondary": "#89ceff", "error": "#ffb4ab", "surface-bright": "#343a42", "on-surface-variant": "#bacac9", "on-error-container": "#ffdad6", "on-primary-container": "#005556", "surface": "#0e141b", "tertiary": "#ffd09b", "outline": "#859493", "surface-container": "#1a2027", "on-primary-fixed-variant": "#004f50", "inverse-on-surface": "#2b3139", "primary-fixed": "#56f9f9", "outline-variant": "#3b4949", "tertiary-fixed": "#ffddb8", "surface-container-high": "#252a32", "surface-container-lowest": "#090f16", "on-secondary-fixed-variant": "#004c6e", "on-primary-fixed": "#002020", "on-secondary": "#00344d", "on-tertiary-fixed-variant": "#653e00", "on-secondary-container": "#00344e", "on-tertiary-container": "#6c4300", "primary-fixed-dim": "#26dcdd", "on-primary": "#003737", "surface-container-low": "#161c23", "tertiary-fixed-dim": "#ffb95f", "on-tertiary-fixed": "#2a1700" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop": "1.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin": "1rem", "margin-tablet": "1.5rem", "gutter": "1rem", "margin-desktop": "2.5rem", "space-xl": "2.5rem" }, "fontFamily": { "label-micro": ["JetBrains Mono"], "headline-md": ["Space Grotesk"], "telemetry-display": ["JetBrains Mono"], "headline-lg-mobile": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "headline-xl-mobile": ["Space Grotesk"], "body-sm": ["Inter"], "body-lg": ["Inter"], "telemetry-display-mobile": ["JetBrains Mono"], "body-md": ["Inter"], "label-data": ["JetBrains Mono"], "headline-lg": ["Space Grotesk"], "headline-xl": ["Space Grotesk"] }, "fontSize": { "label-micro": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "telemetry-display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "telemetry-display-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-data": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.18)]"><div class="h-16 px-margin flex items-center justify-between relative"><div class="flex items-center min-w-[44px] h-[44px] z-10"><button aria-label="Voltar" class="w-[44px] h-[44px] -ml-2 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button></div><div class="absolute inset-0 flex items-center justify-center pointer-events-none"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase truncate max-w-[200px]">Relatórios</h1></div><div class="flex items-center justify-end gap-space-xs min-w-[44px] h-[44px] z-10"><button aria-label="Ações" class="w-[44px] h-[44px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-10">
+<!-- Modal / Overlay de Opções Contextuais -->
+<div class="fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm items-end sm:items-center justify-center p-margin transition-opacity hidden" id="options-menu-overlay">
+<div class="w-full max-w-sm bg-surface-container-high rounded-xl p-space-md shadow-xl flex flex-col gap-space-sm animate-in fade-in zoom-in-95 duration-150">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Opções do Relatório</span>
+<button class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-primary" id="close-options-btn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<button class="w-full py-3 px-space-md rounded-lg bg-surface-container hover:bg-surface-variant flex items-center gap-space-md text-left transition-colors" id="export-pdf-action">
+<span class="material-symbols-outlined text-primary text-[22px]">picture_as_pdf</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-semibold">Exportar PDF</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Gerar laudo oficial de estabilidade</span>
+</div>
+</button>
+<button class="w-full py-3 px-space-md rounded-lg bg-surface-container hover:bg-error-container/30 flex items-center gap-space-md text-left transition-colors" id="delete-report-action">
+<span class="material-symbols-outlined text-error text-[22px]">delete</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-error font-semibold">Excluir</span>
+<span class="font-body-sm text-body-sm text-error/80">Remover registro de telemetria</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Toast Notificação: PDF Exportado -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-primary text-on-primary font-body-md text-body-md px-space-md py-space-sm rounded-full shadow-lg flex items-center gap-space-sm transition-all duration-300 opacity-0 pointer-events-none" id="pdf-toast">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-semibold">PDF exportado com sucesso</span>
+</div>
+<!-- Identificação do Documento Técnico e Metadados -->
+<div class="px-margin pt-space-md flex flex-col gap-space-md">
+<!-- Header de Identificação -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm">
+<div class="flex items-center gap-space-xs mb-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-micro text-label-micro text-primary uppercase">Certificado Hidrostático Oficial</span>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold tracking-tight">
+        Prova de Inclinação — Navio Tanque Bravo
+      </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Registro de Ensaio de Estabilidade Estática e Inclinometria</p>
+</div>
+<!-- Grade de Metadados -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="col-span-2 bg-surface-container rounded-lg p-space-sm flex items-start gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Localização</span>
+<span class="font-body-md text-body-md text-on-surface font-medium truncate">Doca Seca Estaleiro Rio Grande - RS</span>
+</div>
+</div>
+<div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Data</span>
+<span class="font-label-data text-label-data text-on-surface">24/10/2024</span>
+</div>
+</div>
+<div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Hora</span>
+<span class="font-label-data text-label-data text-on-surface">14:30</span>
+</div>
+</div>
+<div class="col-span-2 bg-surface-container rounded-lg p-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">timer</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Tempo registrado</span>
+<span class="font-telemetry-display-mobile text-telemetry-display-mobile text-primary">00:18:42</span>
+</div>
+</div>
+<span class="px-space-sm py-1 bg-surface-variant text-on-surface-variant font-label-micro text-label-micro rounded">1.122 PTS</span>
+</div>
+</div>
+</div>
+<!-- Seção: Informações da Gravação com Medidor Angular de Arco Aberto -->
+<div class="px-margin mt-space-lg flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Informações da gravação</h3>
+<span class="font-label-micro text-label-micro text-secondary uppercase">Range Operacional</span>
+</div>
+<div class="bg-surface-container rounded-xl p-space-md flex flex-col items-center shadow-sm">
+<!-- Mostrador em Arco Aberto na Parte Superior -->
+<div class="relative w-full max-w-[280px] h-36 flex items-center justify-center">
+<svg class="w-full h-full overflow-visible" viewBox="0 0 200 110">
+<!-- Trilho base simétrico do arco: centro em (100, 100), raio R=75, de 195° (-15° da horizontal) até -15° (195° no total, span 150°) -->
+<!-- Ângulo inicial 195°: cx+75*cos(195°) = 100 - 72.44 = 27.56, cy+75*sin(195°) = 100 - 19.41 = 80.59 -->
+<!-- Ângulo final -15°: cx+75*cos(-15°) = 100 + 72.44 = 172.44, cy+75*sin(-15°) = 100 - 19.41 = 80.59 -->
+<path d="M 27.56 80.59 A 75 75 0 0 1 172.44 80.59" fill="none" stroke="#2f353d" stroke-linecap="round" stroke-width="12"></path>
+<!-- Arco ativo: R=75, centro (100, 100). Escala: 0.0° no ápice 90° (x=100, y=25). -->
+<!-- Mínimo -4.2° corresponde a angulo no topo: ~42° à esquerda (132° trigonométrico: x=100+75*cos(132°)=49.8, y=100-75*sin(132°)=44.3) -->
+<!-- Máximo +5.8° corresponde a ~58° à direita (32° trigonométrico: x=100+75*cos(32°)=163.6, y=100-75*sin(32°)=60.3) -->
+<path d="M 49.82 44.27 A 75 75 0 0 1 163.61 60.25" fill="none" stroke="#00d2d3" stroke-linecap="round" stroke-width="12"></path>
+<!-- Linha de graduação e ponto neutro 0.0° REF (exatamente no zênite do raio 75: x=100, y=25) -->
+<line stroke="#859493" stroke-width="2" stroke-linecap="round" x1="100" x2="100" y1="14" y2="22"></line>
+<circle cx="100" cy="25" fill="#48efef" r="2.5"></circle>
+<!-- Marcador do Ponto Mínimo (-4.2°) no centro exato do terminal inicial do arco ativo -->
+<circle cx="49.82" cy="44.27" fill="#89ceff" r="4.5" stroke="#0e141b" stroke-width="1.5"></circle>
+<!-- Marcador do Ponto Máximo (+5.8°) no centro exato do terminal final do arco ativo -->
+<circle cx="163.61" cy="60.25" fill="#ffd09b" r="4.5" stroke="#0e141b" stroke-width="1.5"></circle>
+</svg>
+<!-- Marcador 0.0° REF no topo perfeitamente centralizado -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 font-label-micro text-label-micro text-outline tracking-wider flex flex-col items-center leading-none">
+  <span class="">0.0° REF</span>
+</div>
+<!-- Rótulo MÍNIMO alinhado à esquerda -->
+<div class="absolute bottom-2 left-2 flex flex-col items-center">
+<span class="font-label-micro text-label-micro text-on-surface-variant">MÍNIMO</span>
+<span class="font-label-data text-label-data text-secondary font-bold">-4.2°</span>
+</div>
+<!-- Rótulo MÁXIMO alinhado à direita -->
+<div class="absolute bottom-2 right-2 flex flex-col items-center">
+<span class="font-label-micro text-label-micro text-on-surface-variant">MÁXIMO</span>
+<span class="font-label-data text-label-data text-tertiary font-bold">+5.8°</span>
+</div>
+</div>
+<!-- Destaque Central da Abertura -->
+<div class="flex flex-col items-center mt-space-xs">
+<span class="font-telemetry-display text-telemetry-display text-primary leading-none">10.0°</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Abertura (máx − mín)</span>
+</div>
+</div>
+</div>
+<!-- Seção: Gráfico Trim × Roll -->
+<div class="px-margin mt-space-lg flex flex-col gap-space-sm">
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm">
+<div class="flex flex-col gap-space-xs mb-space-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Variação Angular Trim × Roll</h3>
+<!-- Legenda das Séries -->
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="font-label-data text-label-data text-primary">Trim</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-tertiary-container"></span>
+<span class="font-label-data text-label-data text-tertiary">Roll</span>
+</div>
+</div>
+</div>
+<!-- Área Gráfica com Eixos Vetoriais e Séries -->
+<div class="relative w-full h-52 bg-surface-container-lowest rounded-lg p-2 flex flex-col justify-between">
+<svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 320 180">
+<!-- Linhas de Grade de Fundo -->
+<line stroke="#252a32" stroke-dasharray="3 3" x1="32" x2="310" y1="20" y2="20"></line>
+<line stroke="#252a32" stroke-dasharray="3 3" x1="32" x2="310" y1="55" y2="55"></line>
+<line stroke="#252a32" stroke-dasharray="3 3" x1="32" x2="310" y1="125" y2="125"></line>
+<line stroke="#252a32" stroke-dasharray="3 3" x1="32" x2="310" y1="160" y2="160"></line>
+<!-- Linha Horizontal de Referência Central (0°) -->
+<line stroke="#3b4949" stroke-width="1.5" x1="32" x2="310" y1="90" y2="90"></line>
+<!-- Grade Vertical dos Intervalos de Tempo -->
+<line stroke="#252a32" x1="32" x2="32" y1="15" y2="165"></line>
+<line stroke="#252a32" stroke-dasharray="2 2" x1="101" x2="101" y1="15" y2="165"></line>
+<line stroke="#252a32" stroke-dasharray="2 2" x1="171" x2="171" y1="15" y2="165"></line>
+<line stroke="#252a32" stroke-dasharray="2 2" x1="240" x2="240" y1="15" y2="165"></line>
+<line stroke="#252a32" x1="310" x2="310" y1="15" y2="165"></line>
+<!-- Curva Roll (Laranja / Âmbar) oscilando em torno de -0.48° com picos até 4.5° -->
+<path d="M 32 94 Q 60 70 85 96 T 130 115 T 180 82 T 235 98 T 270 78 T 310 93" fill="none" stroke="#ffab32" stroke-linecap="round" stroke-width="2"></path>
+<!-- Curva Trim (Azul Ciano) estável em torno de +1.35° -->
+<path d="M 32 80 Q 70 78 110 82 T 180 76 T 240 81 T 280 79 T 310 78" fill="none" stroke="#48efef" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Rótulos Eixo Vertical (-10° a +10°) -->
+<text fill="#859493" font-family="JetBrains Mono" font-size="9" x="6" y="24">+10°</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="9" x="11" y="59">+5°</text>
+<text fill="#dde3ed" font-family="JetBrains Mono" font-size="9" font-weight="bold" x="16" y="93">0°</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="9" x="12" y="128">-5°</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="9" x="6" y="163">-10°</text>
+<!-- Rótulos Eixo Horizontal (0 min a 18 min) -->
+<text fill="#859493" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" x="32" y="176">0m</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" x="101" y="176">4.5m</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" x="171" y="176">9m</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" x="240" y="176">13.5m</text>
+<text fill="#859493" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" x="306" y="176">18m</text>
+</svg>
+</div>
+</div>
+</div>
+<!-- Seção: Medidas (Tabela Elegante) -->
+<div class="px-margin mt-space-lg flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Medidas</h3>
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase">Estatística Amostral</span>
+</div>
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant font-label-micro text-label-micro uppercase">
+<th class="py-space-sm px-space-md">Eixo</th>
+<th class="py-space-sm px-space-md text-right">Média</th>
+<th class="py-space-sm px-space-md text-right">Desvio</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<tr class="bg-surface-container hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary shrink-0"></span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">Trim</span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-data text-label-data text-primary font-bold">
+              +1.35°
+            </td>
+<td class="py-space-md px-space-md text-right font-label-data text-label-data text-on-surface">
+              0.12°
+            </td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-container shrink-0"></span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">Roll</span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-data text-label-data text-tertiary font-bold">
+              -0.48°
+            </td>
+<td class="py-space-md px-space-md text-right font-label-data text-label-data text-on-surface">
+              0.34°
+            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Seção: Dados Brutos -->
+<div class="px-margin mt-space-lg flex flex-col gap-space-sm">
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dados brutos</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">1.122 leituras (intervalo de 1.000 ms)</p>
+</div>
+<!-- Tabela com Cabeçalho Fixo e Scroll Interno -->
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-sm flex flex-col">
+<!-- Cabeçalho Fixo -->
+<div class="grid grid-cols-4 bg-surface-container-highest py-2.5 px-space-md text-on-surface font-label-micro text-label-micro uppercase font-bold tracking-wider">
+<div class="">Nº</div>
+<div class="text-right">X (Trim)</div>
+<div class="text-right">Y (Roll)</div>
+<div class="text-right">Z (Yaw)</div>
+</div>
+<!-- Linhas Amostrais de Telemetria Triaxial Realística -->
+<div class="max-h-60 overflow-y-auto divide-y-0 flex flex-col">
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0001</span>
+<span class="text-right text-primary">+1.34°</span>
+<span class="text-right text-tertiary">-0.42°</span>
+<span class="text-right text-on-surface">0.02°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container-low hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0002</span>
+<span class="text-right text-primary">+1.35°</span>
+<span class="text-right text-tertiary">-0.45°</span>
+<span class="text-right text-on-surface">0.03°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0003</span>
+<span class="text-right text-primary">+1.36°</span>
+<span class="text-right text-tertiary">-0.50°</span>
+<span class="text-right text-on-surface">0.01°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container-low hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0004</span>
+<span class="text-right text-primary">+1.35°</span>
+<span class="text-right text-tertiary">-0.48°</span>
+<span class="text-right text-on-surface">0.00°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0005</span>
+<span class="text-right text-primary">+1.33°</span>
+<span class="text-right text-tertiary">-0.44°</span>
+<span class="text-right text-on-surface">-0.01°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container-low hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0006</span>
+<span class="text-right text-primary">+1.34°</span>
+<span class="text-right text-tertiary">-0.46°</span>
+<span class="text-right text-on-surface">0.01°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0007</span>
+<span class="text-right text-primary">+1.37°</span>
+<span class="text-right text-tertiary">-0.52°</span>
+<span class="text-right text-on-surface">0.02°</span>
+</div>
+<div class="grid grid-cols-4 py-2.5 px-space-md font-label-data text-label-data bg-surface-container-low hover:bg-surface-container-high">
+<span class="text-on-surface-variant">#0008</span>
+<span class="text-right text-primary">+1.35°</span>
+<span class="text-right text-tertiary">-0.49°</span>
+<span class="text-right text-on-surface">0.00°</span>
+</div>
+</div>
+<div class="p-2 bg-surface-container-high text-center">
+<span class="font-label-micro text-label-micro text-on-surface-variant tracking-wider uppercase">Mais 1.114 registros armazenados</span>
+</div>
+</div>
+</div>
+<!-- Ações Rápidas de Fundo -->
+
+</div>
+<script>
+  (function() {
+    const overlay = document.getElementById('options-menu-overlay');
+    const closeBtn = document.getElementById('close-options-btn');
+    const exportBtn = document.getElementById('export-pdf-action');
+    const quickExportBtn = document.getElementById('quick-export-pdf');
+    const deleteBtn = document.getElementById('delete-report-action');
+    const quickDeleteBtn = document.getElementById('quick-delete');
+    const toast = document.getElementById('pdf-toast');
+
+    // Conectar ao botão do cabeçalho do Shell se disponível
+    const headerMoreBtn = document.querySelector('header button[aria-label="Ações"]');
+    if (headerMoreBtn) {
+      headerMoreBtn.addEventListener('click', () => {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+      });
+    }
+
+    function closeOverlay() {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeOverlay);
+    }
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeOverlay();
+      }
+    });
+
+    function showToast() {
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2600);
+    }
+
+    function triggerExport() {
+      closeOverlay();
+      showToast();
+    }
+
+    if (exportBtn) exportBtn.addEventListener('click', triggerExport);
+    if (quickExportBtn) quickExportBtn.addEventListener('click', triggerExport);
+
+    function triggerDelete() {
+      closeOverlay();
+      if (confirm('Deseja excluir permanentemente este relatório?')) {
+        history.back();
+      }
+    }
+
+    if (deleteBtn) deleteBtn.addEventListener('click', triggerDelete);
+    if (quickDeleteBtn) quickDeleteBtn.addEventListener('click', triggerDelete);
+  })();
+</script></main>
+
+
+
+</body></html>

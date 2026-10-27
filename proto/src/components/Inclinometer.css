@@ -11,17 +11,11 @@
   display: block;
 }
 
-/* ---- Nível 2 (fundo): régua do Trim ---- */
+/* ---- Nível 2 (fundo): escala do Trim ---- */
 
 .inclino__disc {
   fill: var(--bg);
   stroke: none;
-}
-
-.inclino__strip-bg {
-  fill: var(--bg-elevated);
-  stroke: var(--border);
-  stroke-width: 1;
 }
 
 .inclino__tick {

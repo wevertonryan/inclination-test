@@ -3,6 +3,7 @@
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
 }
 
