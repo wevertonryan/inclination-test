@@ -49,7 +49,7 @@ public partial class MainPage : ContentPage
     }
 
     private void OnRecordingSaved(string recordingId)
-        => MainThread.BeginInvokeOnMainThread(() => MainTabView.SelectedItem = _relatoriosTab);
+        => MainThread.BeginInvokeOnMainThread(() => _relatoriosTab.IsSelected = true);
 
     private void OnTabViewSizeChanged(object? sender, EventArgs e)
         => DistributeTabsEvenly();
