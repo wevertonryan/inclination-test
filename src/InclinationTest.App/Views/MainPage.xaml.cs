@@ -1,5 +1,7 @@
 using System.ComponentModel;
+using InclinationTest.Core.Recording;
 using InclinationTest.Core.ViewModels;
+using Microsoft.Maui.ApplicationModel;
 using UraniumUI.Icons.MaterialSymbols;
 using UraniumUI.Material.Controls;
 
@@ -9,10 +11,13 @@ public partial class MainPage : ContentPage
 {
     private readonly RecorderViewModel _recorder;
     private readonly ReportsViewModel _reports;
+    private readonly RecordingWriter _writer;
+    private TabItem _relatoriosTab;
 
     public MainPage(
         RecorderViewModel recorder,
         ReportsViewModel reports,
+        RecordingWriter writer,
         HomeView home,
         CalibragemView calibragem,
         RelatoriosView relatorios,
@@ -23,12 +28,15 @@ public partial class MainPage : ContentPage
 
         _recorder = recorder;
         _reports = reports;
+        _writer = writer;
 
         BindingContext = recorder;
 
+        _writer.Saved += OnRecordingSaved;
+
         AddTab(home, "Medição", MaterialOutlined.Explore);
         AddTab(calibragem, "Calibragem", MaterialOutlined.Straighten);
-        AddTab(relatorios, "Relatórios", MaterialOutlined.Description);
+        _relatoriosTab = AddTab(relatorios, "Relatórios", MaterialOutlined.Description);
         AddTab(testes, "Testes", MaterialOutlined.Science);
         AddTab(configuracoes, "Ajustes", MaterialOutlined.Settings);
 
@@ -39,6 +47,9 @@ public partial class MainPage : ContentPage
 
         UpdateChrome();
     }
+
+    private void OnRecordingSaved(string recordingId)
+        => MainThread.BeginInvokeOnMainThread(() => MainTabView.SelectedItem = _relatoriosTab);
 
     private void OnTabViewSizeChanged(object? sender, EventArgs e)
         => DistributeTabsEvenly();
@@ -77,6 +88,10 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void AddTab(View content, string title, string glyph)
-        => MainTabView.Tabs.Add(new TabItem { Content = content, Title = title, Data = glyph });
+    private TabItem AddTab(View content, string title, string glyph)
+    {
+        var tab = new TabItem { Content = content, Title = title, Data = glyph };
+        MainTabView.Tabs.Add(tab);
+        return tab;
+    }
 }

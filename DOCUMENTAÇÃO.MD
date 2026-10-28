@@ -592,11 +592,12 @@ HomeView "Salvar" → DisplayPromptAsync(título) → RecorderViewModel.RequestS
    └─ RecordingSession.Save(title)
         ├─ RecordingSummary (média, desvio, mín, máx de roll/trim)
         ├─ Flush() do último lote
-        └─ Finished(Saved)
-             └─ RecordingWriter (thread do ThreadSerialExecutor)
-                  ├─ IReportRepository.AppendSamples(...)   → {id}.csv (append)
-                  ├─ IReportRepository.SaveRecording(...)   → {id}.hdr (reescrito)
-                  └─ Saved?.Invoke(id)                      → RelatoriosView.Refresh()
+└─ Finished(Saved)
+     └─ RecordingWriter (thread do ThreadSerialExecutor)
+          ├─ IReportRepository.AppendSamples(...)   → {id}.csv (append)
+          ├─ IReportRepository.SaveRecording(...)   → {id}.hdr (reescrito)
+          └─ Saved?.Invoke(id)                      → RelatoriosView.Refresh()
+                           └─ MainPage navega para a aba Relatórios
 ```
 
 A ordem importa: `RecordingSession.Save` faz `Flush()` **antes** de disparar `Finished`, e todas as
