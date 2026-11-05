@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using InclinationTest.Core.Persistence;
 using InclinationTest.Core.Recording;
 
+using CommunityToolkit.Mvvm.Input;
 namespace InclinationTest.Core.ViewModels;
 
 /// <summary>
@@ -97,7 +98,6 @@ public sealed class ReportsViewModel : ObservableObject
         }
     }
 
-    private string _timeFilter = string.Empty;
     private bool _isRollSelected = true;
 
     public bool ExportPdfRequested
