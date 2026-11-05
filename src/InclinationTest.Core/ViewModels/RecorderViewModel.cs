@@ -98,14 +98,22 @@ public sealed class RecorderViewModel : ObservableObject
         _ticker.Start(OnTick);
     }
 
+    public void Pause()
+    {
+        if (_mode == RecorderMode.Recording)
+        {
+            _accumulatedMs += _clock.NowMs - _segmentStartMs;
+            _session.Pause(_clock.NowMs);
+            Mode = RecorderMode.Paused;
+        }
+    }
+
     public void Toggle()
     {
         switch (_mode)
         {
             case RecorderMode.Recording:
-                _accumulatedMs += _clock.NowMs - _segmentStartMs;
-                _session.Pause(_clock.NowMs);
-                Mode = RecorderMode.Paused;
+                Pause();
                 break;
             case RecorderMode.Paused:
                 _segmentStartMs = _clock.NowMs;
