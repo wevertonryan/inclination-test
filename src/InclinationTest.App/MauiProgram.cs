@@ -20,10 +20,10 @@ namespace InclinationTest.App;
 public static class MauiProgram
 {
     /// <summary>
-    /// O sensor entrega ~50 Hz; a tela (inclinômetro, rótulos, gráfico) repinta a ~15 Hz.
+    /// O sensor entrega ~50 Hz; a tela (inclinômetro, rótulos, gráfico) repinta a ~30 Hz.
     /// A gravação continua recebendo todas as amostras via <c>OnSample</c>.
     /// </summary>
-    private const int UiPublishIntervalMs = 66;
+    private const int UiPublishIntervalMs = 33;
 
     public static MauiApp CreateMauiApp()
     {

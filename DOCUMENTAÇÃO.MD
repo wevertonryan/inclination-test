@@ -10,7 +10,7 @@ Plataforma-alvo: **Android** (.NET 10 / .NET MAUI 10).
 
 ## Status atual do projeto
 
-> **Última verificação: 27/10/2026.** Este status reflete o que existe no código hoje e é a
+> **Última verificação: 05/11/2026.** Este status reflete o que existe no código hoje e é a
 > fonte de verdade sobre o andamento. As demais seções descrevem o desenho-alvo; o que ainda
 > não foi implementado está marcado como **Planejado** ao longo do documento.
 
@@ -47,7 +47,7 @@ sobrevivem a fechar o app. A suíte total (**235 testes**) está **verde**.
 | `Core/Persistence/` | Evolução opcional: `SqliteReportRepository` (`Microsoft.Data.Sqlite`) para consultas/índices. A semântica já é garantida por contrato e coberta por `FileReportRepository` |
 | `App` | Telas reais de Testes e Configurações; exportação de PDF; sensores além do acelerômetro. A exclusão de relatórios já está implementada |
 | Stack de UI | UraniumUI, LiveCharts2 e SkiaSharp **já em uso** (gráfico Trim × Roll, inclinômetro e gráfico de relatório) |
-| Build | APK de **Debug** via GitHub Actions (`.github/workflows/apk.yml`, artifact `inclination-test-apk`); falta assinatura fixa e um perfil Release |
+| Build | APK **Release/AOT** (arm64) via GitHub Actions (`.github/workflows/apk.yml`, artifact `inclination-test-apk`); assinatura fixa opcional via secrets (`KEYSTORE_BASE64`/`KEYSTORE_PASSWORD`) |
 
 > A Prova de Mar / série temporal é, no `README.md`, **fora do escopo do MVP**. Ainda assim, por
 > decisão do time, o **Core** da gravação (seção 7) já foi antecipado e implementado; a **interface**
@@ -555,11 +555,11 @@ segundo.
 Medido no Redmi Note 13 com APK de **Debug**: `p50 26 ms` (orçamento 16,7 ms), `p90 65 ms`,
 `p99 200 ms`, **58% de frames perdidos**, ~8,5 fps.
 
-### O que mudou
+### O que mudou — rodada 1 (apresentação)
 
 | Antes | Depois |
 |---|---|
-| UI publicada a 50 Hz | UI publicada a 15 Hz (`MauiProgram.UiPublishIntervalMs = 66`) |
+| UI publicada a 50 Hz | UI publicada a 15 Hz (`MauiProgram.UiPublishIntervalMs`) |
 | `Clear()` + 600 `Add()` por amostra (2 séries) | `Add()` + 1 `RemoveAt(0)` só nos pontos novos |
 | Escala Y recalculada e reatribuída sempre | Só reatribui quando o valor muda |
 | Rótulos/agulha a 50 Hz | Rótulos/agulha a 15 Hz |
@@ -569,15 +569,51 @@ A gravação **não** perde resolução: `InclinationViewModel.HandleSample` con
 limitada. O parâmetro é opcional (`uiIntervalMs: 0` = comportamento antigo), o que mantém os testes
 existentes intactos.
 
+### O que mudou — rodada 2 (Release/AOT + Skia em camadas)
+
+| Antes | Depois |
+|---|---|
+| APK **Debug** (JIT, sem AOT) | `dotnet publish -c Release` com `RunAOTCompilation=true` e `AndroidEnableProfiledAot=true`, só `android-arm64` |
+| Cada frame redesenhava ~300 operações Skia (anéis, ~200 pontos do poço, 74 ticks, rótulos e um gradiente novo) | Cinco `SKPicture` gravadas **uma vez** no construtor (`base`, `trim`, `ring`, `roll`, `pointer`); cada frame faz 5 replays em vez de ~300 chamadas nativas, sem recriar shader nem refazer layout de texto |
+| UI publicada a 15 Hz | UI publicada a 30 Hz (`UiPublishIntervalMs = 33`) — mais barato agora que a montagem do frame foi reduzida |
+| Workflow publicava Debug com keystore efêmera | Workflow publica Release/AOT; assinatura fixa opcional via secrets |
+
+O AOT é o ponto mais importante: em Debug o MAUI roda o app em JIT, o que domina o custo de CPU
+mesmo com o desenho otimizado. O APK de Release fica maior (bibliotecas nativas por assembly),
+mas troca o custo de compilação em tempo de execução por código nativo.
+
+### Assinatura fixa (opcional, recomendada)
+
+Sem uma chave fixa, cada run do Actions gera uma debug keystore nova e o Android recusa
+`adb install -r` com `INSTALL_FAILED_UPDATE_INCOMPATIBLE` — atualizar exige desinstalar, o que
+apaga os relatórios salvos. Para fixar:
+
+```bash
+keytool -genkeypair -v -keystore release.keystore -alias inclination \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -storepass SUA_SENHA -keypass SUA_SENHA \
+  -dname "CN=Inclination Test, OU=Dev, O=Inclination, C=BR"
+base64 -w0 release.keystore > release.keystore.b64
+```
+
+Em **Settings → Secrets and variables → Actions**, crie:
+
+- `KEYSTORE_BASE64` — conteúdo de `release.keystore.b64`
+- `KEYSTORE_PASSWORD` — a senha usada acima
+
+O workflow detecta os secrets e passa a assinar com essa chave; se eles não existirem, ele apenas
+emite um aviso e continua com a debug keystore efêmera. **Não commite** `release.keystore`
+(o `.gitignore` já cobre `*.keystore`).
+
 ### Limite conhecido
 
 A série do gráfico é capada em `RecorderViewModel.DefaultSeriesCapacity` = **600 amostras**
 ≈ **50 s** a 12 Hz: é um gráfico de janela deslizante, não o histórico completo. Para mostrar a
 gravação inteira seria preciso decimar (ex.: 1 ponto a cada 500 ms).
 
-Medição depois (app visível, mesmo aparelho): ~**22 fps** contra ~8,5 fps antes. Ainda há jank
-porque o APK é **Debug** (JIT sem otimização, sem AOT/trimming) — um perfil Release muda bastante
-esse número.
+A medição de ~**22 fps** contra ~8,5 fps antes foi feita no APK de **Debug** e continua sendo a
+referência histórica. O build Release/AOT ainda precisa ser medido no aparelho: em 29/10/2026 o
+`com.uscreen` (espelhamento de tela) roubava o foco e o `dumpsys gfxinfo` reportava 0 frames.
 
 ## 10. Relatórios — da gravação à tela
 

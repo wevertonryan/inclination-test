@@ -37,6 +37,14 @@ public class InclinometerControl : SKCanvasView
     private readonly SKPaint _stroke = new() { IsAntialias = true, Style = SKPaintStyle.Stroke };
     private readonly SKPaint _text = new() { IsAntialias = true, Style = SKPaintStyle.Fill, Typeface = Mono };
 
+    // Camadas gravadas uma vez e apenas reexecutadas a cada frame. Sem isso, cada
+    // repaint refazia ~300 operações (anéis, ~200 pontos do poço, 74 ticks e rótulos).
+    private readonly SKPicture _baseLayer;
+    private readonly SKPicture _trimLayer;
+    private readonly SKPicture _ringLayer;
+    private readonly SKPicture _rollLayer;
+    private readonly SKPicture _pointerLayer;
+
     public static readonly BindableProperty RollProperty =
         BindableProperty.Create(nameof(Roll), typeof(double), typeof(InclinometerControl), 0.0, propertyChanged: OnValueChanged);
 
@@ -49,6 +57,22 @@ public class InclinometerControl : SKCanvasView
     public InclinometerControl()
     {
         UpdateSize();
+
+        // As camadas não dependem do tamanho em pixels: o desenho é feito no
+        // sistema de coordenadas fixo (ViewBox) e o canvas aplica a escala.
+        _baseLayer = Record(canvas =>
+        {
+            DrawBezel(canvas);
+            DrawWell(canvas);
+        });
+        _trimLayer = Record(canvas => DrawTrimRack(canvas, 0f));
+        _ringLayer = Record(canvas =>
+        {
+            DrawHorizon(canvas);
+            DrawRingOutlines(canvas);
+        });
+        _rollLayer = Record(DrawRollTicks);
+        _pointerLayer = Record(DrawPointer);
     }
 
     public double Roll
@@ -92,12 +116,29 @@ public class InclinometerControl : SKCanvasView
         var trim = float.IsFinite((float)Trim) ? (float)Trim : 0f;
         trim = Math.Clamp(trim, -MaxTrim, MaxTrim);
 
-        DrawBezel(canvas);
-        DrawWell(canvas);
-        DrawTrimRack(canvas, trim);
-        DrawHorizon(canvas);
-        DrawRollRing(canvas, roll);
-        DrawPointer(canvas);
+        canvas.DrawPicture(_baseLayer);
+
+        canvas.Save();
+        canvas.Translate(0f, trim * (TrimTravel / MaxTrim));
+        canvas.DrawPicture(_trimLayer);
+        canvas.Restore();
+
+        canvas.DrawPicture(_ringLayer);
+
+        canvas.Save();
+        canvas.RotateDegrees(roll, Cx, Cy);
+        canvas.DrawPicture(_rollLayer);
+        canvas.Restore();
+
+        canvas.DrawPicture(_pointerLayer);
+    }
+
+    private static SKPicture Record(Action<SKCanvas> draw)
+    {
+        using var recorder = new SKPictureRecorder();
+        var canvas = recorder.BeginRecording(new SKRect(0f, 0f, ViewBox, ViewBox));
+        draw(canvas);
+        return recorder.EndRecording();
     }
 
     private void DrawBezel(SKCanvas canvas)
@@ -209,16 +250,16 @@ public class InclinometerControl : SKCanvasView
         canvas.DrawPath(path, _stroke);
     }
 
-    private void DrawRollRing(SKCanvas canvas, float roll)
+    private void DrawRingOutlines(SKCanvas canvas)
     {
         _stroke.Color = Outline.WithAlpha(210);
         _stroke.StrokeWidth = 1.2f;
         canvas.DrawCircle(Cx, Cy, WellRadius + 1f, _stroke);
         canvas.DrawCircle(Cx, Cy, RingOuter, _stroke);
+    }
 
-        canvas.Save();
-        canvas.RotateDegrees(roll, Cx, Cy);
-
+    private void DrawRollTicks(SKCanvas canvas)
+    {
         for (var direction = 1; direction >= -1; direction -= 2)
         {
             for (var value = 0; value <= 180; value += 10)
@@ -245,8 +286,6 @@ public class InclinometerControl : SKCanvasView
                 canvas.DrawText($"{value}°", label.X, label.Y + 3.5f, _text);
             }
         }
-
-        canvas.Restore();
     }
 
     private void DrawPointer(SKCanvas canvas)
