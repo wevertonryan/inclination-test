@@ -25,6 +25,7 @@ public sealed class RecorderViewModel : ObservableObject
     private long _accumulatedMs;
     private long _segmentStartMs;
     private long _lastPublishedMs;
+    private bool _pausedByRequest;
 
     public RecorderViewModel(
         IRecordingSession session,
@@ -85,6 +86,7 @@ public sealed class RecorderViewModel : ObservableObject
             return;
         }
 
+        _pausedByRequest = false;
         _accumulatedMs = 0;
         _segmentStartMs = _clock.NowMs;
         _lastPublishedMs = _clock.NowMs;
@@ -110,6 +112,7 @@ public sealed class RecorderViewModel : ObservableObject
 
     public void Toggle()
     {
+        _pausedByRequest = false;
         switch (_mode)
         {
             case RecorderMode.Recording:
@@ -149,6 +152,7 @@ public sealed class RecorderViewModel : ObservableObject
     {
         if (_mode == RecorderMode.Recording)
         {
+            _pausedByRequest = true;
             Pause();
         }
         Confirmation = ConfirmationRequest.Cancel;
@@ -158,13 +162,14 @@ public sealed class RecorderViewModel : ObservableObject
     {
         if (_mode == RecorderMode.Recording)
         {
+            _pausedByRequest = true;
             Pause();
         }
         Confirmation = ConfirmationRequest.Save;
     }
 
     public void Confirm()
-{
+    {
         if (string.IsNullOrWhiteSpace(_title))
         {
             _title = "Medição";
@@ -183,7 +188,17 @@ public sealed class RecorderViewModel : ObservableObject
         }
     }
 
-    public void Dismiss() => Confirmation = ConfirmationRequest.None;
+    public void Dismiss()
+    {
+        Confirmation = ConfirmationRequest.None;
+        if (_pausedByRequest)
+        {
+            _pausedByRequest = false;
+            _segmentStartMs = _clock.NowMs;
+            _session.Resume(_clock.NowMs);
+            Mode = RecorderMode.Recording;
+        }
+    }
 
     private void OnTick()
     {
@@ -204,6 +219,7 @@ public sealed class RecorderViewModel : ObservableObject
 
     private void ResetToIdle()
     {
+        _pausedByRequest = false;
         _ticker.Stop();
         Mode = RecorderMode.Idle;
         Confirmation = ConfirmationRequest.None;
