@@ -22,7 +22,11 @@ public partial class RecordingBar : ContentView
         => CancelRequested?.Invoke(this, EventArgs.Empty);
 
     private void OnSave(object? sender, TappedEventArgs e)
-        => SaveRequested?.Invoke(this, EventArgs.Empty);
+    {
+        // Gravando: confirma e salva imediatamente, parando a gravação
+        var recorder = BindingContext as InclinationTest.Core.ViewModels.RecorderViewModel;
+        recorder?.Confirm();
+    }
 
     private void OnToggle(object? sender, EventArgs e)
         => ToggleRequested?.Invoke(this, EventArgs.Empty);

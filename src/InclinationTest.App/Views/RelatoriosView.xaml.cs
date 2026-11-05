@@ -94,8 +94,33 @@ public partial class RelatoriosView : ContentView
 
     private void OnExportPdfTapped(object? sender, TappedEventArgs e)
     {
-        HideOverlay(OptionsOverlay);
-        ShowToast("Exportação PDF indisponível neste build.", ToastKind.Info);
+        _viewModel.ExportPdfCommand.Execute(null);
+    }
+
+    private void OnRollTrimTapped(object? sender, TappedEventArgs e)
+    {
+        _viewModel.IsRollSelected = !_viewModel.IsRollSelected;
+        // Atualizar a gauge imediatamente
+        ApplyGaugeValuesFromViewModel();
+    }
+
+    private void ApplyGaugeValuesFromViewModel()
+    {
+        var selected = _viewModel.Selected;
+        if (selected is null || RangeGauge is null) return;
+
+        if (_viewModel.IsRollSelected)
+        {
+            RangeGauge.MinValue = selected.RollMinValue;
+            RangeGauge.MaxValue = selected.RollMaxValue;
+        }
+        else
+        {
+            var mean = selected.TrimMeanText != null ? double.Parse(selected.TrimMeanText.Replace("°", "").Trim()) : 0;
+            var std = selected.TrimStdText != null ? double.Parse(selected.TrimStdText.Replace("°", "").Replace(" ± ", "").Trim()) : 0;
+            RangeGauge.MinValue = mean - std;
+            RangeGauge.MaxValue = mean + std;
+        }
     }
 
     private void OnDeleteTapped(object? sender, TappedEventArgs e)

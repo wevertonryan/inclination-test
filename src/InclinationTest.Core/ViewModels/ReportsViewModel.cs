@@ -22,6 +22,9 @@ public sealed class ReportsViewModel : ObservableObject
     private string _searchText = string.Empty;
     private string? _selectedLocation;
     private bool _sortDescending = true;
+    private string _dateFilter = string.Empty;
+    private string _timeFilter = string.Empty;
+    private bool _exportPdfRequested = false;
 
     public ReportsViewModel(IReportRepository repository)
     {
@@ -29,6 +32,7 @@ public sealed class ReportsViewModel : ObservableObject
         Reports = new ReadOnlyObservableCollection<ReportItem>(_reports);
         VisibleReports = new ReadOnlyObservableCollection<ReportItem>(_visibleReports);
         Locations = new ReadOnlyObservableCollection<string>(_locations);
+        IsRollSelected = true; // Default: show Roll
     }
 
     public ReadOnlyObservableCollection<ReportItem> Reports { get; }
@@ -81,6 +85,67 @@ public sealed class ReportsViewModel : ObservableObject
         }
     }
 
+    public string DateFilter
+    {
+        get => _dateFilter;
+        set
+        {
+            if (SetProperty(ref _dateFilter, value))
+            {
+                ApplyFilter();
+            }
+        }
+    }
+
+    private string _timeFilter = string.Empty;
+    private bool _isRollSelected = true;
+
+    public bool ExportPdfRequested
+    {
+        get => _exportPdfRequested;
+        set
+        {
+            if (SetProperty(ref _exportPdfRequested, value))
+            {
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ICommand ExportPdfCommand => new Command(OnExportPdf);
+
+    private void OnExportPdf()
+    {
+        ExportPdfRequested = true;
+        // Gera PDF simplificado com dados do relatório selecionado
+        _ = Task.Run(async () =>
+        {
+            if (Selected is null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Atenção", "Selecione um relatório para exportar.", "OK");
+                ExportPdfRequested = false;
+                return;
+            }
+
+            // Simulação de geração de PDF - em produção, usar PdfSharp ou semelhante
+            var pdfText = $"Relatório: {Selected.Title}\n\n";
+            pdfText += $"Data: {Selected.DateText}\n";
+            pdfText += $"Hora: {Selected.TimeOnlyText}\n";
+            pdfText += $"Duração: {Selected.DurationLongText}\n";
+            pdfText += $"Local: {Selected.LocationText}\n";
+            pdfText += $"Roll Médio: {Selected.RollMeanText}\n";
+            pdfText += $"Trim Médio: {Selected.TrimMeanText}\n";
+            pdfText += $"Abertura: {Selected.RollRangeText}\n";
+            pdfText += $"\nAmostras: {Selected.SampleCountText}";
+
+            // Aqui seria gravado o arquivo PDF
+            // Para este build, apenas confirmamos o pedido
+            await Application.Current.MainPage.DisplayAlert("PDF", "PDF gerado com sucesso (simulação).", "OK");
+
+            ExportPdfRequested = false;
+        });
+    }
+
     public bool SortDescending
     {
         get => _sortDescending;
@@ -93,6 +158,23 @@ public sealed class ReportsViewModel : ObservableObject
             }
         }
     }
+
+    public bool IsRollSelected
+    {
+        get => _isRollSelected;
+        set
+        {
+            if (SetProperty(ref _isRollSelected, value))
+            {
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsTrimSelected));
+                // Atualizar a gauge quando a seleção mudar
+                ApplyGaugeValues();
+            }
+        }
+    }
+
+    public bool IsTrimSelected => !IsRollSelected;
 
     public string SortLabel => _sortDescending ? "Mais recentes" : "Mais antigos";
 
@@ -157,6 +239,27 @@ public sealed class ReportsViewModel : ObservableObject
         OnPropertyChanged(nameof(SummaryText));
     }
 
+    private void ApplyGaugeValues()
+    {
+        var selected = Selected;
+        if (selected is null) return;
+
+        if (IsRollSelected)
+        {
+            // Usar valores de Roll
+            MinValue = selected.RollMinValue;
+            MaxValue = selected.RollMaxValue;
+        }
+        else
+        {
+            // Usar valores de Trim (aproximativa: mean ± std)
+            var mean = selected.TrimMeanText != null ? double.Parse(selected.TrimMeanText.Replace("°", "").Trim()) : 0;
+            var std = selected.TrimStdText != null ? double.Parse(selected.TrimStdText.Replace("°", "").Replace(" ± ", "").Trim()) : 0;
+            MinValue = mean - std;
+            MaxValue = mean + std;
+        }
+    }
+
     public void Open(ReportItem item)
     {
         Selected = item;
@@ -188,8 +291,12 @@ public sealed class ReportsViewModel : ObservableObject
     {
         _searchText = string.Empty;
         _selectedLocation = null;
+        _dateFilter = string.Empty;
+        _timeFilter = string.Empty;
         OnPropertyChanged(nameof(SearchText));
         OnPropertyChanged(nameof(SelectedLocation));
+        OnPropertyChanged(nameof(DateFilter));
+        OnPropertyChanged(nameof(TimeFilter));
         ApplyFilter();
     }
 
@@ -210,6 +317,18 @@ public sealed class ReportsViewModel : ObservableObject
         {
             items = items.Where(item =>
                 string.Equals(item.LocationText, _selectedLocation, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(_dateFilter))
+        {
+            items = items.Where(item =>
+                item.DateText.Contains(_dateFilter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(_timeFilter))
+        {
+            items = items.Where(item =>
+                item.TimeOnlyText.Contains(_timeFilter, StringComparison.OrdinalIgnoreCase));
         }
 
         items = _sortDescending

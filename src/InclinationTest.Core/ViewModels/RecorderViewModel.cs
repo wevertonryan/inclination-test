@@ -142,7 +142,12 @@ public sealed class RecorderViewModel : ObservableObject
     public void RequestSave() => Confirmation = ConfirmationRequest.Save;
 
     public void Confirm()
-    {
+{
+        if (string.IsNullOrWhiteSpace(_title))
+        {
+            _title = "Medição";
+        }
+
         switch (_confirmation)
         {
             case ConfirmationRequest.Save:

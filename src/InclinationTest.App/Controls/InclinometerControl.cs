@@ -19,10 +19,12 @@ public class InclinometerControl : SKCanvasView
     private const float TickMajorInner = 124f;
     private const float TickMinorInner = 130f;
     private const float RollLabelRadius = 110f;
-    private const float TrimTravel = 58f;
+    private const float TrimTravel = 85f;
+    // Old value was 58f; increased for a larger ruler with more spacing between numbers.
     private const float MaxTrim = 90f;
 
     private static readonly SKColor SurfaceLowest = SKColor.Parse("#090f16");
+    // Remove explicit zero background - the well background handles it
     private static readonly SKColor SurfaceHigh = SKColor.Parse("#252a32");
     private static readonly SKColor Outline = SKColor.Parse("#3b4949");
     private static readonly SKColor TickBright = SKColor.Parse("#eefcfb");
@@ -109,7 +111,8 @@ public class InclinometerControl : SKCanvasView
     protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
-        canvas.Clear(SKColors.Transparent);
+        // Clear com a cor mais escura do app em vez de transparente para evitar fundo branco
+        canvas.Clear(SurfaceLowest);
         canvas.Scale(e.Info.Width / ViewBox, e.Info.Height / ViewBox);
 
         var roll = float.IsFinite((float)Roll) ? (float)Roll : 0f;
@@ -211,23 +214,21 @@ public class InclinometerControl : SKCanvasView
 
             _stroke.Color = major ? TickBright : TickMuted;
             _stroke.StrokeWidth = major ? 1.4f : 1f;
-            canvas.DrawLine(Cx - 34f, y, Cx - 23f, y, _stroke);
-            canvas.DrawLine(Cx + 23f, y, Cx + 34f, y, _stroke);
+            // Linhas menores para manter a régua interna ao círculo well (radius 93)
+            var tickHalfLength = value % 30 == 0 ? 28f : 18f;
+            canvas.DrawLine(Cx - tickHalfLength, y, Cx - (tickHalfLength - 11f), y, _stroke);
+            canvas.DrawLine(Cx + tickHalfLength, y, Cx + (tickHalfLength - 11f), y, _stroke);
 
             _text.Color = major ? TickBright : TickMuted.WithAlpha(205);
-            _text.TextSize = major ? 10.5f : 9.5f;
+            _text.TextSize = major ? 13f : 11f;
             _text.FakeBoldText = major;
-            var prefix = value > 0 ? "+" : string.Empty;
-            canvas.DrawText($"{prefix}{value}°", Cx, y + 3.5f, _text);
+            canvas.DrawText($"{value}°", Cx, y + 4.5f, _text);
         }
 
-        var zeroTop = Cy - 11f;
-        _fill.Color = SurfaceLowest.WithAlpha(235);
-        canvas.DrawRoundRect(new SKRoundRect(new SKRect(Cx - 22f, zeroTop, Cx + 22f, zeroTop + 22f), 5f, 5f), _fill);
         _text.Color = White;
         _text.TextSize = 13f;
         _text.FakeBoldText = true;
-        canvas.DrawText("0°", Cx, Cy + 4.5f, _text);
+        canvas.DrawText("0°", Cx, 4.5f, _text);
 
         canvas.Restore();
     }
