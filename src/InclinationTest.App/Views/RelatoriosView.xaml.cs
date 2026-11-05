@@ -39,6 +39,10 @@ public partial class RelatoriosView : ContentView
         {
             UpdateSelectedSamples();
         }
+        else if (e.PropertyName is nameof(ReportsViewModel.MinValue) or nameof(ReportsViewModel.MaxValue))
+        {
+            ApplyGaugeValuesFromViewModel();
+        }
     }
 
     private void OnReportSelected(object? sender, SelectionChangedEventArgs e)
@@ -94,33 +98,28 @@ public partial class RelatoriosView : ContentView
 
     private void OnExportPdfTapped(object? sender, TappedEventArgs e)
     {
+        HideOverlay(OptionsOverlay);
+        if (!_viewModel.HasSelection)
+        {
+            ShowToast("Selecione um relatório para exportar.", ToastKind.Error);
+            return;
+        }
+
         _viewModel.ExportPdfCommand.Execute(null);
+        ShowToast("PDF gerado com sucesso (simulação).", ToastKind.Success);
     }
 
     private void OnRollTrimTapped(object? sender, TappedEventArgs e)
     {
         _viewModel.IsRollSelected = !_viewModel.IsRollSelected;
-        // Atualizar a gauge imediatamente
         ApplyGaugeValuesFromViewModel();
     }
 
     private void ApplyGaugeValuesFromViewModel()
     {
-        var selected = _viewModel.Selected;
-        if (selected is null || RangeGauge is null) return;
-
-        if (_viewModel.IsRollSelected)
-        {
-            RangeGauge.MinValue = selected.RollMinValue;
-            RangeGauge.MaxValue = selected.RollMaxValue;
-        }
-        else
-        {
-            var mean = selected.TrimMeanText != null ? double.Parse(selected.TrimMeanText.Replace("°", "").Trim()) : 0;
-            var std = selected.TrimStdText != null ? double.Parse(selected.TrimStdText.Replace("°", "").Replace(" ± ", "").Trim()) : 0;
-            RangeGauge.MinValue = mean - std;
-            RangeGauge.MaxValue = mean + std;
-        }
+        if (RangeGauge is null) return;
+        RangeGauge.MinValue = _viewModel.MinValue;
+        RangeGauge.MaxValue = _viewModel.MaxValue;
     }
 
     private void OnDeleteTapped(object? sender, TappedEventArgs e)

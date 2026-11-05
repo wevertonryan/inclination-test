@@ -10,6 +10,10 @@
 
     <ContentView.Resources>
         <converters:InverseBoolConverter x:Key="InverseBool" />
+        <converters:SelectionColorConverter x:Key="RollBg" Selected="{StaticResource Primary}" Unselected="{StaticResource SurfaceContainerHigh}" />
+        <converters:SelectionColorConverter x:Key="RollFg" Selected="{StaticResource OnPrimary}" Unselected="{StaticResource OnSurfaceVariant}" />
+        <converters:SelectionColorConverter x:Key="TrimBg" Selected="{StaticResource SurfaceContainerHigh}" Unselected="{StaticResource Primary}" />
+        <converters:SelectionColorConverter x:Key="TrimFg" Selected="{StaticResource OnSurfaceVariant}" Unselected="{StaticResource OnPrimary}" />
     </ContentView.Resources>
 
     <Grid BackgroundColor="{StaticResource Surface}">
@@ -57,52 +61,6 @@
                                     <TapGestureRecognizer Tapped="OnClearSearchTapped" />
                                 </Label.GestureRecognizers>
                             </Label>
-                            <Border
-                                Grid.Column="3"
-                                HeightRequest="44"
-                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
-                                StrokeShape="RoundRectangle 12"
-                                StrokeThickness="0"
-                                Padding="8,0">
-                                <Picker
-                                    x:Name="DatePicker"
-                                    HeightRequest="44"
-                                    SelectedItem="{Binding DateFilter, Mode=TwoWay}"
-                                    Title="Filtrar por data">
-                                    <Picker.Item>
-                                        <Label Text="Todas as datas" />
-                                    </Picker.Item>
-                                    <Picker.Item>
-                                        <Label Text="01/10/2024" />
-                                    </Picker.Item>
-                                    <Picker.Item>
-                                        <Label Text="15/10/2024" />
-                                    </Picker.Item>
-                                </Picker>
-                            </Border>
-                            <Border
-                                Grid.Column="4"
-                                HeightRequest="44"
-                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
-                                StrokeShape="RoundRectangle 12"
-                                StrokeThickness="0"
-                                Padding="8,0">
-                                <Picker
-                                    x:Name="TimePicker"
-                                    HeightRequest="44"
-                                    SelectedItem="{Binding TimeFilter, Mode=TwoWay}"
-                                    Title="Filtrar por hora">
-                                    <Picker.Item>
-                                        <Label Text="Todas as horas" />
-                                    </Picker.Item>
-                                    <Picker.Item>
-                                        <Label Text="10:00" />
-                                    </Picker.Item>
-                                    <Picker.Item>
-                                        <Label Text="14:30" />
-                                    </Picker.Item>
-                                </Picker>
-                            </Border>
                         </Grid>
                     </Border>
 
@@ -510,41 +468,41 @@
                         </Border>
                     </Grid>
 
-                    <!--  GAUGE TOGGLE  -->
-        <StackLayout Orientation="Horizontal" HeightRequest="32" VerticalOptions="Start" Spacing="0">
-            <Border
-                Padding="8,4"
-                BackgroundColor="{Binding IsRollSelected, Converter={StaticResource SelectionColorConverter}, ConverterParameter=Primary}"
-                StrokeShape="RoundRectangle 8"
-                StrokeThickness="0"
-                GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnRollTrimTapped" />
-            </Border>
-            <Label
-                FontFamily="{StaticResource FontMono}"
-                FontSize="11"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"
-                Text="Roll"
-                TextColor="{Binding IsRollSelected, Converter={StaticResource SelectionColorConverter}, ConverterParameter=OnPrimary}" />
-            <Border
-                Padding="8,4"
-                BackgroundColor="{Binding IsRollSelected, Converter={StaticResource InverseBoolConverter}}"
-                StrokeShape="RoundRectangle 8"
-                StrokeThickness="0"
-                GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnRollTrimTapped" />
-            </Border>
-            <Label
-                FontFamily="{StaticResource FontMono}"
-                FontSize="11"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"
-                Text="Trim"
-                TextColor="{Binding IsRollSelected, Converter={StaticResource InverseBoolConverter}, ConverterParameter=OnSecondaryVariant}" />
-        </StackLayout>
+                    <!--  GAUGE TOGGLE (Roll / Trim)  -->
+                    <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                        <Border
+                            Padding="12,6"
+                            BackgroundColor="{Binding IsRollSelected, Converter={StaticResource RollBg}}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnRollTrimTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="11"
+                                FontAttributes="Bold"
+                                Text="ROLL"
+                                TextColor="{Binding IsRollSelected, Converter={StaticResource RollFg}}" />
+                        </Border>
+                        <Border
+                            Padding="12,6"
+                            BackgroundColor="{Binding IsRollSelected, Converter={StaticResource TrimBg}}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnRollTrimTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="11"
+                                FontAttributes="Bold"
+                                Text="TRIM"
+                                TextColor="{Binding IsRollSelected, Converter={StaticResource TrimFg}}" />
+                        </Border>
+                    </HorizontalStackLayout>
 
-        <!--  GAUGE  -->
+                    <!--  GAUGE  -->
                     <VerticalStackLayout Spacing="8">
                         <Label
                             FontFamily="{StaticResource FontDisplay}"
@@ -559,11 +517,11 @@
                             StrokeShape="RoundRectangle 12">
                             <VerticalStackLayout Spacing="4">
                                 <controls:RangeGaugeControl
-                    x:Name="RangeGauge"
-                    HeightRequest="150"
-                    HorizontalOptions="Fill"
-                    MaxValue="{Binding Selected.RollMaxValue}"
-                    MinValue="{Binding Selected.RollMinValue}" />
+                                    x:Name="RangeGauge"
+                                    HeightRequest="150"
+                                    HorizontalOptions="Fill"
+                                    MaxValue="{Binding MaxValue}"
+                                    MinValue="{Binding MinValue}" />
                                 <Grid ColumnDefinitions="*,*,*">
                                     <VerticalStackLayout Spacing="2" HorizontalOptions="Start">
                                         <Label

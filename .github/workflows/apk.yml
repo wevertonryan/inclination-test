@@ -74,6 +74,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: inclination-test-apk
-          path: src/InclinationTest.App/bin/Release/net10.0-android/**/*-Signed.apk
+          path: src/InclinationTest.App/bin/Release/net10.0-android/**/*.apk
           if-no-files-found: error
           retention-days: 30

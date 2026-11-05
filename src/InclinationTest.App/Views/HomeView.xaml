@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-     xmlns:controls="clr-namespace:InclinationTest.App.Controls"
-     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
-     xmlns:features="clr-namespace:InclinationTest.App.Components.Features"
-     xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-     xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
+<ContentView
+    x:Class="InclinationTest.App.Views.HomeView"
+    x:Name="RootView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:InclinationTest.App.Controls"
+    xmlns:converters="clr-namespace:InclinationTest.App.Converters"
+    xmlns:features="clr-namespace:InclinationTest.App.Components.Features"
+    xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
+
+    <ContentView.Resources>
+        <converters:ElapsedMsToTimerConverter x:Key="Timer" />
+        <converters:ElapsedMsToShortTimerConverter x:Key="ShortTimer" />
+        <converters:SignedAngleConverter x:Key="SignedAngle" />
+    </ContentView.Resources>
      <ScrollView>
         <Grid
             x:Name="RootGrid"

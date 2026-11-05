@@ -42,6 +42,10 @@ public sealed record ReportItem(
 
     public double RollMeanValue { get; init; }
 
+    public double TrimMinValue { get; init; }
+
+    public double TrimMaxValue { get; init; }
+
     public long DurationMs { get; init; }
 
     public int SampleCount { get; init; }

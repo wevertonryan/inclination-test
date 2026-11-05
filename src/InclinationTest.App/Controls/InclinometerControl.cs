@@ -228,7 +228,7 @@ public class InclinometerControl : SKCanvasView
         _text.Color = White;
         _text.TextSize = 13f;
         _text.FakeBoldText = true;
-        canvas.DrawText("0°", Cx, 4.5f, _text);
+        canvas.DrawText("0°", Cx, Cy + 4.5f, _text);
 
         canvas.Restore();
     }

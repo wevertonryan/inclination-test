@@ -1,10 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using InclinationTest.Core.Persistence;
 using InclinationTest.Core.Recording;
 
-using CommunityToolkit.Mvvm.Input;
 namespace InclinationTest.Core.ViewModels;
 
 /// <summary>
@@ -26,6 +27,8 @@ public sealed class ReportsViewModel : ObservableObject
     private string _dateFilter = string.Empty;
     private string _timeFilter = string.Empty;
     private bool _exportPdfRequested = false;
+    private double _minValue;
+    private double _maxValue;
 
     public ReportsViewModel(IReportRepository repository)
     {
@@ -91,11 +94,35 @@ public sealed class ReportsViewModel : ObservableObject
         get => _dateFilter;
         set
         {
-            if (SetProperty(ref _dateFilter, value))
+            if (SetProperty(ref _dateFilter, value ?? string.Empty))
             {
                 ApplyFilter();
             }
         }
+    }
+
+    public string TimeFilter
+    {
+        get => _timeFilter;
+        set
+        {
+            if (SetProperty(ref _timeFilter, value ?? string.Empty))
+            {
+                ApplyFilter();
+            }
+        }
+    }
+
+    public double MinValue
+    {
+        get => _minValue;
+        private set => SetProperty(ref _minValue, value);
+    }
+
+    public double MaxValue
+    {
+        get => _maxValue;
+        private set => SetProperty(ref _maxValue, value);
     }
 
     private bool _isRollSelected = true;
@@ -112,38 +139,14 @@ public sealed class ReportsViewModel : ObservableObject
         }
     }
 
-    public ICommand ExportPdfCommand => new Command(OnExportPdf);
+    public ICommand ExportPdfCommand => new RelayCommand(OnExportPdf);
 
     private void OnExportPdf()
     {
+        if (Selected is null) return;
         ExportPdfRequested = true;
-        // Gera PDF simplificado com dados do relatório selecionado
-        _ = Task.Run(async () =>
-        {
-            if (Selected is null)
-            {
-                await Application.Current.MainPage.DisplayAlert("Atenção", "Selecione um relatório para exportar.", "OK");
-                ExportPdfRequested = false;
-                return;
-            }
-
-            // Simulação de geração de PDF - em produção, usar PdfSharp ou semelhante
-            var pdfText = $"Relatório: {Selected.Title}\n\n";
-            pdfText += $"Data: {Selected.DateText}\n";
-            pdfText += $"Hora: {Selected.TimeOnlyText}\n";
-            pdfText += $"Duração: {Selected.DurationLongText}\n";
-            pdfText += $"Local: {Selected.LocationText}\n";
-            pdfText += $"Roll Médio: {Selected.RollMeanText}\n";
-            pdfText += $"Trim Médio: {Selected.TrimMeanText}\n";
-            pdfText += $"Abertura: {Selected.RollRangeText}\n";
-            pdfText += $"\nAmostras: {Selected.SampleCountText}";
-
-            // Aqui seria gravado o arquivo PDF
-            // Para este build, apenas confirmamos o pedido
-            await Application.Current.MainPage.DisplayAlert("PDF", "PDF gerado com sucesso (simulação).", "OK");
-
-            ExportPdfRequested = false;
-        });
+        // Simulação / sinalização de exportação
+        ExportPdfRequested = false;
     }
 
     public bool SortDescending
@@ -242,21 +245,22 @@ public sealed class ReportsViewModel : ObservableObject
     private void ApplyGaugeValues()
     {
         var selected = Selected;
-        if (selected is null) return;
+        if (selected is null)
+        {
+            MinValue = 0;
+            MaxValue = 0;
+            return;
+        }
 
         if (IsRollSelected)
         {
-            // Usar valores de Roll
             MinValue = selected.RollMinValue;
             MaxValue = selected.RollMaxValue;
         }
         else
         {
-            // Usar valores de Trim (aproximativa: mean ± std)
-            var mean = selected.TrimMeanText != null ? double.Parse(selected.TrimMeanText.Replace("°", "").Trim()) : 0;
-            var std = selected.TrimStdText != null ? double.Parse(selected.TrimStdText.Replace("°", "").Replace(" ± ", "").Trim()) : 0;
-            MinValue = mean - std;
-            MaxValue = mean + std;
+            MinValue = selected.TrimMinValue;
+            MaxValue = selected.TrimMaxValue;
         }
     }
 
@@ -264,12 +268,15 @@ public sealed class ReportsViewModel : ObservableObject
     {
         Selected = item;
         SelectedSamples = _repository.GetSamples(item.Id);
+        ApplyGaugeValues();
     }
 
     public void Close()
     {
         Selected = null;
         SelectedSamples = Array.Empty<RecordedSample>();
+        MinValue = 0;
+        MaxValue = 0;
     }
 
     public void ToggleSort() => SortDescending = !SortDescending;
@@ -391,6 +398,8 @@ public sealed class ReportsViewModel : ObservableObject
             RollMinValue = summary.MinRoll,
             RollMaxValue = summary.MaxRoll,
             RollMeanValue = summary.MeanRoll,
+            TrimMinValue = summary.MinTrim,
+            TrimMaxValue = summary.MaxTrim,
             DurationMs = durationMs,
             SampleCount = summary.SampleCount,
             SavedAtUtc = savedAt,
