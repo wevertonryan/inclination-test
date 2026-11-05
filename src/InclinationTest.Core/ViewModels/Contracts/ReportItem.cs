@@ -36,6 +36,12 @@ public sealed record ReportItem(
 
     public string RollRangeText { get; init; } = "—";
 
+    public string TrimMinText { get; init; } = "—";
+
+    public string TrimMaxText { get; init; } = "—";
+
+    public string TrimRangeText { get; init; } = "—";
+
     public double RollMinValue { get; init; }
 
     public double RollMaxValue { get; init; }
@@ -45,6 +51,8 @@ public sealed record ReportItem(
     public double TrimMinValue { get; init; }
 
     public double TrimMaxValue { get; init; }
+
+    public double TrimMeanValue { get; init; }
 
     public long DurationMs { get; init; }
 

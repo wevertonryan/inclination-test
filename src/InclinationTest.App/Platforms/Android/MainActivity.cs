@@ -26,6 +26,8 @@ public class MainActivity : MauiAppCompatActivity
             return;
         }
 
+        Window.SetBackgroundDrawable(new Android.Graphics.Drawables.ColorDrawable(Android.Graphics.Color.ParseColor("#0e141b")));
+
         if (!OperatingSystem.IsAndroidVersionAtLeast(35))
         {
             Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#0e141b"));

@@ -21,7 +21,6 @@ public partial class MainPage : ContentPage
         HomeView home,
         CalibragemView calibragem,
         RelatoriosView relatorios,
-        TestesView testes,
         ConfiguracoesView configuracoes)
     {
         InitializeComponent();
@@ -37,7 +36,6 @@ public partial class MainPage : ContentPage
         AddTab(home, "Medição", MaterialOutlined.Explore);
         AddTab(calibragem, "Calibragem", MaterialOutlined.Straighten);
         _relatoriosTab = AddTab(relatorios, "Relatórios", MaterialOutlined.Description);
-        AddTab(testes, "Testes", MaterialOutlined.Science);
         AddTab(configuracoes, "Ajustes", MaterialOutlined.Settings);
 
         MainTabView.SizeChanged += OnTabViewSizeChanged;

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using InclinationTest.App.Components.Features;
+using InclinationTest.App.Platform;
 using InclinationTest.Core.Recording;
 using InclinationTest.Core.ViewModels;
 using Microsoft.Maui.ApplicationModel;
@@ -96,17 +97,25 @@ public partial class RelatoriosView : ContentView
     private void OnOptionsDismissed(object? sender, TappedEventArgs e)
         => HideOverlay(OptionsOverlay);
 
-    private void OnExportPdfTapped(object? sender, TappedEventArgs e)
+    private async void OnExportPdfTapped(object? sender, TappedEventArgs e)
     {
         HideOverlay(OptionsOverlay);
-        if (!_viewModel.HasSelection)
+        if (!_viewModel.HasSelection || _viewModel.Selected is null)
         {
             ShowToast("Selecione um relatório para exportar.", ToastKind.Error);
             return;
         }
 
-        _viewModel.ExportPdfCommand.Execute(null);
-        ShowToast("PDF gerado com sucesso (simulação).", ToastKind.Success);
+        try
+        {
+            ShowToast("Gerando PDF...", ToastKind.Info);
+            await PdfExportService.ExportAndShareAsync(_viewModel.Selected, _viewModel.SelectedSamples);
+            ShowToast("PDF exportado com sucesso!", ToastKind.Success);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Falha ao exportar PDF: {ex.Message}", ToastKind.Error);
+        }
     }
 
     private void OnRollTrimTapped(object? sender, TappedEventArgs e)

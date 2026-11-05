@@ -137,9 +137,23 @@ public sealed class RecorderViewModel : ObservableObject
         SampleCount++;
     }
 
-    public void RequestCancel() => Confirmation = ConfirmationRequest.Cancel;
+    public void RequestCancel()
+    {
+        if (_mode == RecorderMode.Recording)
+        {
+            Pause();
+        }
+        Confirmation = ConfirmationRequest.Cancel;
+    }
 
-    public void RequestSave() => Confirmation = ConfirmationRequest.Save;
+    public void RequestSave()
+    {
+        if (_mode == RecorderMode.Recording)
+        {
+            Pause();
+        }
+        Confirmation = ConfirmationRequest.Save;
+    }
 
     public void Confirm()
 {

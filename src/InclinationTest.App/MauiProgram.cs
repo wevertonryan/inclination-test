@@ -76,7 +76,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<HomeView>();
         builder.Services.AddSingleton<CalibragemView>();
         builder.Services.AddSingleton<RelatoriosView>();
-        builder.Services.AddSingleton<TestesView>();
         builder.Services.AddSingleton<ConfiguracoesView>();
 
 #if DEBUG

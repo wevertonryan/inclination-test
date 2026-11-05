@@ -15,11 +15,11 @@
         <converters:ElapsedMsToShortTimerConverter x:Key="ShortTimer" />
         <converters:SignedAngleConverter x:Key="SignedAngle" />
     </ContentView.Resources>
-     <ScrollView>
-        <Grid
-            x:Name="RootGrid"
-            RowDefinitions="Auto,Auto,*,Auto"
-            BackgroundColor="{StaticResource Surface}">
+
+    <Grid
+        x:Name="RootGrid"
+        RowDefinitions="Auto,Auto,*,Auto"
+        BackgroundColor="{StaticResource Surface}">
             <!--  HEADER  -->
             <layout:ScreenHeader x:Name="Header" Grid.Row="0" Title="Home">
                 <layout:ScreenHeader.LeftContent>
@@ -88,13 +88,13 @@
             </Grid>
 
             <!--  GAUGE + TELEMETRY  -->
-            <Grid
-                x:Name="ContentHost"
-                Grid.Row="2"
-                Padding="20,4,20,4">
-                <VerticalStackLayout
-                    Spacing="14"
-                    VerticalOptions="Center">
+            <ScrollView Grid.Row="2">
+                <Grid
+                    x:Name="ContentHost"
+                    Padding="20,4,20,4">
+                    <VerticalStackLayout
+                        Spacing="14"
+                        VerticalOptions="Center">
 
                     <controls:InclinometerControl
                         x:Name="Gauge"
@@ -199,6 +199,7 @@
                     BindingContext="{Binding Source={x:Reference RootView}, Path=BindingContext}" />
             </VerticalStackLayout>
             </Grid>
+            </ScrollView>
 
             <!--  BOTTOM ACTION  -->
             <Grid
@@ -509,5 +510,4 @@
                 </Border>
             </Grid>
         </Grid>
-     </ScrollView>
 </ContentView>

@@ -19,8 +19,7 @@ public class InclinometerControl : SKCanvasView
     private const float TickMajorInner = 124f;
     private const float TickMinorInner = 130f;
     private const float RollLabelRadius = 110f;
-    private const float TrimTravel = 85f;
-    // Old value was 58f; increased for a larger ruler with more spacing between numbers.
+    private const float TrimTravel = 130f;
     private const float MaxTrim = 90f;
 
     private static readonly SKColor SurfaceLowest = SKColor.Parse("#090f16");
@@ -122,6 +121,11 @@ public class InclinometerControl : SKCanvasView
         canvas.DrawPicture(_baseLayer);
 
         canvas.Save();
+        using (var clipPath = new SKPath())
+        {
+            clipPath.AddCircle(Cx, Cy, WellRadius - 2f);
+            canvas.ClipPath(clipPath, SKClipOperation.Intersect, antialias: true);
+        }
         canvas.Translate(0f, trim * (TrimTravel / MaxTrim));
         canvas.DrawPicture(_trimLayer);
         canvas.Restore();
@@ -202,33 +206,35 @@ public class InclinometerControl : SKCanvasView
 
         _text.TextAlign = SKTextAlign.Center;
 
-        for (var value = -90; value <= 90; value += 15)
+        for (var value = -80; value <= 80; value += 10)
         {
             var y = Cy - (value * TrimTravel / MaxTrim);
-            var major = value % 30 == 0;
+            var isLabel = value % 20 == 0;
 
             if (value == 0)
             {
                 continue;
             }
 
-            _stroke.Color = major ? TickBright : TickMuted;
-            _stroke.StrokeWidth = major ? 1.4f : 1f;
-            // Linhas menores para manter a régua interna ao círculo well (radius 93)
-            var tickHalfLength = value % 30 == 0 ? 28f : 18f;
-            canvas.DrawLine(Cx - tickHalfLength, y, Cx - (tickHalfLength - 11f), y, _stroke);
-            canvas.DrawLine(Cx + tickHalfLength, y, Cx + (tickHalfLength - 11f), y, _stroke);
+            _stroke.Color = isLabel ? TickBright : TickMuted;
+            _stroke.StrokeWidth = isLabel ? 1.5f : 1f;
+            var tickHalfLength = isLabel ? 26f : 16f;
+            canvas.DrawLine(Cx - tickHalfLength, y, Cx - (tickHalfLength - 10f), y, _stroke);
+            canvas.DrawLine(Cx + tickHalfLength, y, Cx + (tickHalfLength - 10f), y, _stroke);
 
-            _text.Color = major ? TickBright : TickMuted.WithAlpha(205);
-            _text.TextSize = major ? 13f : 11f;
-            _text.FakeBoldText = major;
-            canvas.DrawText($"{value}°", Cx, y + 4.5f, _text);
+            if (isLabel)
+            {
+                _text.Color = TickBright;
+                _text.TextSize = 13.5f;
+                _text.FakeBoldText = true;
+                canvas.DrawText($"{Math.Abs(value)}°", Cx, y + 4.5f, _text);
+            }
         }
 
         _text.Color = White;
-        _text.TextSize = 13f;
+        _text.TextSize = 14f;
         _text.FakeBoldText = true;
-        canvas.DrawText("0°", Cx, Cy + 4.5f, _text);
+        canvas.DrawText("0°", Cx, Cy + 5f, _text);
 
         canvas.Restore();
     }

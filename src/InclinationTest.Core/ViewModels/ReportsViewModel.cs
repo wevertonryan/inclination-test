@@ -18,11 +18,19 @@ public sealed class ReportsViewModel : ObservableObject
     private readonly ObservableCollection<ReportItem> _reports = new();
     private readonly ObservableCollection<ReportItem> _visibleReports = new();
     private readonly ObservableCollection<string> _locations = new();
+    private readonly ObservableCollection<string> _durations = new()
+    {
+        "Todas as durações",
+        "Menos de 1 min",
+        "1 a 5 min",
+        "Mais de 5 min"
+    };
 
     private ReportItem? _selected;
     private IReadOnlyList<RecordedSample> _selectedSamples = Array.Empty<RecordedSample>();
     private string _searchText = string.Empty;
     private string? _selectedLocation;
+    private string _selectedDuration = "Todas as durações";
     private bool _sortDescending = true;
     private string _dateFilter = string.Empty;
     private string _timeFilter = string.Empty;
@@ -36,6 +44,7 @@ public sealed class ReportsViewModel : ObservableObject
         Reports = new ReadOnlyObservableCollection<ReportItem>(_reports);
         VisibleReports = new ReadOnlyObservableCollection<ReportItem>(_visibleReports);
         Locations = new ReadOnlyObservableCollection<string>(_locations);
+        Durations = new ReadOnlyObservableCollection<string>(_durations);
         IsRollSelected = true; // Default: show Roll
     }
 
@@ -44,6 +53,8 @@ public sealed class ReportsViewModel : ObservableObject
     public ReadOnlyObservableCollection<ReportItem> VisibleReports { get; }
 
     public ReadOnlyObservableCollection<string> Locations { get; }
+
+    public ReadOnlyObservableCollection<string> Durations { get; }
 
     public ReportItem? Selected
     {
@@ -88,6 +99,23 @@ public sealed class ReportsViewModel : ObservableObject
             }
         }
     }
+
+    public string SelectedDuration
+    {
+        get => _selectedDuration;
+        set
+        {
+            if (SetProperty(ref _selectedDuration, value ?? "Todas as durações"))
+            {
+                ApplyFilter();
+            }
+        }
+    }
+
+    public string CurrentMinText => IsRollSelected ? (Selected?.RollMinText ?? "—") : (Selected?.TrimMinText ?? "—");
+    public string CurrentMaxText => IsRollSelected ? (Selected?.RollMaxText ?? "—") : (Selected?.TrimMaxText ?? "—");
+    public string CurrentRangeText => IsRollSelected ? (Selected?.RollRangeText ?? "—") : (Selected?.TrimRangeText ?? "—");
+    public string CurrentRangeLabel => IsRollSelected ? "Abertura Roll (máx − mín)" : "Abertura Trim (máx − mín)";
 
     public string DateFilter
     {
@@ -186,7 +214,9 @@ public sealed class ReportsViewModel : ObservableObject
     public bool IsFilteredEmpty => _visibleReports.Count == 0;
 
     public bool HasActiveFilter => !string.IsNullOrWhiteSpace(_searchText)
-        || !string.IsNullOrWhiteSpace(_selectedLocation);
+        || !string.IsNullOrWhiteSpace(_selectedLocation)
+        || !string.IsNullOrWhiteSpace(_dateFilter)
+        || (!string.IsNullOrWhiteSpace(_selectedDuration) && _selectedDuration != "Todas as durações");
 
     public int VisibleCount => _visibleReports.Count;
 
@@ -212,23 +242,30 @@ public sealed class ReportsViewModel : ObservableObject
     {
         Close();
 
-        _reports.Clear();
-        _locations.Clear();
-
-        foreach (var header in _repository.ListReports())
+        var headers = _repository.ListReports();
+        var items = new List<ReportItem>(headers.Count);
+        for (var i = 0; i < headers.Count; i++)
         {
-            _reports.Add(ToItem(header));
+            items.Add(ToItem(headers[i]));
         }
 
-        var locations = _reports
-            .Select(item => item.LocationText)
-            .Where(location => !string.IsNullOrWhiteSpace(location) && location != "—")
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(location => location, StringComparer.OrdinalIgnoreCase);
-
-        foreach (var location in locations)
+        _reports.Clear();
+        for (var i = 0; i < items.Count; i++)
         {
-            _locations.Add(location);
+            _reports.Add(items[i]);
+        }
+
+        var locations = items
+            .Select(item => item.LocationText)
+            .Where(loc => !string.IsNullOrWhiteSpace(loc) && loc != "—")
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(loc => loc, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        _locations.Clear();
+        for (var i = 0; i < locations.Count; i++)
+        {
+            _locations.Add(locations[i]);
         }
 
         if (_selectedLocation is not null && !_locations.Contains(_selectedLocation))
@@ -249,10 +286,8 @@ public sealed class ReportsViewModel : ObservableObject
         {
             MinValue = 0;
             MaxValue = 0;
-            return;
         }
-
-        if (IsRollSelected)
+        else if (IsRollSelected)
         {
             MinValue = selected.RollMinValue;
             MaxValue = selected.RollMaxValue;
@@ -262,12 +297,20 @@ public sealed class ReportsViewModel : ObservableObject
             MinValue = selected.TrimMinValue;
             MaxValue = selected.TrimMaxValue;
         }
+
+        OnPropertyChanged(nameof(CurrentMinText));
+        OnPropertyChanged(nameof(CurrentMaxText));
+        OnPropertyChanged(nameof(CurrentRangeText));
+        OnPropertyChanged(nameof(CurrentRangeLabel));
     }
 
     public void Open(ReportItem item)
     {
         Selected = item;
         SelectedSamples = _repository.GetSamples(item.Id);
+        _isRollSelected = true;
+        OnPropertyChanged(nameof(IsRollSelected));
+        OnPropertyChanged(nameof(IsTrimSelected));
         ApplyGaugeValues();
     }
 
@@ -277,6 +320,10 @@ public sealed class ReportsViewModel : ObservableObject
         SelectedSamples = Array.Empty<RecordedSample>();
         MinValue = 0;
         MaxValue = 0;
+        _isRollSelected = true;
+        OnPropertyChanged(nameof(IsRollSelected));
+        OnPropertyChanged(nameof(IsTrimSelected));
+        ApplyGaugeValues();
     }
 
     public void ToggleSort() => SortDescending = !SortDescending;
@@ -300,10 +347,12 @@ public sealed class ReportsViewModel : ObservableObject
         _selectedLocation = null;
         _dateFilter = string.Empty;
         _timeFilter = string.Empty;
+        _selectedDuration = "Todas as durações";
         OnPropertyChanged(nameof(SearchText));
         OnPropertyChanged(nameof(SelectedLocation));
         OnPropertyChanged(nameof(DateFilter));
         OnPropertyChanged(nameof(TimeFilter));
+        OnPropertyChanged(nameof(SelectedDuration));
         ApplyFilter();
     }
 
@@ -329,7 +378,19 @@ public sealed class ReportsViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(_dateFilter))
         {
             items = items.Where(item =>
-                item.DateText.Contains(_dateFilter, StringComparison.OrdinalIgnoreCase));
+                item.DateText.Contains(_dateFilter, StringComparison.OrdinalIgnoreCase)
+                || item.DateOnlyText.Contains(_dateFilter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(_selectedDuration) && _selectedDuration != "Todas as durações")
+        {
+            items = _selectedDuration switch
+            {
+                "Menos de 1 min" => items.Where(item => item.DurationMs < 60_000),
+                "1 a 5 min" => items.Where(item => item.DurationMs >= 60_000 && item.DurationMs <= 300_000),
+                "Mais de 5 min" => items.Where(item => item.DurationMs > 300_000),
+                _ => items
+            };
         }
 
         if (!string.IsNullOrWhiteSpace(_timeFilter))
@@ -395,11 +456,15 @@ public sealed class ReportsViewModel : ObservableObject
             RollMinText = FormatAngle(summary.MinRoll),
             RollMaxText = FormatAngle(summary.MaxRoll),
             RollRangeText = $"{summary.RollRange:0.0}°",
+            TrimMinText = FormatAngle(summary.MinTrim),
+            TrimMaxText = FormatAngle(summary.MaxTrim),
+            TrimRangeText = $"{summary.TrimRange:0.0}°",
             RollMinValue = summary.MinRoll,
             RollMaxValue = summary.MaxRoll,
             RollMeanValue = summary.MeanRoll,
             TrimMinValue = summary.MinTrim,
             TrimMaxValue = summary.MaxTrim,
+            TrimMeanValue = summary.MeanTrim,
             DurationMs = durationMs,
             SampleCount = summary.SampleCount,
             SavedAtUtc = savedAt,
