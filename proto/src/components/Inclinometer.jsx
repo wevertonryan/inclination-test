@@ -11,9 +11,10 @@ const TICK_OUT = 106
 const TICK_IN_MAJOR = 96
 const TICK_IN_MINOR = 101
 const LABEL_R = 78
-const STRIP_W = 46
-const STRIP_HALF = 76
-const RULER_MOVE = 52
+const RULER_MOVE = 48
+const RULER_TICK_GAP = 20
+const RULER_TICK_MAJOR = 16
+const RULER_TICK_MINOR = 10
 
 function fmtDeg(v) {
   return `${v.toFixed(1).replace('.', ',')}°`
@@ -63,6 +64,28 @@ function RollTicks() {
   return marks
 }
 
+function RulerTicks({ y, major }) {
+  const len = major ? RULER_TICK_MAJOR : RULER_TICK_MINOR
+  return (
+    <>
+      <line
+        x1={CX - RULER_TICK_GAP - len}
+        y1={y}
+        x2={CX - RULER_TICK_GAP}
+        y2={y}
+        className={`inclino__tick ${major ? 'inclino__tick--major' : ''}`}
+      />
+      <line
+        x1={CX + RULER_TICK_GAP}
+        y1={y}
+        x2={CX + RULER_TICK_GAP + len}
+        y2={y}
+        className={`inclino__tick ${major ? 'inclino__tick--major' : ''}`}
+      />
+    </>
+  )
+}
+
 function RulerSlides() {
   const ticks = []
   const spacing = RULER_MOVE / 90
@@ -75,38 +98,20 @@ function RulerSlides() {
     if (v === 0) {
       ticks.push(
         <g key="0">
-          <line
-            x1={CX - 12}
-            y1={CY}
-            x2={CX + 12}
-            y2={CY}
-            className="inclino__tick inclino__tick--major"
-          />
+          <RulerTicks y={CY} major />
         </g>,
       )
     } else {
       ticks.push(
         <g key={v}>
-          <line
-            x1={CX - 12}
-            y1={yTop}
-            x2={CX + 12}
-            y2={yTop}
-            className={`inclino__tick ${major ? 'inclino__tick--major' : ''}`}
-          />
-          <line
-            x1={CX - 12}
-            y1={yBot}
-            x2={CX + 12}
-            y2={yBot}
-            className={`inclino__tick ${major ? 'inclino__tick--major' : ''}`}
-          />
+          <RulerTicks y={yTop} major={major} />
+          <RulerTicks y={yBot} major={major} />
           {major && (
             <text
-              x={CX - 19}
+              x={CX}
               y={yTop}
               className="inclino__tlabel"
-              textAnchor="end"
+              textAnchor="middle"
               dominantBaseline="central"
             >
               {v}
@@ -114,10 +119,10 @@ function RulerSlides() {
           )}
           {major && (
             <text
-              x={CX - 19}
+              x={CX}
               y={yBot}
               className="inclino__tlabel"
-              textAnchor="end"
+              textAnchor="middle"
               dominantBaseline="central"
             >
               {v}
@@ -141,15 +146,10 @@ function Inclinometer({ roll, trim }) {
       <svg viewBox="0 0 260 260" className="inclino__svg">
         <circle cx={CX} cy={CY} r={R} className="inclino__disc" />
 
-        <g className="inclino__strip" transform={`translate(0, ${trimPx})`}>
-          <rect
-            x={CX - STRIP_W / 2}
-            y={CY - STRIP_HALF}
-            width={STRIP_W}
-            height={STRIP_HALF * 2}
-            rx="8"
-            className="inclino__strip-bg"
-          />
+        <g
+          className="inclino__trim-scale"
+          transform={`translate(0, ${trimPx})`}
+        >
           {RulerSlides()}
         </g>
 

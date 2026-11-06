@@ -6,17 +6,24 @@ import '../components/ScreenHeader.css'
 import '../components/Modal.css'
 import './Relatorios.css'
 
-const TIME_RANGES = [
-  { id: 'short', label: 'Até 30s', test: (ms) => ms <= 30000 },
-  { id: 'mid', label: '30s – 1min', test: (ms) => ms > 30000 && ms <= 60000 },
-  { id: 'long', label: '≥ 1min', test: (ms) => ms > 60000 },
-]
-
 const pad2 = (n) => String(n).padStart(2, '0')
+
+const emptyFilters = () => ({
+  dateFrom: '',
+  dateTo: '',
+  locs: [],
+  timeMin: '',
+  timeMax: '',
+})
 
 function fmtDate(iso) {
   const d = new Date(iso)
   return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}`
+}
+
+function dateKey(iso) {
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
 }
 
 function distinct(values) {
@@ -61,13 +68,9 @@ function FilterGroup({ title, children }) {
 function Relatorios({ reports, onOpenReport }) {
   const [query, setQuery] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [draft, setDraft] = useState({ dates: [], locs: [], times: [] })
-  const [applied, setApplied] = useState({ dates: [], locs: [], times: [] })
+  const [draft, setDraft] = useState(emptyFilters)
+  const [applied, setApplied] = useState(emptyFilters)
 
-  const dateOptions = useMemo(
-    () => distinct(reports.map((r) => fmtDate(r.date))),
-    [reports],
-  )
   const locOptions = useMemo(
     () => distinct(reports.map((r) => r.location).filter(Boolean)),
     [reports],
@@ -83,25 +86,31 @@ function Relatorios({ reports, onOpenReport }) {
           (r.location || '').toLowerCase().includes(q),
       )
     }
-    if (applied.dates.length) {
-      list = list.filter((r) => applied.dates.includes(fmtDate(r.date)))
+    if (applied.dateFrom) {
+      list = list.filter((r) => dateKey(r.date) >= applied.dateFrom)
+    }
+    if (applied.dateTo) {
+      list = list.filter((r) => dateKey(r.date) <= applied.dateTo)
     }
     if (applied.locs.length) {
       list = list.filter((r) => applied.locs.includes(r.location))
     }
-    if (applied.times.length) {
-      list = list.filter((r) =>
-        applied.times.some((id) =>
-          TIME_RANGES.find((t) => t.id === id).test(r.durationMs),
-        ),
-      )
+    if (applied.timeMin !== '') {
+      list = list.filter((r) => r.durationMs >= Number(applied.timeMin) * 1000)
+    }
+    if (applied.timeMax !== '') {
+      list = list.filter((r) => r.durationMs <= Number(applied.timeMax) * 1000)
     }
     return list
   }, [reports, query, applied])
 
   const hasQuery = query.trim().length > 0
   const hasFilters =
-    applied.dates.length > 0 || applied.locs.length > 0 || applied.times.length > 0
+    applied.dateFrom !== '' ||
+    applied.dateTo !== '' ||
+    applied.locs.length > 0 ||
+    applied.timeMin !== '' ||
+    applied.timeMax !== ''
   const searching = hasQuery || hasFilters
 
   function toggleDraft(key, value) {
@@ -113,9 +122,13 @@ function Relatorios({ reports, onOpenReport }) {
     }))
   }
 
+  function setDraftField(key, value) {
+    setDraft((prev) => ({ ...prev, [key]: value }))
+  }
+
   function resetFilters() {
-    setDraft({ dates: [], locs: [], times: [] })
-    setApplied({ dates: [], locs: [], times: [] })
+    setDraft(emptyFilters())
+    setApplied(emptyFilters())
   }
 
   return (
@@ -136,7 +149,10 @@ function Relatorios({ reports, onOpenReport }) {
           <button
             type="button"
             className="rep-funnel"
-            onClick={() => setFilterOpen(true)}
+            onClick={() => {
+              setDraft(applied)
+              setFilterOpen(true)
+            }}
             aria-label="Filtrar"
           >
             <FunnelIcon />
@@ -165,14 +181,28 @@ function Relatorios({ reports, onOpenReport }) {
       <Modal open={filterOpen} backdrop onClose={() => setFilterOpen(false)}>
         <h2 className="modal__title">Filtrar relatórios</h2>
         <FilterGroup title="Data">
-          {dateOptions.map((d) => (
-            <FilterChip
-              key={d}
-              label={d}
-              active={draft.dates.includes(d)}
-              onClick={() => toggleDraft('dates', d)}
-            />
-          ))}
+          <div className="filter-range">
+            <label className="filter-field">
+              <span>De</span>
+              <input
+                type="date"
+                className="filter-field__input"
+                value={draft.dateFrom}
+                max={draft.dateTo || undefined}
+                onChange={(e) => setDraftField('dateFrom', e.target.value)}
+              />
+            </label>
+            <label className="filter-field">
+              <span>Até</span>
+              <input
+                type="date"
+                className="filter-field__input"
+                value={draft.dateTo}
+                min={draft.dateFrom || undefined}
+                onChange={(e) => setDraftField('dateTo', e.target.value)}
+              />
+            </label>
+          </div>
         </FilterGroup>
         <FilterGroup title="Localização">
           {locOptions.map((loc) => (
@@ -185,14 +215,32 @@ function Relatorios({ reports, onOpenReport }) {
           ))}
         </FilterGroup>
         <FilterGroup title="Tempo gravado">
-          {TIME_RANGES.map((t) => (
-            <FilterChip
-              key={t.id}
-              label={t.label}
-              active={draft.times.includes(t.id)}
-              onClick={() => toggleDraft('times', t.id)}
-            />
-          ))}
+          <div className="filter-range">
+            <label className="filter-field">
+              <span>Mínimo (s)</span>
+              <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                className="filter-field__input"
+                placeholder="0"
+                value={draft.timeMin}
+                onChange={(e) => setDraftField('timeMin', e.target.value)}
+              />
+            </label>
+            <label className="filter-field">
+              <span>Máximo (s)</span>
+              <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                className="filter-field__input"
+                placeholder="Sem limite"
+                value={draft.timeMax}
+                onChange={(e) => setDraftField('timeMax', e.target.value)}
+              />
+            </label>
+          </div>
         </FilterGroup>
         <div className="modal__actions">
           <button

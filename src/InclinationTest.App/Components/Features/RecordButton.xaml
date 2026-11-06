@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.RecordButton"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid
+        HeightRequest="96"
+        WidthRequest="96">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border
+            x:Name="Glow"
+            BackgroundColor="#26ffb4ab"
+            HeightRequest="88"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="88" />
+
+        <Border
+            x:Name="Circle"
+            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+            HeightRequest="80"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="80">
+            <Border.Shadow>
+                <Shadow
+                    Brush="#99000000"
+                    Offset="0,6"
+                    Radius="16" />
+            </Border.Shadow>
+
+            <Border
+                x:Name="Inner"
+                BackgroundColor="#66ffb4ab"
+                HeightRequest="64"
+                HorizontalOptions="Center"
+                StrokeShape="RoundRectangle 999"
+                StrokeThickness="0"
+                VerticalOptions="Center"
+                WidthRequest="64">
+                <Grid>
+                    <Border
+                        x:Name="Core"
+                        BackgroundColor="{StaticResource Error}"
+                        HeightRequest="28"
+                        HorizontalOptions="Center"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        VerticalOptions="Center"
+                        WidthRequest="28" />
+
+                    <Label
+                        x:Name="Icon"
+                        FontFamily="{StaticResource FontIcons}"
+                        FontSize="30"
+                        HorizontalOptions="Center"
+                        IsVisible="False"
+                        TextColor="{StaticResource OnPrimaryContainer}"
+                        VerticalOptions="Center" />
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</ContentView>

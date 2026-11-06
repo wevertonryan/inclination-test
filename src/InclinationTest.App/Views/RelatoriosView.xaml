@@ -1,0 +1,1201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Views.RelatoriosView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:InclinationTest.App.Controls"
+    xmlns:converters="clr-namespace:InclinationTest.App.Converters"
+    xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout"
+    BackgroundColor="{StaticResource Surface}">
+
+    <ContentView.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+        <converters:SelectionColorConverter x:Key="RollBg" Selected="{StaticResource Primary}" Unselected="{StaticResource SurfaceContainerHigh}" />
+        <converters:SelectionColorConverter x:Key="RollFg" Selected="{StaticResource OnPrimary}" Unselected="{StaticResource OnSurfaceVariant}" />
+        <converters:SelectionColorConverter x:Key="TrimBg" Selected="{StaticResource SurfaceContainerHigh}" Unselected="{StaticResource Primary}" />
+        <converters:SelectionColorConverter x:Key="TrimFg" Selected="{StaticResource OnSurfaceVariant}" Unselected="{StaticResource OnPrimary}" />
+    </ContentView.Resources>
+
+    <Grid BackgroundColor="{StaticResource Surface}">
+
+        <!--  LISTA  -->
+        <Grid
+            IsVisible="{Binding HasSelection, Converter={StaticResource InverseBool}}"
+            RowDefinitions="Auto,*">
+            <layout:ScreenHeader Grid.Row="0" Title="Relatórios" />
+
+            <!--  CARDS COM HEADER SCROLLÁVEL  -->
+            <CollectionView
+                x:Name="ReportsList"
+                Grid.Row="1"
+                ItemsSource="{Binding VisibleReports}"
+                SelectionChanged="OnReportSelected"
+                SelectionMode="Single">
+                <CollectionView.Header>
+                    <VerticalStackLayout Padding="16,12,16,12" Spacing="12">
+                        <!--  BUSCA + FILTRO  -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Border
+                                HeightRequest="44"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="12,0">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        Text="{x:Static icons:MaterialOutlined.Search}"
+                                        TextColor="{StaticResource Outline}"
+                                        VerticalOptions="Center" />
+                                    <Entry
+                                        Grid.Column="1"
+                                        FontSize="14"
+                                        Placeholder="Buscar relatórios"
+                                        Text="{Binding SearchText, Mode=TwoWay}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Grid.Column="2"
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="16"
+                                        Text="{x:Static icons:MaterialOutlined.Close}"
+                                        TextColor="{StaticResource Outline}"
+                                        VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnClearSearchTapped" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Grid.Column="1"
+                                HeightRequest="44"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                WidthRequest="44">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnFilterTapped" />
+                                </Border.GestureRecognizers>
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="20"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Filter_list}"
+                                    TextColor="{StaticResource OnSurface}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+
+                        <!--  TÍTULO + CONTADOR + ORDENAÇÃO  -->
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                Text="{Binding ListTitle}"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                            <Border
+                                Grid.Column="1"
+                                Padding="8,2"
+                                BackgroundColor="{StaticResource SurfaceContainerHighest}"
+                                StrokeShape="RoundRectangle 999"
+                                StrokeThickness="0"
+                                VerticalOptions="Center">
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="10"
+                                    FontAttributes="Bold"
+                                    Text="{Binding VisibleCountText}"
+                                    TextColor="{StaticResource Secondary}" />
+                            </Border>
+
+                            <HorizontalStackLayout
+                                Grid.Column="3"
+                                Spacing="3"
+                                VerticalOptions="Center">
+                                <HorizontalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSortTapped" />
+                                </HorizontalStackLayout.GestureRecognizers>
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="16"
+                                    Text="{x:Static icons:MaterialOutlined.Swap_vert}"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="10"
+                                    FontAttributes="Bold"
+                                    Text="{Binding SortLabel}"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    VerticalOptions="Center"
+                                    CharacterSpacing="0.6" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </CollectionView.Header>
+                    SelectionChanged="OnReportSelected"
+                    SelectionMode="Single">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout
+                            Padding="24,40"
+                            Spacing="12"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="32"
+                                HorizontalTextAlignment="Center"
+                                Text="{x:Static icons:MaterialOutlined.Radar}"
+                                TextColor="{StaticResource Outline}" />
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Nenhum ensaio localizado"
+                                TextColor="{StaticResource OnSurface}" />
+                            <Label
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="13"
+                                HorizontalTextAlignment="Center"
+                                MaximumWidthRequest="280"
+                                Text="Não encontramos relatórios com este termo no diário de bordo."
+                                TextColor="{StaticResource OnSurfaceVariant}" />
+                            <Border
+                                Padding="16,8"
+                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                HorizontalOptions="Center"
+                                StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnResetFiltersTapped" />
+                                </Border.GestureRecognizers>
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="13"
+                                    FontAttributes="Bold"
+                                    Text="Redefinir Filtros"
+                                    TextColor="{StaticResource Primary}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="0,0,0,8"
+                                Padding="16"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 16">
+                                <Border.Shadow>
+                                    <Shadow
+                                        Brush="#44000000"
+                                        Offset="0,2"
+                                        Radius="6" />
+                                </Border.Shadow>
+                                <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <Label
+                                            FontFamily="{StaticResource FontDisplay}"
+                                            FontSize="16"
+                                            FontAttributes="Bold"
+                                            LineBreakMode="TailTruncation"
+                                            MaxLines="2"
+                                            Text="{Binding Title}"
+                                            TextColor="{StaticResource OnSurface}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="12"
+                                            Text="{Binding DateOnlyText}"
+                                            TextColor="{StaticResource Secondary}"
+                                            VerticalOptions="Start" />
+                                    </Grid>
+                                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
+                                        <Label
+                                            FontFamily="{StaticResource FontIcons}"
+                                            FontSize="18"
+                                            Text="{x:Static icons:MaterialOutlined.My_location}"
+                                            TextColor="{StaticResource Outline}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Grid.Column="1"
+                                            FontFamily="{StaticResource FontBody}"
+                                            FontSize="13"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding LocationText}"
+                                            TextColor="{StaticResource OnSurfaceVariant}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Grid.Column="2"
+                                            FontFamily="{StaticResource FontIcons}"
+                                            FontSize="20"
+                                            Text="{x:Static icons:MaterialOutlined.Chevron_right}"
+                                            TextColor="{StaticResource Outline}"
+                                            VerticalOptions="Center" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+        </Grid>
+
+        <!--  DETALHE  -->
+        <Grid
+            IsVisible="{Binding HasSelection}"
+            RowDefinitions="Auto,*">
+            <layout:ScreenHeader Grid.Row="0" Title="Relatório">
+                <layout:ScreenHeader.LeftContent>
+                    <Border
+                        HeightRequest="40"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        WidthRequest="40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBackClicked" />
+                        </Border.GestureRecognizers>
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="22"
+                            HorizontalOptions="Center"
+                            Text="{x:Static icons:MaterialOutlined.Arrow_back_ios_new}"
+                            TextColor="{StaticResource OnSurface}"
+                            VerticalOptions="Center" />
+                    </Border>
+                </layout:ScreenHeader.LeftContent>
+                <layout:ScreenHeader.RightContent>
+                    <Border
+                        HeightRequest="40"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        WidthRequest="40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOptionsTapped" />
+                        </Border.GestureRecognizers>
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="22"
+                            HorizontalOptions="Center"
+                            Text="{x:Static icons:MaterialOutlined.More_vert}"
+                            TextColor="{StaticResource OnSurface}"
+                            VerticalOptions="Center" />
+                    </Border>
+                </layout:ScreenHeader.RightContent>
+            </layout:ScreenHeader>
+
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Padding="16,12,16,32" Spacing="20">
+
+                    <!--  IDENTIFICAÇÃO  -->
+                    <Border
+                        Padding="16"
+                        BackgroundColor="{StaticResource SurfaceContainerLow}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12">
+                        <Label
+                            FontFamily="{StaticResource FontDisplay}"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            Text="{Binding Selected.Title}"
+                            TextColor="{StaticResource OnSurface}" />
+                    </Border>
+
+                    <!--  METADADOS  -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+                        <Border
+                            Grid.ColumnSpan="2"
+                            Padding="12"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Border
+                                    HeightRequest="36"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="36">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.My_location}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="10"
+                                        Text="LOCALIZAÇÃO"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding Selected.LocationText}"
+                                        TextColor="{StaticResource OnSurface}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <Border
+                            Grid.Row="1"
+                            Padding="10"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <Border
+                                    HeightRequest="32"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="32">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Calendar_today}"
+                                        TextColor="{StaticResource Secondary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        Text="DATA"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="12"
+                                        Text="{Binding Selected.DateOnlyText}"
+                                        TextColor="{StaticResource OnSurface}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <Border
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Padding="10"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <Border
+                                    HeightRequest="32"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="32">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="18"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Schedule}"
+                                        TextColor="{StaticResource Secondary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        Text="HORA"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="12"
+                                        Text="{Binding Selected.TimeOnlyText}"
+                                        TextColor="{StaticResource OnSurface}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <Border
+                            Grid.Row="2"
+                            Grid.ColumnSpan="2"
+                            Padding="12"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Border
+                                    HeightRequest="36"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="36">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Timer}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="10"
+                                        Text="TEMPO REGISTRADO"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="26"
+                                        FontAttributes="Bold"
+                                        Text="{Binding Selected.DurationLongText}"
+                                        TextColor="{StaticResource Primary}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!--  GAUGE TOGGLE (Roll / Trim)  -->
+                    <!--  GAUGE COM INTERRUPTOR ROLL / TRIM NO LADO DIREITO  -->
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                Text="Informações da gravação"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+
+                            <!--  INTERRUPTOR (Logo acima do componente no lado direito)  -->
+                            <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Border
+                                    Padding="10,5"
+                                    BackgroundColor="{Binding IsRollSelected, Converter={StaticResource RollBg}}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRollTrimTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="11"
+                                        FontAttributes="Bold"
+                                        Text="ROLL"
+                                        TextColor="{Binding IsRollSelected, Converter={StaticResource RollFg}}" />
+                                </Border>
+                                <Border
+                                    Padding="10,5"
+                                    BackgroundColor="{Binding IsRollSelected, Converter={StaticResource TrimBg}}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRollTrimTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="11"
+                                        FontAttributes="Bold"
+                                        Text="TRIM"
+                                        TextColor="{Binding IsRollSelected, Converter={StaticResource TrimFg}}" />
+                                </Border>
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <Border
+                            Padding="16"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <VerticalStackLayout Spacing="4">
+                                <controls:RangeGaugeControl
+                                    x:Name="RangeGauge"
+                                    HeightRequest="150"
+                                    HorizontalOptions="Fill"
+                                    MaxValue="{Binding MaxValue}"
+                                    MinValue="{Binding MinValue}" />
+                                <Grid ColumnDefinitions="*,*,*">
+                                    <VerticalStackLayout Spacing="2" HorizontalOptions="Start">
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="9"
+                                            Text="MÍNIMO"
+                                            TextColor="{StaticResource OnSurfaceVariant}"
+                                            CharacterSpacing="0.8" />
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="13"
+                                            FontAttributes="Bold"
+                                            Text="{Binding CurrentMinText}"
+                                            TextColor="{StaticResource Secondary}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="9"
+                                            HorizontalTextAlignment="Center"
+                                            Text="0.0° REF"
+                                            TextColor="{StaticResource Outline}"
+                                            CharacterSpacing="0.8" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="End">
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="9"
+                                            Text="MÁXIMO"
+                                            TextColor="{StaticResource OnSurfaceVariant}"
+                                            CharacterSpacing="0.8" />
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="13"
+                                            FontAttributes="Bold"
+                                            Text="{Binding CurrentMaxText}"
+                                            TextColor="{StaticResource Tertiary}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <VerticalStackLayout Margin="0,4,0,0" Spacing="1" HorizontalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="30"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{Binding CurrentRangeText}"
+                                        TextColor="{StaticResource Primary}" />
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="12"
+                                        Text="{Binding CurrentRangeLabel}"
+                                        TextColor="{StaticResource OnSurfaceVariant}" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!--  GRÁFICO  -->
+                    <VerticalStackLayout Spacing="8">
+                        <Border
+                            Padding="16,12,12,8"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    FontFamily="{StaticResource FontDisplay}"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    Text="Variação Angular Trim × Roll"
+                                    TextColor="{StaticResource OnSurface}" />
+                                <HorizontalStackLayout Spacing="16">
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Ellipse
+                                            Fill="{StaticResource ChartTrim}"
+                                            HeightRequest="9"
+                                            VerticalOptions="Center"
+                                            WidthRequest="9" />
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="11"
+                                            Text="Trim"
+                                            TextColor="{StaticResource ChartTrim}" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Ellipse
+                                            Fill="{StaticResource ChartRoll}"
+                                            HeightRequest="9"
+                                            VerticalOptions="Center"
+                                            WidthRequest="9" />
+                                        <Label
+                                            FontFamily="{StaticResource FontMono}"
+                                            FontSize="11"
+                                            Text="Roll"
+                                            TextColor="{StaticResource ChartRoll}" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                                <Grid x:Name="ChartHost" HeightRequest="210" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!--  MEDIDAS  -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label
+                            FontFamily="{StaticResource FontDisplay}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Text="Medidas"
+                            TextColor="{StaticResource OnSurface}" />
+                        <Border
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*,*">
+                                <Grid
+                                    Grid.ColumnSpan="3"
+                                    Padding="16,8"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    ColumnDefinitions="*,*,*">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        Text="EIXO"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        Grid.Column="1"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        HorizontalTextAlignment="End"
+                                        Text="MÉDIA"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        Grid.Column="2"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        HorizontalTextAlignment="End"
+                                        Text="DESVIO"
+                                        TextColor="{StaticResource OnSurfaceVariant}"
+                                        CharacterSpacing="0.8" />
+                                </Grid>
+                                <Grid
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="3"
+                                    Padding="16,12"
+                                    ColumnDefinitions="*,*,*">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Ellipse
+                                            Fill="{StaticResource ChartTrim}"
+                                            HeightRequest="9"
+                                            VerticalOptions="Center"
+                                            WidthRequest="9" />
+                                        <Label
+                                            FontFamily="{StaticResource FontBody}"
+                                            FontSize="13"
+                                            FontAttributes="Bold"
+                                            Text="Trim"
+                                            TextColor="{StaticResource OnSurface}" />
+                                    </HorizontalStackLayout>
+                                    <Label
+                                        Grid.Column="1"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="13"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="End"
+                                        Text="{Binding Selected.TrimMeanText}"
+                                        TextColor="{StaticResource ChartTrim}" />
+                                    <Label
+                                        Grid.Column="2"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="13"
+                                        HorizontalTextAlignment="End"
+                                        Text="{Binding Selected.TrimStdText}"
+                                        TextColor="{StaticResource OnSurface}" />
+                                </Grid>
+                                <Grid
+                                    Grid.Row="2"
+                                    Grid.ColumnSpan="3"
+                                    Padding="16,12"
+                                    BackgroundColor="{StaticResource SurfaceContainerLow}"
+                                    ColumnDefinitions="*,*,*">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Ellipse
+                                            Fill="{StaticResource ChartRoll}"
+                                            HeightRequest="9"
+                                            VerticalOptions="Center"
+                                            WidthRequest="9" />
+                                        <Label
+                                            FontFamily="{StaticResource FontBody}"
+                                            FontSize="13"
+                                            FontAttributes="Bold"
+                                            Text="Roll"
+                                            TextColor="{StaticResource OnSurface}" />
+                                    </HorizontalStackLayout>
+                                    <Label
+                                        Grid.Column="1"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="13"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="End"
+                                        Text="{Binding Selected.RollMeanText}"
+                                        TextColor="{StaticResource ChartRoll}" />
+                                    <Label
+                                        Grid.Column="2"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="13"
+                                        HorizontalTextAlignment="End"
+                                        Text="{Binding Selected.RollStdText}"
+                                        TextColor="{StaticResource OnSurface}" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!--  DADOS BRUTOS  -->
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                Text="Dados brutos"
+                                TextColor="{StaticResource OnSurface}" />
+                            <Label
+                                x:Name="RawCountLabel"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="12"
+                                TextColor="{StaticResource OnSurfaceVariant}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Border
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12">
+                            <Grid RowDefinitions="Auto,*,Auto">
+                                <Grid
+                                    Padding="16,8"
+                                    BackgroundColor="{StaticResource SurfaceContainerHighest}"
+                                    ColumnDefinitions="*,*,*">
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        FontAttributes="Bold"
+                                        Text="Nº"
+                                        TextColor="{StaticResource OnSurface}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        Grid.Column="1"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="End"
+                                        Text="X (TRIM)"
+                                        TextColor="{StaticResource OnSurface}"
+                                        CharacterSpacing="0.8" />
+                                    <Label
+                                        Grid.Column="2"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="9"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="End"
+                                        Text="Y (ROLL)"
+                                        TextColor="{StaticResource OnSurface}"
+                                        CharacterSpacing="0.8" />
+                                </Grid>
+
+                                <CollectionView
+                                    x:Name="RawSamplesList"
+                                    Grid.Row="1"
+                                    HeightRequest="276">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid
+                                                Padding="16,9"
+                                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                                ColumnDefinitions="*,*,*">
+                                                <Label
+                                                    FontFamily="{StaticResource FontMono}"
+                                                    FontSize="11"
+                                                    Text="{Binding IndexText}"
+                                                    TextColor="{StaticResource OnSurfaceVariant}" />
+                                                <Label
+                                                    Grid.Column="1"
+                                                    FontFamily="{StaticResource FontMono}"
+                                                    FontSize="11"
+                                                    HorizontalTextAlignment="End"
+                                                    Text="{Binding TrimText}"
+                                                    TextColor="{StaticResource ChartTrim}" />
+                                                <Label
+                                                    Grid.Column="2"
+                                                    FontFamily="{StaticResource FontMono}"
+                                                    FontSize="11"
+                                                    HorizontalTextAlignment="End"
+                                                    Text="{Binding RollText}"
+                                                    TextColor="{StaticResource ChartRoll}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <Label
+                                    x:Name="RawFooterLabel"
+                                    Grid.Row="2"
+                                    Padding="8"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="9"
+                                    HorizontalTextAlignment="Center"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    CharacterSpacing="0.8" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!--  FILTROS  -->
+        <Grid
+            x:Name="FilterOverlay"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="20">
+            <BoxView BackgroundColor="Transparent">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnFilterDismissed" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+            <Border
+                Margin="16"
+                Padding="20"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                StrokeShape="RoundRectangle 20"
+                StrokeThickness="0"
+                VerticalOptions="End">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label
+                            FontFamily="{StaticResource FontDisplay}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Text="Filtrar relatórios"
+                            TextColor="{StaticResource OnSurface}" />
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="20"
+                            Text="{x:Static icons:MaterialOutlined.Close}"
+                            TextColor="{StaticResource OnSurfaceVariant}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFilterDismissed" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="10"
+                            Text="LOCALIZAÇÃO"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            CharacterSpacing="0.8" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLow}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Picker
+                                x:Name="LocationPicker"
+                                HeightRequest="48"
+                                ItemsSource="{Binding Locations}"
+                                SelectedItem="{Binding SelectedLocation, Mode=TwoWay}"
+                                Title="Todas as localizações" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="10"
+                            Text="DATA DA MEDIÇÃO"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            CharacterSpacing="0.8" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLow}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Entry
+                                HeightRequest="48"
+                                Placeholder="Ex: 05/11/2026"
+                                Text="{Binding DateFilter, Mode=TwoWay}"
+                                FontSize="14" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="10"
+                            Text="TEMPO GRAVADO (DURAÇÃO)"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            CharacterSpacing="0.8" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLow}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Picker
+                                HeightRequest="48"
+                                ItemsSource="{Binding Durations}"
+                                SelectedItem="{Binding SelectedDuration, Mode=TwoWay}"
+                                Title="Qualquer duração" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border
+                            Padding="0"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnResetFiltersTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,13"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Limpar"
+                                TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border
+                            Grid.Column="1"
+                            Padding="0"
+                            BackgroundColor="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFilterDismissed" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,13"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Aplicar"
+                                TextColor="{StaticResource OnPrimary}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!--  OPÇÕES  -->
+        <Grid
+            x:Name="OptionsOverlay"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="30">
+            <BoxView BackgroundColor="Transparent">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnOptionsDismissed" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+            <Border
+                Margin="16"
+                Padding="16"
+                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                StrokeShape="RoundRectangle 16"
+                StrokeThickness="0"
+                VerticalOptions="End">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label
+                            FontFamily="{StaticResource FontDisplay}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Text="Opções do Relatório"
+                            TextColor="{StaticResource OnSurface}" />
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="18"
+                            Text="{x:Static icons:MaterialOutlined.Close}"
+                            TextColor="{StaticResource OnSurfaceVariant}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnOptionsDismissed" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <Border
+                        Padding="16,12"
+                        BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 8"
+                        StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnExportPdfTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="22"
+                                Text="{x:Static icons:MaterialOutlined.Picture_as_pdf}"
+                                TextColor="{StaticResource Primary}" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    Text="Exportar PDF"
+                                    TextColor="{StaticResource OnSurface}" />
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="12"
+                                    Text="Gerar laudo oficial de estabilidade"
+                                    TextColor="{StaticResource OnSurfaceVariant}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        Padding="16,12"
+                        BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 8"
+                        StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDeleteTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="22"
+                                Text="{x:Static icons:MaterialOutlined.Delete}"
+                                TextColor="{StaticResource Error}" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    Text="Excluir"
+                                    TextColor="{StaticResource Error}" />
+                                <Label
+                                    FontFamily="{StaticResource FontBody}"
+                                    FontSize="12"
+                                    Text="Remover registro de telemetria"
+                                    TextColor="#ccffb4ab" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!--  CONFIRMAR EXCLUSÃO  -->
+        <Grid
+            x:Name="DeleteOverlay"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="40">
+            <Border
+                Margin="16"
+                Padding="24"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                StrokeShape="RoundRectangle 24"
+                StrokeThickness="0"
+                VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Border
+                        HeightRequest="40"
+                        BackgroundColor="{StaticResource ErrorContainer}"
+                        HorizontalOptions="Start"
+                        StrokeShape="RoundRectangle 999"
+                        StrokeThickness="0"
+                        WidthRequest="40">
+                        <Label
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="24"
+                            HorizontalOptions="Center"
+                            Text="{x:Static icons:MaterialOutlined.Warning}"
+                            TextColor="{StaticResource Error}"
+                            VerticalOptions="Center" />
+                    </Border>
+                    <Label
+                        FontFamily="{StaticResource FontDisplay}"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        Text="Excluir relatório?"
+                        TextColor="{StaticResource OnSurface}" />
+                    <Label
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        Text="Esta ação não pode ser desfeita."
+                        TextColor="{StaticResource OnSurfaceVariant}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Border
+                            Padding="0"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDeleteDismissed" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,14"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Voltar"
+                                TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border
+                            Grid.Column="1"
+                            Padding="0"
+                            BackgroundColor="{StaticResource ErrorContainer}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDeleteConfirmed" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                Padding="0,14"
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Excluir"
+                                TextColor="{StaticResource Error}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!--  TOAST  -->
+        <Border
+            x:Name="Toast"
+            Margin="24,20,24,0"
+            Padding="14,10"
+            BackgroundColor="{StaticResource Primary}"
+            HorizontalOptions="Center"
+            IsVisible="False"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Start"
+            ZIndex="50">
+            <HorizontalStackLayout Spacing="6">
+                <Label
+                    x:Name="ToastIcon"
+                    FontFamily="{StaticResource FontIcons}"
+                    FontSize="18"
+                    Text="{x:Static icons:MaterialOutlined.Check_circle}"
+                    TextColor="{StaticResource OnPrimary}"
+                    VerticalOptions="Center" />
+                <Label
+                    x:Name="ToastLabel"
+                    FontFamily="{StaticResource FontBody}"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource OnPrimary}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

@@ -107,16 +107,18 @@
   margin-top: 2px;
 }
 
-/* ---- Gráficos ---- */
-
-.rep-charts {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+.rep-angle__caption {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
+/* ---- Gráfico Trim × Roll ---- */
+
 .rep-chart {
+  margin-top: 12px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -137,10 +139,69 @@
   letter-spacing: 0.06em;
 }
 
-.rep-chart__value {
+.rep-chart .line-chart {
+  height: 150px;
+}
+
+/* ---- Dados brutos ---- */
+
+.rep-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 2px 12px;
+}
+
+.rep-section-head .rel-section {
+  margin: 0;
+}
+
+.rep-raw__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rep-raw {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rep-raw__row {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
   font-size: 13px;
-  font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+
+.rep-raw__row + .rep-raw__row {
+  border-top: 1px solid var(--border);
+}
+
+.rep-raw__head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background: var(--bg-elevated);
+}
+
+.rep-raw__n {
+  color: var(--text-muted);
+}
+
+.rep-raw__list {
+  max-height: 240px;
+  overflow-y: auto;
 }
 
 /* ---- Medidas ---- */
