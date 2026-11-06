@@ -3,13 +3,49 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Material/UraniumUI compatibility keys -->
+    <!-- UraniumUI / Material 3 Dark Palette tokens -->
+    <Color x:Key="Background">#0e141b</Color>
+    <Color x:Key="OnBackground">#dde3ed</Color>
+
+    <Color x:Key="Surface">#0e141b</Color>
+    <Color x:Key="SurfaceDim">#0e141b</Color>
+    <Color x:Key="SurfaceBright">#343a42</Color>
+    <Color x:Key="SurfaceContainerLowest">#090f16</Color>
+    <Color x:Key="SurfaceContainerLow">#161c23</Color>
+    <Color x:Key="SurfaceContainer">#1a2027</Color>
+    <Color x:Key="SurfaceContainerHigh">#252a32</Color>
+    <Color x:Key="SurfaceContainerHighest">#2f353d</Color>
+    <Color x:Key="SurfaceVariant">#2f353d</Color>
+    <Color x:Key="OnSurface">#dde3ed</Color>
+    <Color x:Key="OnSurfaceVariant">#bacac9</Color>
+
     <Color x:Key="Primary">#48efef</Color>
+    <Color x:Key="OnPrimary">#003737</Color>
+    <Color x:Key="PrimaryContainer">#00d2d3</Color>
+    <Color x:Key="OnPrimaryContainer">#005556</Color>
     <Color x:Key="PrimaryDark">#26dcdd</Color>
     <Color x:Key="PrimaryDarkText">#002020</Color>
+
     <Color x:Key="Secondary">#89ceff</Color>
+    <Color x:Key="OnSecondary">#00344d</Color>
+    <Color x:Key="SecondaryContainer">#00a2e6</Color>
+    <Color x:Key="OnSecondaryContainer">#00344e</Color>
     <Color x:Key="SecondaryDarkText">#00344d</Color>
-    <Color x:Key="Tertiary">#ffab32</Color>
+
+    <Color x:Key="Tertiary">#ffd09b</Color>
+    <Color x:Key="OnTertiary">#472a00</Color>
+    <Color x:Key="TertiaryContainer">#ffab32</Color>
+    <Color x:Key="OnTertiaryContainer">#6c4300</Color>
+
+    <Color x:Key="Error">#ffb4ab</Color>
+    <Color x:Key="OnError">#690005</Color>
+    <Color x:Key="ErrorContainer">#93000a</Color>
+    <Color x:Key="OnErrorContainer">#ffdad6</Color>
+
+    <Color x:Key="Outline">#859493</Color>
+    <Color x:Key="OutlineVariant">#3b4949</Color>
+
+    <!-- Legacy / compatibility aliases -->
     <Color x:Key="White">#ffffff</Color>
     <Color x:Key="Black">#000000</Color>
     <Color x:Key="Magenta">#d600aa</Color>

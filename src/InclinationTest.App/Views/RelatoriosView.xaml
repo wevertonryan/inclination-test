@@ -6,7 +6,8 @@
     xmlns:controls="clr-namespace:InclinationTest.App.Controls"
     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
     xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout"
+    BackgroundColor="{StaticResource Surface}">
 
     <ContentView.Resources>
         <converters:InverseBoolConverter x:Key="InverseBool" />

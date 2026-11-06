@@ -19,6 +19,7 @@ public sealed class CollapsibleTabView : TabView
 
     public CollapsibleTabView()
     {
+        BackgroundColor = Color.FromArgb("#0e141b");
         IsClippedToBounds = true;
         SizeChanged += OnSizeChanged;
     }

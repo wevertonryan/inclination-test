@@ -8,7 +8,8 @@
     xmlns:converters="clr-namespace:InclinationTest.App.Converters"
     xmlns:features="clr-namespace:InclinationTest.App.Components.Features"
     xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout">
+    xmlns:layout="clr-namespace:InclinationTest.App.Components.Layout"
+    BackgroundColor="{StaticResource Surface}">
 
     <ContentView.Resources>
         <converters:ElapsedMsToTimerConverter x:Key="Timer" />
@@ -98,6 +99,7 @@
 
                     <controls:InclinometerControl
                         x:Name="Gauge"
+                        BackgroundColor="Transparent"
                         HorizontalOptions="Center"
                         Roll="{Binding Roll}"
                         Size="300"

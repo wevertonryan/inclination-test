@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- ===== Stitch design tokens ===== -->
+    <Color x:Key="Background">#0e141b</Color>
+    <Color x:Key="OnBackground">#dde3ed</Color>
     <Color x:Key="Surface">#0e141b</Color>
     <Color x:Key="SurfaceDim">#0e141b</Color>
     <Color x:Key="SurfaceBright">#343a42</Color>

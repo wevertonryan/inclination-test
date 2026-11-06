@@ -4,11 +4,14 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     FlyoutBehavior="Disabled"
-    Shell.NavBarIsVisible="False">
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{StaticResource Surface}"
+    Shell.BackgroundColor="{StaticResource Surface}">
 
     <ShellContent
         x:Name="MainContent"
         Route="main"
-        Title="Inclination Test" />
+        Title="Inclination Test"
+        BackgroundColor="{StaticResource Surface}" />
 
 </Shell>
