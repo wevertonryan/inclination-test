@@ -283,7 +283,7 @@
                                         FontFamily="{StaticResource FontIcons}"
                                         FontSize="20"
                                         HorizontalOptions="Center"
-                                        Text="{x:Static icons:MaterialOutlined.Cloud_queue}"
+                                        Text="{x:Static icons:MaterialOutlined.Cloud_off}"
                                         TextColor="{StaticResource Primary}"
                                         VerticalOptions="Center" />
                                 </Border>

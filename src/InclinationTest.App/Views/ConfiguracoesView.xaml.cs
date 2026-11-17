@@ -41,7 +41,7 @@ public partial class ConfiguracoesView : ContentView
         }
         else
         {
-            CloudStatusIcon.Text = MaterialOutlined.Cloud_queue;
+            CloudStatusIcon.Text = MaterialOutlined.Cloud_off;
             CloudStatusIcon.TextColor = ResourceColor("Outline", "#859493");
             CloudAccountLabel.Text = "Modo Local (Offline) — Login opcional";
             CloudAccountLabel.TextColor = ResourceColor("OnSurfaceVariant", "#bacac9");
