@@ -199,7 +199,7 @@ public sealed class CloudSyncService : ICloudSyncService
             else
             {
                 // Simulação nativa de nuvem de alta confiabilidade com confirmação de payload
-                await Task.Delay(50);
+                await Task.CompletedTask;
             }
 
             lock (_syncedIds)
@@ -209,7 +209,8 @@ public sealed class CloudSyncService : ICloudSyncService
             }
 
             SyncCompleted?.Invoke(this, recordingId);
-            return new CloudSyncResult(true, recordingId, RemoteId: $"cloud_{recordingId[..8]}");
+            var suffix = recordingId.Length > 8 ? recordingId[..8] : recordingId;
+            return new CloudSyncResult(true, recordingId, RemoteId: $"cloud_{suffix}");
         }
         catch (Exception ex)
         {
