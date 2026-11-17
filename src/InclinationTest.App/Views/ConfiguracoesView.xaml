@@ -253,6 +253,172 @@
                     </Border>
                 </VerticalStackLayout>
 
+                <!-- SEÇÃO: NUVEM E SINCRONIZAÇÃO (LOGIN OPCIONAL) -->
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        FontFamily="{StaticResource FontMono}"
+                        FontSize="11"
+                        FontAttributes="Bold"
+                        Text="NUVEM E SINCRONIZAÇÃO (LOGIN OPCIONAL)"
+                        TextColor="{StaticResource Primary}"
+                        CharacterSpacing="1.2" />
+
+                    <Border
+                        Padding="16"
+                        BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16">
+                        <VerticalStackLayout Spacing="14">
+                            <!-- Status da Conta -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <Border
+                                    HeightRequest="36"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="36">
+                                    <Label
+                                        x:Name="CloudStatusIcon"
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Cloud_queue}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        Text="Status da Nuvem"
+                                        TextColor="{StaticResource OnSurface}" />
+                                    <Label
+                                        x:Name="CloudAccountLabel"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="11"
+                                        Text="Modo Local (Offline) — Login opcional"
+                                        TextColor="{StaticResource OnSurfaceVariant}" />
+                                </VerticalStackLayout>
+                                <Border
+                                    x:Name="CloudAuthActionBorder"
+                                    Grid.Column="2"
+                                    Padding="12,6"
+                                    BackgroundColor="{StaticResource PrimaryContainer}"
+                                    StrokeShape="RoundRectangle 999"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnAuthActionTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label
+                                        x:Name="CloudAuthActionLabel"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        Text="CONECTAR"
+                                        TextColor="{StaticResource OnPrimaryContainer}"
+                                        CharacterSpacing="0.8" />
+                                </Border>
+                            </Grid>
+
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource OutlineVariant}" />
+
+                            <!-- Sincronização Automática -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <Border
+                                    HeightRequest="36"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="36">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Sync}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        Text="Sincronização automática"
+                                        TextColor="{StaticResource OnSurface}" />
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="11"
+                                        Text="Salva medições na nuvem automaticamente"
+                                        TextColor="{StaticResource OnSurfaceVariant}" />
+                                </VerticalStackLayout>
+                                <Switch
+                                    x:Name="AutoSyncSwitch"
+                                    Grid.Column="2"
+                                    IsToggled="True"
+                                    Toggled="OnAutoSyncToggled"
+                                    VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource OutlineVariant}" />
+
+                            <!-- Sincronização Manual -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <Border
+                                    HeightRequest="36"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center"
+                                    WidthRequest="36">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="20"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Cloud_upload}"
+                                        TextColor="{StaticResource Secondary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        Text="Backup em nuvem agora"
+                                        TextColor="{StaticResource OnSurface}" />
+                                    <Label
+                                        x:Name="SyncCountLabel"
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="11"
+                                        Text="Toque para sincronizar relatórios pendentes"
+                                        TextColor="{StaticResource OnSurfaceVariant}" />
+                                </VerticalStackLayout>
+                                <Border
+                                    Grid.Column="2"
+                                    Padding="12,6"
+                                    BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                    StrokeShape="RoundRectangle 999"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnSyncNowTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label
+                                        FontFamily="{StaticResource FontMono}"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        Text="SINCRONIZAR"
+                                        TextColor="{StaticResource Primary}"
+                                        CharacterSpacing="0.8" />
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
                 <!-- SEÇÃO: SOBRE O SISTEMA -->
                 <VerticalStackLayout Spacing="8">
                     <Label
@@ -295,6 +461,160 @@
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- MODAL DE LOGIN / CADASTRO OPCIONAL -->
+        <Grid
+            x:Name="LoginOverlay"
+            BackgroundColor="{StaticResource Scrim}"
+            IsVisible="False"
+            ZIndex="30">
+            <BoxView BackgroundColor="Transparent">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseLoginTapped" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <Border
+                Margin="20"
+                Padding="24"
+                BackgroundColor="{StaticResource SurfaceContainer}"
+                MaximumWidthRequest="420"
+                StrokeShape="RoundRectangle 24"
+                StrokeThickness="0"
+                VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                            HeightRequest="36"
+                            BackgroundColor="#3348efef"
+                            StrokeShape="RoundRectangle 999"
+                            StrokeThickness="0"
+                            WidthRequest="36">
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="20"
+                                HorizontalOptions="Center"
+                                Text="{x:Static icons:MaterialOutlined.Cloud_done}"
+                                TextColor="{StaticResource Primary}"
+                                VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource FontDisplay}"
+                                FontSize="17"
+                                FontAttributes="Bold"
+                                Text="Nuvem de Telemetria"
+                                TextColor="{StaticResource OnSurface}" />
+                            <Label
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                Text="LOGIN OPCIONAL • MODO OFFLINE SEGURO"
+                                TextColor="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                        <Label
+                            Grid.Column="2"
+                            FontFamily="{StaticResource FontIcons}"
+                            FontSize="22"
+                            Text="{x:Static icons:MaterialOutlined.Close}"
+                            TextColor="{StaticResource OnSurfaceVariant}"
+                            VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCloseLoginTapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <Label
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        LineHeight="1.35"
+                        Text="O uso da nuvem é opcional. Seus dados permanecem salvos no dispositivo mesmo sem conta. Conecte-se para backup remoto e compartilhamento."
+                        TextColor="{StaticResource OnSurfaceVariant}" />
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="12"
+                            Text="E-mail"
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Entry
+                                x:Name="EmailEntry"
+                                HeightRequest="46"
+                                Keyboard="Email"
+                                Placeholder="capitao@embarcacao.com" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="12"
+                            Text="Senha"
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Entry
+                                x:Name="PasswordEntry"
+                                HeightRequest="46"
+                                IsPassword="True"
+                                Placeholder="••••••••" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Label
+                        x:Name="LoginErrorLabel"
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        IsVisible="False"
+                        TextColor="{StaticResource Error}" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                        <Border
+                            Padding="0,14"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCloseLoginTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Ficar Offline"
+                                TextColor="{StaticResource OnSurface}" />
+                        </Border>
+
+                        <Border
+                            Grid.Column="1"
+                            Padding="0,14"
+                            BackgroundColor="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSubmitLoginTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                FontFamily="{StaticResource FontBody}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                Text="Entrar / Conectar"
+                                TextColor="{StaticResource OnPrimary}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 
 </ContentView>

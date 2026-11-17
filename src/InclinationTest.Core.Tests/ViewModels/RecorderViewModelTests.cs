@@ -306,6 +306,20 @@ public class RecorderViewModelTests
     }
 
     [Fact]
+    public void Confirm_WhenConfirmationNoneAndRecording_SavesSession()
+    {
+        var (viewModel, session, _, _) = Create();
+        viewModel.Record();
+        viewModel.Title = "Teste Direto";
+
+        viewModel.Confirm();
+
+        session.SaveCount.Should().Be(1);
+        session.LastTitle.Should().Be("Teste Direto");
+        viewModel.Mode.Should().Be(RecorderMode.Idle);
+    }
+
+    [Fact]
     public void ConfirmSave_ReturnsToIdle()
     {
         var (viewModel, _, _, _) = Create();

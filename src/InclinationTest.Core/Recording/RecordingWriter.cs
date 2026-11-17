@@ -1,4 +1,5 @@
 using InclinationTest.Core.Persistence;
+using InclinationTest.Core.Services;
 
 namespace InclinationTest.Core.Recording;
 
@@ -7,15 +8,21 @@ public sealed class RecordingWriter : IDisposable
     private readonly IRecordingSession _session;
     private readonly IReportRepository _repository;
     private readonly ISerialExecutor _executor;
+    private readonly ICloudSyncService? _cloudSync;
 
     private bool _finished;
     private bool _disposed;
 
-    public RecordingWriter(IRecordingSession session, IReportRepository repository, ISerialExecutor executor)
+    public RecordingWriter(
+        IRecordingSession session,
+        IReportRepository repository,
+        ISerialExecutor executor,
+        ICloudSyncService? cloudSync = null)
     {
         _session = session;
         _repository = repository;
         _executor = executor;
+        _cloudSync = cloudSync;
 
         _session.Started += OnStarted;
         _session.BatchReady += OnBatchReady;
@@ -74,6 +81,19 @@ public sealed class RecordingWriter : IDisposable
             {
                 _repository.SaveRecording(id, finished.Title ?? string.Empty, finished.Summary, finished.TimestampMs);
                 Saved?.Invoke(id);
+
+                if (_cloudSync != null && _cloudSync.AutoSyncEnabled)
+                {
+                    try
+                    {
+                        var samples = _repository.ReadSamples(id);
+                        _ = _cloudSync.SyncRecordingAsync(id, finished.Title ?? string.Empty, finished.Summary, samples);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[RecordingWriter] Cloud sync failed: {ex}");
+                    }
+                }
             });
         }
         else

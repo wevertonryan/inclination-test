@@ -270,23 +270,54 @@
                     </Border>
                 </layout:ScreenHeader.LeftContent>
                 <layout:ScreenHeader.RightContent>
-                    <Border
-                        HeightRequest="40"
-                        BackgroundColor="Transparent"
-                        StrokeShape="RoundRectangle 999"
-                        StrokeThickness="0"
-                        WidthRequest="40">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnOptionsTapped" />
-                        </Border.GestureRecognizers>
-                        <Label
-                            FontFamily="{StaticResource FontIcons}"
-                            FontSize="22"
-                            HorizontalOptions="Center"
-                            Text="{x:Static icons:MaterialOutlined.More_vert}"
-                            TextColor="{StaticResource OnSurface}"
-                            VerticalOptions="Center" />
-                    </Border>
+                    <HorizontalStackLayout Spacing="6">
+                        <Border
+                            HeightRequest="36"
+                            Padding="10,0"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 999"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnExportPdfTapped" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                <Label
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="16"
+                                    HorizontalOptions="Center"
+                                    Text="{x:Static icons:MaterialOutlined.Picture_as_pdf}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="11"
+                                    FontAttributes="Bold"
+                                    Text="PDF"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border
+                            HeightRequest="40"
+                            BackgroundColor="Transparent"
+                            StrokeShape="RoundRectangle 999"
+                            StrokeThickness="0"
+                            VerticalOptions="Center"
+                            WidthRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnOptionsTapped" />
+                            </Border.GestureRecognizers>
+                            <Label
+                                FontFamily="{StaticResource FontIcons}"
+                                FontSize="22"
+                                HorizontalOptions="Center"
+                                Text="{x:Static icons:MaterialOutlined.More_vert}"
+                                TextColor="{StaticResource OnSurface}"
+                                VerticalOptions="Center" />
+                        </Border>
+                    </HorizontalStackLayout>
                 </layout:ScreenHeader.RightContent>
             </layout:ScreenHeader>
 
@@ -839,6 +870,55 @@
                                     HorizontalTextAlignment="Center"
                                     TextColor="{StaticResource OnSurfaceVariant}"
                                     CharacterSpacing="0.8" />
+                            </Grid>
+                        </Border>
+
+                        <!-- BOTÃO DE EXPORTAR PDF EM DESTAQUE -->
+                        <Border
+                            Margin="0,8,0,0"
+                            Padding="16"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            Stroke="{StaticResource Primary}"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="1">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnExportPdfTapped" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <Border
+                                    HeightRequest="42"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="0"
+                                    WidthRequest="42">
+                                    <Label
+                                        FontFamily="{StaticResource FontIcons}"
+                                        FontSize="24"
+                                        HorizontalOptions="Center"
+                                        Text="{x:Static icons:MaterialOutlined.Picture_as_pdf}"
+                                        TextColor="{StaticResource OnPrimary}"
+                                        VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="{StaticResource FontDisplay}"
+                                        FontSize="15"
+                                        FontAttributes="Bold"
+                                        Text="Exportar Relatório PDF"
+                                        TextColor="{StaticResource OnSurface}" />
+                                    <Label
+                                        FontFamily="{StaticResource FontBody}"
+                                        FontSize="11"
+                                        Text="Gera documento A4 náutico completo com gráficos e estatísticas"
+                                        TextColor="{StaticResource OnSurfaceVariant}" />
+                                </VerticalStackLayout>
+                                <Label
+                                    Grid.Column="2"
+                                    FontFamily="{StaticResource FontIcons}"
+                                    FontSize="22"
+                                    Text="{x:Static icons:MaterialOutlined.Share}"
+                                    TextColor="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
                             </Grid>
                         </Border>
                     </VerticalStackLayout>

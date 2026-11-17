@@ -60,7 +60,14 @@ public sealed class ThreadSerialExecutor : ISerialExecutor
     {
         foreach (var work in _queue.GetConsumingEnumerable())
         {
-            work();
+            try
+            {
+                work();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ThreadSerialExecutor] Unhandled exception: {ex}");
+            }
         }
     }
 }

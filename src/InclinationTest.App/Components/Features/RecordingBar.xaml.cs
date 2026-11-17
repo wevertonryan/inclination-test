@@ -23,9 +23,16 @@ public partial class RecordingBar : ContentView
 
     private void OnSave(object? sender, TappedEventArgs e)
     {
-        // Gravando: confirma e salva imediatamente, parando a gravação
-        var recorder = BindingContext as InclinationTest.Core.ViewModels.RecorderViewModel;
-        recorder?.Confirm();
+        if (SaveRequested != null)
+        {
+            SaveRequested.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            var recorder = BindingContext as InclinationTest.Core.ViewModels.RecorderViewModel;
+            recorder?.RequestSave();
+            recorder?.Confirm();
+        }
     }
 
     private void OnToggle(object? sender, EventArgs e)

@@ -6,6 +6,7 @@ using InclinationTest.Core.Platform;
 using InclinationTest.Core.Processing;
 using InclinationTest.Core.Recording;
 using InclinationTest.Core.Sensors;
+using InclinationTest.Core.Services;
 using InclinationTest.Core.ViewModels;
 using LiveChartsCore.SkiaSharpView.Maui;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRecordingSession, RecordingSession>();
         builder.Services.AddSingleton<IReportStorage, AppDataReportStorage>();
         builder.Services.AddSingleton<IReportRepository, FileReportRepository>();
+        builder.Services.AddSingleton<IKeyValueStorage, MauiPreferencesKeyValueStorage>();
+        builder.Services.AddSingleton<ICloudSyncService, CloudSyncService>();
         builder.Services.AddSingleton<ReportsViewModel>();
         builder.Services.AddSingleton<RecordingWriter>();
         builder.Services.AddSingleton<RecorderViewModel>(provider =>

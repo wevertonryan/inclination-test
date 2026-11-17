@@ -185,6 +185,13 @@ public sealed class RecorderViewModel : ObservableObject
                 _session.Discard();
                 ResetToIdle();
                 break;
+            case ConfirmationRequest.None:
+                if (_mode != RecorderMode.Idle)
+                {
+                    _session.Save(_title);
+                    ResetToIdle();
+                }
+                break;
         }
     }
 

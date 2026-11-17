@@ -22,6 +22,22 @@ public static class PdfExportService
 
         GeneratePdf(filePath, report, samples);
 
+#if ANDROID
+        try
+        {
+            var publicDownloads = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads)?.AbsolutePath;
+            if (!string.IsNullOrEmpty(publicDownloads) && Directory.Exists(publicDownloads))
+            {
+                var destPath = Path.Combine(publicDownloads, fileName);
+                File.Copy(filePath, destPath, true);
+            }
+        }
+        catch
+        {
+            // Se restrito, o Share dialog padrão do MAUI cuidará do envio
+        }
+#endif
+
         await Share.Default.RequestAsync(new ShareFileRequest
         {
             Title = $"Relatório: {report.Title}",

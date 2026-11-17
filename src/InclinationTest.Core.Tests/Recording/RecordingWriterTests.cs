@@ -111,6 +111,23 @@ public class RecordingWriterTests
         repository.Calls.Should().Equal("create", "save");
     }
 
+    [Fact]
+    public void FinishedSaved_WhenCloudSyncEnabled_SyncsRecording()
+    {
+        var session = new FakeRecordingSession();
+        var repository = new SpyReportRepository();
+        var executor = new InlineSerialExecutor();
+        var cloudSync = new InclinationTest.Core.Services.CloudSyncService(new FakeKeyValueStorage());
+
+        using (new RecordingWriter(session, repository, executor, cloudSync))
+        {
+            session.Start(0);
+            session.Save("Teste Nuvem");
+        }
+
+        cloudSync.IsSynced(session.Id!).Should().BeTrue();
+    }
+
     private static (RecordingWriter Writer, FakeRecordingSession Session, SpyReportRepository Repository, InlineSerialExecutor Executor) Create()
     {
         var session = new FakeRecordingSession();
