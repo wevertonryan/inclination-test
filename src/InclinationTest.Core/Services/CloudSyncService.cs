@@ -169,17 +169,17 @@ public sealed class CloudSyncService : ICloudSyncService
                 sampleCount = summary.SampleCount,
                 roll = new
                 {
-                    mean = summary.Roll.Mean,
-                    min = summary.Roll.Min,
-                    max = summary.Roll.Max,
-                    stdDev = summary.Roll.StdDev
+                    mean = summary.MeanRoll,
+                    min = summary.MinRoll,
+                    max = summary.MaxRoll,
+                    stdDev = summary.StdRoll
                 },
                 trim = new
                 {
-                    mean = summary.Trim.Mean,
-                    min = summary.Trim.Min,
-                    max = summary.Trim.Max,
-                    stdDev = summary.Trim.StdDev
+                    mean = summary.MeanTrim,
+                    min = summary.MinTrim,
+                    max = summary.MaxTrim,
+                    stdDev = summary.StdTrim
                 },
                 sampleCountRecorded = samples.Count
             };
@@ -227,7 +227,7 @@ public sealed class CloudSyncService : ICloudSyncService
 
         foreach (var report in pending)
         {
-            var samples = repository.ReadSamples(report.Id);
+            var samples = repository.GetSamples(report.Id);
             var result = await SyncRecordingAsync(report.Id, report.Title, report.Summary ?? default, samples);
             if (result.Success)
             {

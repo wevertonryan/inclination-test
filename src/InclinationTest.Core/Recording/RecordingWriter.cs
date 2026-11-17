@@ -86,7 +86,7 @@ public sealed class RecordingWriter : IDisposable
                 {
                     try
                     {
-                        var samples = _repository.ReadSamples(id);
+                        var samples = _repository.GetSamples(id);
                         _ = _cloudSync.SyncRecordingAsync(id, finished.Title ?? string.Empty, finished.Summary, samples);
                     }
                     catch (Exception ex)

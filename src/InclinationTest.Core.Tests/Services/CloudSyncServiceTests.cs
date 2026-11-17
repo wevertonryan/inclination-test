@@ -77,7 +77,7 @@ public class CloudSyncServiceTests
             firedId = id;
         };
 
-        var summary = new RecordingSummary(1000, 10, default, default);
+        var summary = new RecordingSummary(1000, 10, 0, 0, 0, 0, 0, 0, 0, 0);
         var samples = new[] { new RecordedSample(0, 1.0, 0.5) };
 
         var result = await service.SyncRecordingAsync("rec123", "Ensaio Alpha", summary, samples);
@@ -98,11 +98,11 @@ public class CloudSyncServiceTests
 
         repo.CreateRecording("rec1", 0);
         repo.AppendSamples("rec1", new[] { new RecordedSample(0, 0.5, 0.2) });
-        repo.SaveRecording("rec1", "Ensaio 1", new RecordingSummary(1000, 1, default, default), 1000);
+        repo.SaveRecording("rec1", "Ensaio 1", new RecordingSummary(1000, 1, 0, 0, 0, 0, 0, 0, 0, 0), 1000);
 
         repo.CreateRecording("rec2", 1000);
         repo.AppendSamples("rec2", new[] { new RecordedSample(0, 1.5, 0.8) });
-        repo.SaveRecording("rec2", "Ensaio 2", new RecordingSummary(2000, 1, default, default), 2000);
+        repo.SaveRecording("rec2", "Ensaio 2", new RecordingSummary(2000, 1, 0, 0, 0, 0, 0, 0, 0, 0), 2000);
 
         var count = await service.SyncAllPendingAsync(repo);
 
