@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userprefs
+TestResults/
+*.cobertura.xml
+!src/InclinationTest.sln
+
+# Android
+*.apk
+*.aab
+*.keystore
+*.idsig
