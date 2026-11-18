@@ -8,7 +8,7 @@ namespace InclinationTest.Core.Services;
 
 public record CloudUser(string Id, string Email, string Name, DateTimeOffset LoggedInAt);
 
-public record CloudAuthResult(bool Success, string? ErrorMessage = null, CloudUser? User = null);
+public record CloudAuthResult(bool Success, string? ErrorMessage = null, CloudUser? User = null, string? Token = null);
 
 public record CloudSyncResult(bool Success, string RecordingId, string? RemoteId = null, string? ErrorMessage = null);
 
@@ -22,6 +22,7 @@ public interface ICloudSyncService
 
     Task<CloudAuthResult> LoginAsync(string email, string password);
     Task<CloudAuthResult> RegisterAsync(string email, string password, string name);
+    Task<string?> GetAuthTokenAsync();
     void Logout();
 
     Task<CloudSyncResult> SyncRecordingAsync(string recordingId, string title, RecordingSummary summary, IReadOnlyList<RecordedSample> samples);

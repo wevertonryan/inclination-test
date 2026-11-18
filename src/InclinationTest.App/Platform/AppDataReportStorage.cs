@@ -81,5 +81,20 @@ public sealed class AppDataReportStorage : IReportStorage
         }
     }
 
-    private string PathOf(string name) => Path.Combine(_root, name);
+    private string PathOf(string name)
+    {
+        var fileName = Path.GetFileName(name);
+        if (string.IsNullOrEmpty(fileName) || fileName != name)
+        {
+            throw new ArgumentException("Invalid file name: directory traversal is forbidden.", nameof(name));
+        }
+
+        var fullPath = Path.GetFullPath(Path.Combine(_root, fileName));
+        if (!fullPath.StartsWith(_root, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Access outside reports directory is forbidden.");
+        }
+
+        return fullPath;
+    }
 }

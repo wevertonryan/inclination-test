@@ -64,6 +64,26 @@ public class CloudSyncServiceTests
     }
 
     [Fact]
+    public async Task Login_WithSecureStorage_SavesTokenInSecureStorage()
+    {
+        var storage = new FakeKeyValueStorage();
+        var secureStorage = new FakeSecureStorageService();
+        var service = new CloudSyncService(storage, secureStorage);
+
+        var result = await service.LoginAsync("marinheiro@porto.com", "senha123");
+
+        result.Success.Should().BeTrue();
+        result.Token.Should().NotBeNullOrEmpty();
+
+        var storedToken = await service.GetAuthTokenAsync();
+        storedToken.Should().Be(result.Token);
+
+        service.Logout();
+        var tokenAfterLogout = await service.GetAuthTokenAsync();
+        tokenAfterLogout.Should().BeNull();
+    }
+
+    [Fact]
     public async Task SyncRecording_MarksAsSyncedAndFiresEvent()
     {
         var storage = new FakeKeyValueStorage();

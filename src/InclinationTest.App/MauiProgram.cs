@@ -61,6 +61,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IReportStorage, AppDataReportStorage>();
         builder.Services.AddSingleton<IReportRepository, FileReportRepository>();
         builder.Services.AddSingleton<IKeyValueStorage, MauiPreferencesKeyValueStorage>();
+        builder.Services.AddSingleton<ISecureStorageService, MauiSecureStorageService>();
         builder.Services.AddSingleton<ICloudSyncService, CloudSyncService>();
         builder.Services.AddSingleton<ReportsViewModel>();
         builder.Services.AddSingleton<RecordingWriter>();

@@ -17,17 +17,20 @@ public sealed class CloudSyncService : ICloudSyncService
     private const string KeyAutoSync = "cloud_auto_sync";
     private const string KeyEndpoint = "cloud_endpoint";
     private const string KeySyncedIds = "cloud_synced_ids";
+    private const string KeySecureToken = "cloud_auth_token_secure";
 
     private readonly IKeyValueStorage _storage;
+    private readonly ISecureStorageService? _secureStorage;
     private readonly HttpClient _http;
     private readonly HashSet<string> _syncedIds;
     private CloudUser? _currentUser;
     private bool _autoSyncEnabled;
     private string _endpoint;
 
-    public CloudSyncService(IKeyValueStorage storage, HttpClient? http = null)
+    public CloudSyncService(IKeyValueStorage storage, ISecureStorageService? secureStorage = null, HttpClient? http = null)
     {
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+        _secureStorage = secureStorage;
         _http = http ?? new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
 
         _autoSyncEnabled = _storage.Get(KeyAutoSync) != "false";
@@ -104,10 +107,15 @@ public sealed class CloudSyncService : ICloudSyncService
             Name: name,
             LoggedInAt: DateTimeOffset.UtcNow);
 
+        var token = $"eyNaval.{Guid.NewGuid():N}.{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
         _storage.Set(KeyUser, JsonSerializer.Serialize(_currentUser));
+        if (_secureStorage != null)
+        {
+            await _secureStorage.SetAsync(KeySecureToken, token);
+        }
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
 
-        return new CloudAuthResult(true, User: _currentUser);
+        return new CloudAuthResult(true, User: _currentUser, Token: token);
     }
 
     public async Task<CloudAuthResult> RegisterAsync(string email, string password, string name)
@@ -132,16 +140,28 @@ public sealed class CloudSyncService : ICloudSyncService
             Name: displayName,
             LoggedInAt: DateTimeOffset.UtcNow);
 
+        var token = $"eyNaval.{Guid.NewGuid():N}.{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
         _storage.Set(KeyUser, JsonSerializer.Serialize(_currentUser));
+        if (_secureStorage != null)
+        {
+            await _secureStorage.SetAsync(KeySecureToken, token);
+        }
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
 
-        return new CloudAuthResult(true, User: _currentUser);
+        return new CloudAuthResult(true, User: _currentUser, Token: token);
+    }
+
+    public async Task<string?> GetAuthTokenAsync()
+    {
+        if (_secureStorage == null) return null;
+        return await _secureStorage.GetAsync(KeySecureToken);
     }
 
     public void Logout()
     {
         _currentUser = null;
         _storage.Remove(KeyUser);
+        _ = _secureStorage?.RemoveAsync(KeySecureToken);
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -184,11 +204,20 @@ public sealed class CloudSyncService : ICloudSyncService
                 sampleCountRecorded = samples.Count
             };
 
-            // Se for endpoint HTTP externo válido, tenta requisição REST
+            // Se for endpoint HTTPS externo válido, realiza requisição REST segura
             if (Uri.TryCreate(_endpoint, UriKind.Absolute, out var uri) &&
-                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) &&
+                uri.Scheme == Uri.UriSchemeHttps &&
                 !_endpoint.Contains("marine-cloud.com"))
             {
+                if (_secureStorage != null)
+                {
+                    var token = await _secureStorage.GetAsync(KeySecureToken);
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    }
+                }
+
                 var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
                 var response = await _http.PostAsync(_endpoint, content);
                 if (!response.IsSuccessStatusCode)
