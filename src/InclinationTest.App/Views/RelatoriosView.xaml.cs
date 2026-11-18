@@ -108,13 +108,13 @@ public partial class RelatoriosView : ContentView
 
         try
         {
-            ShowToast("Gerando PDF...", ToastKind.Info);
+            ShowToast("Gerando PDF e CSV...", ToastKind.Info);
             await PdfExportService.ExportAndShareAsync(_viewModel.Selected, _viewModel.SelectedSamples);
-            ShowToast("PDF exportado com sucesso!", ToastKind.Success);
+            ShowToast("PDF e CSV exportados com sucesso!", ToastKind.Success);
         }
         catch (Exception ex)
         {
-            ShowToast($"Falha ao exportar PDF: {ex.Message}", ToastKind.Error);
+            ShowToast($"Falha ao exportar: {ex.Message}", ToastKind.Error);
         }
     }
 
@@ -127,6 +127,7 @@ public partial class RelatoriosView : ContentView
     private void ApplyGaugeValuesFromViewModel()
     {
         if (RangeGauge is null) return;
+        RangeGauge.IsRoll = _viewModel.IsRollSelected;
         RangeGauge.MinValue = _viewModel.MinValue;
         RangeGauge.MaxValue = _viewModel.MaxValue;
     }

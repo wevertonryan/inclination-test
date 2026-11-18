@@ -36,7 +36,7 @@ public partial class MainPage : ContentPage
         AddTab(home, "Medição", MaterialOutlined.Explore);
         AddTab(calibragem, "Calibragem", MaterialOutlined.Straighten);
         _relatoriosTab = AddTab(relatorios, "Relatórios", MaterialOutlined.Description);
-        AddTab(configuracoes, "Ajustes", MaterialOutlined.Settings);
+        AddTab(configuracoes, "Conta", MaterialOutlined.Person);
 
         MainTabView.SizeChanged += OnTabViewSizeChanged;
 

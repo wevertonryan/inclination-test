@@ -15,7 +15,8 @@ public sealed class RangeGaugeControl : SKCanvasView
     private const float SpanDegrees = 75f;
 
     private static readonly SKColor Track = SKColor.Parse("#2f353d");
-    private static readonly SKColor Active = SKColor.Parse("#00d2d3");
+    private static readonly SKColor ActiveRoll = SKColor.Parse("#ffab32");
+    private static readonly SKColor ActiveTrim = SKColor.Parse("#00d2d3");
     private static readonly SKColor Min = SKColor.Parse("#89ceff");
     private static readonly SKColor Max = SKColor.Parse("#ffd09b");
     private static readonly SKColor Zero = SKColor.Parse("#48efef");
@@ -31,6 +32,9 @@ public sealed class RangeGaugeControl : SKCanvasView
     public static readonly BindableProperty MaxValueProperty = BindableProperty.Create(
         nameof(MaxValue), typeof(double), typeof(RangeGaugeControl), 0d, propertyChanged: OnValueChanged);
 
+    public static readonly BindableProperty IsRollProperty = BindableProperty.Create(
+        nameof(IsRoll), typeof(bool), typeof(RangeGaugeControl), true, propertyChanged: OnValueChanged);
+
     public double MinValue
     {
         get => (double)GetValue(MinValueProperty);
@@ -41,6 +45,12 @@ public sealed class RangeGaugeControl : SKCanvasView
     {
         get => (double)GetValue(MaxValueProperty);
         set => SetValue(MaxValueProperty, value);
+    }
+
+    public bool IsRoll
+    {
+        get => (bool)GetValue(IsRollProperty);
+        set => SetValue(IsRollProperty, value);
     }
 
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
@@ -66,7 +76,7 @@ public sealed class RangeGaugeControl : SKCanvasView
         canvas.DrawPath(BuildArc(-magnitude, magnitude), _stroke);
 
         _stroke.StrokeWidth = 12f;
-        _stroke.Color = Active;
+        _stroke.Color = IsRoll ? ActiveRoll : ActiveTrim;
         canvas.DrawPath(BuildArc(min, max), _stroke);
 
         _stroke.StrokeWidth = 2f;
