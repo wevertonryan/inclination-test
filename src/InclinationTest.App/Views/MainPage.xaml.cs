@@ -1,5 +1,8 @@
 using System.ComponentModel;
+using System.Threading.Tasks;
+using InclinationTest.Core.Persistence;
 using InclinationTest.Core.Recording;
+using InclinationTest.Core.Services;
 using InclinationTest.Core.ViewModels;
 using Microsoft.Maui.ApplicationModel;
 using UraniumUI.Icons.MaterialSymbols;
@@ -12,6 +15,8 @@ public partial class MainPage : ContentPage
     private readonly RecorderViewModel _recorder;
     private readonly ReportsViewModel _reports;
     private readonly RecordingWriter _writer;
+    private readonly ICloudSyncService _cloudSync;
+    private readonly IReportRepository _repository;
     private TabItem _relatoriosTab;
 
     public MainPage(
@@ -21,13 +26,17 @@ public partial class MainPage : ContentPage
         HomeView home,
         CalibragemView calibragem,
         RelatoriosView relatorios,
-        ConfiguracoesView configuracoes)
+        ConfiguracoesView configuracoes,
+        ICloudSyncService cloudSync,
+        IReportRepository repository)
     {
         InitializeComponent();
 
         _recorder = recorder;
         _reports = reports;
         _writer = writer;
+        _cloudSync = cloudSync;
+        _repository = repository;
 
         BindingContext = recorder;
 
@@ -51,6 +60,26 @@ public partial class MainPage : ContentPage
         {
             _reports.Refresh();
             MainTabView.SelectedTab = _relatoriosTab;
+
+            if (_cloudSync.AutoSyncEnabled)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var report = _repository.GetReport(recordingId);
+                        if (report != null)
+                        {
+                            var samples = _repository.GetSamples(recordingId);
+                            await _cloudSync.SyncRecordingAsync(recordingId, report.Title, report.Summary ?? default, samples);
+                        }
+                    }
+                    catch
+                    {
+                        // Sincronização automática em segundo plano não interrompe o operador
+                    }
+                });
+            }
         });
 
     private void OnTabViewSizeChanged(object? sender, EventArgs e)

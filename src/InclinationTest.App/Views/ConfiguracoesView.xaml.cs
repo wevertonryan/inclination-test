@@ -13,6 +13,7 @@ public partial class ConfiguracoesView : ContentView
 {
     private readonly ICloudSyncService _cloudSync;
     private readonly IReportRepository _repository;
+    private bool _isRegisterMode;
 
     public ConfiguracoesView(ICloudSyncService cloudSync, IReportRepository repository)
     {
@@ -33,7 +34,11 @@ public partial class ConfiguracoesView : ContentView
         {
             CloudStatusIcon.Text = MaterialOutlined.Cloud_done;
             CloudStatusIcon.TextColor = ResourceColor("Primary", "#48efef");
-            CloudAccountLabel.Text = $"Conectado: {_cloudSync.CurrentUser?.Email}";
+            var userName = _cloudSync.CurrentUser?.Name;
+            var email = _cloudSync.CurrentUser?.Email;
+            CloudAccountLabel.Text = !string.IsNullOrWhiteSpace(userName)
+                ? $"Conectado: {userName} ({email})"
+                : $"Conectado: {email}";
             CloudAccountLabel.TextColor = ResourceColor("Primary", "#48efef");
             CloudAuthActionLabel.Text = "DESCONECTAR";
             CloudAuthActionLabel.TextColor = ResourceColor("Error", "#ffb4ab");
@@ -53,7 +58,7 @@ public partial class ConfiguracoesView : ContentView
         AutoSyncSwitch.IsToggled = _cloudSync.AutoSyncEnabled;
         var count = _cloudSync.SyncedRecordingIds.Count;
         SyncCountLabel.Text = count > 0
-            ? $"{count} medições sincronizadas na nuvem"
+            ? $"{count} medições sincronizadas na nuvem Supabase"
             : "Nenhuma medição sincronizada ainda";
     }
 
@@ -66,13 +71,57 @@ public partial class ConfiguracoesView : ContentView
         }
         else
         {
+            SetAuthMode(false);
             EmailEntry.Text = string.Empty;
             PasswordEntry.Text = string.Empty;
+            NameEntry.Text = string.Empty;
             LoginErrorLabel.IsVisible = false;
             LoginOverlay.IsVisible = true;
             LoginOverlay.Opacity = 0;
             _ = LoginOverlay.FadeTo(1, 150);
             EmailEntry.Focus();
+        }
+    }
+
+    private void OnSelectLoginTabTapped(object? sender, TappedEventArgs e)
+        => SetAuthMode(false);
+
+    private void OnSelectRegisterTabTapped(object? sender, TappedEventArgs e)
+        => SetAuthMode(true);
+
+    private void OnToggleAuthModeTapped(object? sender, TappedEventArgs e)
+        => SetAuthMode(!_isRegisterMode);
+
+    private void SetAuthMode(bool isRegister)
+    {
+        _isRegisterMode = isRegister;
+        LoginErrorLabel.IsVisible = false;
+
+        var primary = ResourceColor("Primary", "#00d2d3");
+        var onPrimary = ResourceColor("OnPrimary", "#0e141b");
+        var onSurfaceVariant = ResourceColor("OnSurfaceVariant", "#bacac9");
+
+        if (_isRegisterMode)
+        {
+            TabRegisterBorder.BackgroundColor = primary;
+            TabRegisterLabel.TextColor = onPrimary;
+            TabLoginBorder.BackgroundColor = Colors.Transparent;
+            TabLoginLabel.TextColor = onSurfaceVariant;
+            NameContainer.IsVisible = true;
+            SubmitAuthLabel.Text = "Criar Conta";
+            ToggleModeLink.Text = "Já tem uma conta? Toque para entrar.";
+            ModalTitleLabel.Text = "Criar Conta Supabase";
+        }
+        else
+        {
+            TabLoginBorder.BackgroundColor = primary;
+            TabLoginLabel.TextColor = onPrimary;
+            TabRegisterBorder.BackgroundColor = Colors.Transparent;
+            TabRegisterLabel.TextColor = onSurfaceVariant;
+            NameContainer.IsVisible = false;
+            SubmitAuthLabel.Text = "Entrar / Conectar";
+            ToggleModeLink.Text = "Não tem uma conta? Toque para cadastrar.";
+            ModalTitleLabel.Text = "Entrar na Conta";
         }
     }
 
@@ -86,28 +135,80 @@ public partial class ConfiguracoesView : ContentView
     {
         var email = EmailEntry.Text?.Trim() ?? string.Empty;
         var pass = PasswordEntry.Text ?? string.Empty;
+        var name = NameEntry.Text?.Trim() ?? string.Empty;
 
-        var result = await _cloudSync.LoginAsync(email, pass);
-        if (!result.Success)
+        LoginErrorLabel.IsVisible = false;
+
+        if (_isRegisterMode)
         {
-            LoginErrorLabel.Text = result.ErrorMessage ?? "Falha na autenticação.";
-            LoginErrorLabel.IsVisible = true;
-            return;
-        }
+            SubmitAuthLabel.Text = "Cadastrando...";
+            var regResult = await _cloudSync.RegisterAsync(email, pass, name);
+            SubmitAuthLabel.Text = "Criar Conta";
 
+            if (!regResult.Success)
+            {
+                LoginErrorLabel.TextColor = ResourceColor("Error", "#ffb4ab");
+                LoginErrorLabel.Text = regResult.ErrorMessage ?? "Falha ao cadastrar no Supabase.";
+                LoginErrorLabel.IsVisible = true;
+                return;
+            }
+
+            // Se o usuário foi autenticado diretamente (autoconfirm ativo no Supabase)
+            if (regResult.User != null)
+            {
+                await CloseLoginModalAsync();
+                UpdateCloudUi();
+                TriggerPendingSyncIfEnabled();
+                return;
+            }
+
+            // Se precisou enviar e-mail de confirmação
+            LoginErrorLabel.TextColor = ResourceColor("Primary", "#00d2d3");
+            LoginErrorLabel.Text = regResult.ErrorMessage ?? "Cadastro criado! Verifique seu e-mail para confirmar a conta.";
+            LoginErrorLabel.IsVisible = true;
+            SetAuthMode(false);
+        }
+        else
+        {
+            SubmitAuthLabel.Text = "Entrando...";
+            var result = await _cloudSync.LoginAsync(email, pass);
+            SubmitAuthLabel.Text = "Entrar / Conectar";
+
+            if (!result.Success)
+            {
+                LoginErrorLabel.TextColor = ResourceColor("Error", "#ffb4ab");
+                LoginErrorLabel.Text = result.ErrorMessage ?? "Falha na autenticação.";
+                LoginErrorLabel.IsVisible = true;
+                return;
+            }
+
+            await CloseLoginModalAsync();
+            UpdateCloudUi();
+            TriggerPendingSyncIfEnabled();
+        }
+    }
+
+    private async Task CloseLoginModalAsync()
+    {
         LoginErrorLabel.IsVisible = false;
         await LoginOverlay.FadeTo(0, 120);
         LoginOverlay.IsVisible = false;
+    }
 
-        UpdateCloudUi();
-
-        // Se houver medições locais pendentes, sincroniza automaticamente
+    private void TriggerPendingSyncIfEnabled()
+    {
         if (_cloudSync.AutoSyncEnabled)
         {
             _ = Task.Run(async () =>
             {
-                await _cloudSync.SyncAllPendingAsync(_repository);
-                MainThread.BeginInvokeOnMainThread(UpdateCloudUi);
+                try
+                {
+                    await _cloudSync.SyncAllPendingAsync(_repository);
+                    MainThread.BeginInvokeOnMainThread(UpdateCloudUi);
+                }
+                catch
+                {
+                }
             });
         }
     }
@@ -119,12 +220,14 @@ public partial class ConfiguracoesView : ContentView
 
     private async void OnSyncNowTapped(object? sender, TappedEventArgs e)
     {
-        SyncCountLabel.Text = "Sincronizando com a nuvem...";
+        SyncCountLabel.Text = "Sincronizando com a nuvem Supabase...";
         try
         {
             var syncedCount = await _cloudSync.SyncAllPendingAsync(_repository);
             UpdateCloudUi();
-            SyncCountLabel.Text = $"{syncedCount} novas medições sincronizadas!";
+            SyncCountLabel.Text = syncedCount > 0
+                ? $"{syncedCount} novas medições sincronizadas no Supabase!"
+                : "Todas as medições locais já estão sincronizadas no Supabase.";
         }
         catch (Exception ex)
         {

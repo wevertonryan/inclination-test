@@ -420,6 +420,7 @@
                 StrokeThickness="0"
                 VerticalOptions="Center">
                 <VerticalStackLayout Spacing="16">
+                    <!-- CABEÇALHO DO MODAL -->
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                         <Border
                             HeightRequest="36"
@@ -437,15 +438,16 @@
                         </Border>
                         <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                             <Label
+                                x:Name="ModalTitleLabel"
                                 FontFamily="{StaticResource FontDisplay}"
                                 FontSize="17"
                                 FontAttributes="Bold"
-                                Text="Conta e Sincronização"
+                                Text="Conta Supabase"
                                 TextColor="{StaticResource OnSurface}" />
                             <Label
                                 FontFamily="{StaticResource FontMono}"
                                 FontSize="10"
-                                Text="LOGIN OPCIONAL • MODO OFFLINE SEGURO"
+                                Text="TELEMETRIA EM NUVEM • REST API"
                                 TextColor="{StaticResource Primary}" />
                         </VerticalStackLayout>
                         <Label
@@ -461,13 +463,76 @@
                         </Label>
                     </Grid>
 
-                    <Label
-                        FontFamily="{StaticResource FontBody}"
-                        FontSize="12"
-                        LineHeight="1.35"
-                        Text="O uso da nuvem é opcional. Seus dados permanecem salvos no dispositivo mesmo sem conta. Conecte-se para backup remoto e compartilhamento."
-                        TextColor="{StaticResource OnSurfaceVariant}" />
+                    <!-- SELETOR ENTRAR / CADASTRAR -->
+                    <Border
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        Padding="3"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="0">
+                        <Grid ColumnDefinitions="*,*">
+                            <Border
+                                x:Name="TabLoginBorder"
+                                BackgroundColor="{StaticResource Primary}"
+                                HeightRequest="36"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSelectLoginTabTapped" />
+                                </Border.GestureRecognizers>
+                                <Label
+                                    x:Name="TabLoginLabel"
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="11"
+                                    FontAttributes="Bold"
+                                    HorizontalTextAlignment="Center"
+                                    Text="ENTRAR"
+                                    TextColor="{StaticResource OnPrimary}"
+                                    VerticalOptions="Center" />
+                            </Border>
 
+                            <Border
+                                x:Name="TabRegisterBorder"
+                                Grid.Column="1"
+                                BackgroundColor="Transparent"
+                                HeightRequest="36"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSelectRegisterTabTapped" />
+                                </Border.GestureRecognizers>
+                                <Label
+                                    x:Name="TabRegisterLabel"
+                                    FontFamily="{StaticResource FontMono}"
+                                    FontSize="11"
+                                    FontAttributes="Bold"
+                                    HorizontalTextAlignment="Center"
+                                    Text="CADASTRAR"
+                                    TextColor="{StaticResource OnSurfaceVariant}"
+                                    VerticalOptions="Center" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- CAMPO NOME (VISÍVEL NO CADASTRO) -->
+                    <VerticalStackLayout x:Name="NameContainer" IsVisible="False" Spacing="6">
+                        <Label
+                            FontFamily="{StaticResource FontMono}"
+                            FontSize="12"
+                            Text="Nome do Operador / Embarcação"
+                            TextColor="{StaticResource OnSurfaceVariant}" />
+                        <Border
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 8"
+                            StrokeThickness="0">
+                            <Entry
+                                x:Name="NameEntry"
+                                HeightRequest="46"
+                                Placeholder="Capitão Silva / Inspetor Naval" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- CAMPO EMAIL -->
                     <VerticalStackLayout Spacing="6">
                         <Label
                             FontFamily="{StaticResource FontMono}"
@@ -487,6 +552,7 @@
                         </Border>
                     </VerticalStackLayout>
 
+                    <!-- CAMPO SENHA -->
                     <VerticalStackLayout Spacing="6">
                         <Label
                             FontFamily="{StaticResource FontMono}"
@@ -502,17 +568,33 @@
                                 x:Name="PasswordEntry"
                                 HeightRequest="46"
                                 IsPassword="True"
-                                Placeholder="••••••••" />
+                                Placeholder="Mínimo 6 caracteres" />
                         </Border>
                     </VerticalStackLayout>
 
+                    <!-- LINK ALTERNAR MODO -->
+                    <Label
+                        x:Name="ToggleModeLink"
+                        FontFamily="{StaticResource FontBody}"
+                        FontSize="12"
+                        HorizontalTextAlignment="Center"
+                        Text="Não tem uma conta? Toque para cadastrar."
+                        TextColor="{StaticResource Primary}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnToggleAuthModeTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <!-- MENSAGEM DE ERRO OU SUCESSO -->
                     <Label
                         x:Name="LoginErrorLabel"
                         FontFamily="{StaticResource FontBody}"
                         FontSize="12"
+                        HorizontalTextAlignment="Center"
                         IsVisible="False"
                         TextColor="{StaticResource Error}" />
 
+                    <!-- BOTÕES DE AÇÃO -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
                         <Border
                             Padding="0,14"
@@ -541,6 +623,7 @@
                                 <TapGestureRecognizer Tapped="OnSubmitLoginTapped" />
                             </Border.GestureRecognizers>
                             <Label
+                                x:Name="SubmitAuthLabel"
                                 FontFamily="{StaticResource FontBody}"
                                 FontSize="13"
                                 FontAttributes="Bold"
