@@ -1,8 +1,5 @@
 using System.ComponentModel;
-using System.Threading.Tasks;
-using InclinationTest.Core.Persistence;
 using InclinationTest.Core.Recording;
-using InclinationTest.Core.Services;
 using InclinationTest.Core.ViewModels;
 using Microsoft.Maui.ApplicationModel;
 using UraniumUI.Icons.MaterialSymbols;
@@ -15,8 +12,6 @@ public partial class MainPage : ContentPage
     private readonly RecorderViewModel _recorder;
     private readonly ReportsViewModel _reports;
     private readonly RecordingWriter _writer;
-    private readonly ICloudSyncService _cloudSync;
-    private readonly IReportRepository _repository;
     private TabItem _relatoriosTab;
 
     public MainPage(
@@ -26,17 +21,13 @@ public partial class MainPage : ContentPage
         HomeView home,
         CalibragemView calibragem,
         RelatoriosView relatorios,
-        ConfiguracoesView configuracoes,
-        ICloudSyncService cloudSync,
-        IReportRepository repository)
+        ConfiguracoesView configuracoes)
     {
         InitializeComponent();
 
         _recorder = recorder;
         _reports = reports;
         _writer = writer;
-        _cloudSync = cloudSync;
-        _repository = repository;
 
         BindingContext = recorder;
 
@@ -60,26 +51,6 @@ public partial class MainPage : ContentPage
         {
             _reports.Refresh();
             MainTabView.SelectedTab = _relatoriosTab;
-
-            if (_cloudSync.AutoSyncEnabled)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        var report = _repository.GetReport(recordingId);
-                        if (report != null)
-                        {
-                            var samples = _repository.GetSamples(recordingId);
-                            await _cloudSync.SyncRecordingAsync(recordingId, report.Title, report.Summary ?? default, samples);
-                        }
-                    }
-                    catch
-                    {
-                        // Sincronização automática em segundo plano não interrompe o operador
-                    }
-                });
-            }
         });
 
     private void OnTabViewSizeChanged(object? sender, EventArgs e)
@@ -87,7 +58,7 @@ public partial class MainPage : ContentPage
 
     private void OnRecorderChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(RecorderViewModel.IsImmersive))
+        if (e.PropertyName == nameof(RecorderViewModel.State))
         {
             UpdateChrome();
         }
@@ -102,27 +73,45 @@ public partial class MainPage : ContentPage
     }
 
     private void UpdateChrome()
-        => MainTabView.HeaderVisible = !_recorder.IsImmersive && !_reports.HasSelection;
+    {
+        var recording = _recorder.State is RecorderMode.Recording or RecorderMode.Paused;
+        var detailOpen = _reports.HasSelection;
+        var hideTabs = recording || detailOpen;
+
+        MainTabView.TabHeaderPosition = hideTabs ? TabPosition.None : TabPosition.Bottom;
+    }
+
+    private TabItem AddTab(View content, string title, string iconGlyph)
+    {
+        var item = new TabItem
+        {
+            Title = title,
+            Icon = new FontImageSource
+            {
+                Glyph = iconGlyph,
+                FontFamily = "MaterialOutlined",
+                Size = 22,
+            },
+            Content = content,
+        };
+
+        MainTabView.Items.Add(item);
+        return item;
+    }
 
     private void DistributeTabsEvenly()
     {
-        if (MainTabView.Width <= 0 || MainTabView.Tabs.Count == 0)
+        var totalWidth = MainTabView.Width;
+        var tabCount = MainTabView.Items.Count;
+        if (totalWidth <= 0 || tabCount == 0)
         {
             return;
         }
 
-        var itemWidth = MainTabView.Width / MainTabView.Tabs.Count;
-        if (!MainTabView.TabHeaderItemColumnWidth.IsAbsolute
-            || Math.Abs(MainTabView.TabHeaderItemColumnWidth.Value - itemWidth) > 0.5)
+        var widthPerTab = totalWidth / tabCount;
+        foreach (var tab in MainTabView.Items)
         {
-            MainTabView.TabHeaderItemColumnWidth = new GridLength(itemWidth);
+            tab.WidthRequest = widthPerTab;
         }
-    }
-
-    private TabItem AddTab(View content, string title, string glyph)
-    {
-        var tab = new TabItem { Content = content, Title = title, Data = glyph };
-        MainTabView.Tabs.Add(tab);
-        return tab;
     }
 }
