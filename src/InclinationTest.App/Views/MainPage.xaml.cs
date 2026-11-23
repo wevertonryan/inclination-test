@@ -58,7 +58,7 @@ public partial class MainPage : ContentPage
 
     private void OnRecorderChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(RecorderViewModel.State))
+        if (e.PropertyName == nameof(RecorderViewModel.IsImmersive))
         {
             UpdateChrome();
         }
@@ -73,45 +73,27 @@ public partial class MainPage : ContentPage
     }
 
     private void UpdateChrome()
-    {
-        var recording = _recorder.State is RecorderMode.Recording or RecorderMode.Paused;
-        var detailOpen = _reports.HasSelection;
-        var hideTabs = recording || detailOpen;
-
-        MainTabView.TabHeaderPosition = hideTabs ? TabPosition.None : TabPosition.Bottom;
-    }
-
-    private TabItem AddTab(View content, string title, string iconGlyph)
-    {
-        var item = new TabItem
-        {
-            Title = title,
-            Icon = new FontImageSource
-            {
-                Glyph = iconGlyph,
-                FontFamily = "MaterialOutlined",
-                Size = 22,
-            },
-            Content = content,
-        };
-
-        MainTabView.Items.Add(item);
-        return item;
-    }
+        => MainTabView.HeaderVisible = !_recorder.IsImmersive && !_reports.HasSelection;
 
     private void DistributeTabsEvenly()
     {
-        var totalWidth = MainTabView.Width;
-        var tabCount = MainTabView.Items.Count;
-        if (totalWidth <= 0 || tabCount == 0)
+        if (MainTabView.Width <= 0 || MainTabView.Tabs.Count == 0)
         {
             return;
         }
 
-        var widthPerTab = totalWidth / tabCount;
-        foreach (var tab in MainTabView.Items)
+        var itemWidth = MainTabView.Width / MainTabView.Tabs.Count;
+        if (!MainTabView.TabHeaderItemColumnWidth.IsAbsolute
+            || Math.Abs(MainTabView.TabHeaderItemColumnWidth.Value - itemWidth) > 0.5)
         {
-            tab.WidthRequest = widthPerTab;
+            MainTabView.TabHeaderItemColumnWidth = new GridLength(itemWidth);
         }
+    }
+
+    private TabItem AddTab(View content, string title, string glyph)
+    {
+        var tab = new TabItem { Content = content, Title = title, Data = glyph };
+        MainTabView.Tabs.Add(tab);
+        return tab;
     }
 }
