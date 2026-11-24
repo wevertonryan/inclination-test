@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ public sealed class CloudSyncService : ICloudSyncService
     private const string KeyEndpoint = "cloud_endpoint";
     private const string KeySyncedIds = "cloud_synced_ids";
     private const string KeySecureToken = "cloud_auth_token_secure";
+
+    public event Action PullExecuted;
 
     private readonly IKeyValueStorage _storage;
     private readonly ISecureStorageService? _secureStorage;
@@ -580,6 +583,8 @@ public sealed class CloudSyncService : ICloudSyncService
             {
                 _storage.Set(KeySyncedIds, string.Join(';', _syncedIds));
             }
+
+            PullExecuted?.Invoke();
 
             return importedCount;
         }

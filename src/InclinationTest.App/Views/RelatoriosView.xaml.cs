@@ -37,9 +37,14 @@ public partial class RelatoriosView : ContentView
         writer.Saved += OnRecordingSaved;
         viewModel.PropertyChanged += OnViewModelChanged;
         Loaded += OnLoaded;
+
+        _cloudSync.PullExecuted += this.Refresh;
     }
 
     private void OnLoaded(object? sender, EventArgs e) => _viewModel.Refresh();
+
+
+    private void Refresh() => _viewModel.Refresh();
 
     private void OnRecordingSaved(string recordingId)
         => MainThread.BeginInvokeOnMainThread(_viewModel.Refresh);
@@ -155,7 +160,6 @@ public partial class RelatoriosView : ContentView
             ShowToast("Sincronizando com a nuvem Supabase...", ToastKind.Info);
             var pulled = await _cloudSync.PullFromCloudAsync(_repository);
             var pushed = await _cloudSync.SyncAllPendingAsync(_repository);
-            _viewModel.Refresh();
             ShowToast($"Sincronizado! {pulled} baixados, {pushed} enviados.", ToastKind.Success);
         }
         catch (Exception ex)

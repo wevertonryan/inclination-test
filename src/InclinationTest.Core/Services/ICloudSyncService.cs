@@ -18,6 +18,7 @@ public interface ICloudSyncService
     CloudUser? CurrentUser { get; }
     bool AutoSyncEnabled { get; set; }
     string Endpoint { get; set; }
+    event Action PullExecuted;
     IReadOnlySet<string> SyncedRecordingIds { get; }
 
     Task<CloudAuthResult> LoginAsync(string email, string password);

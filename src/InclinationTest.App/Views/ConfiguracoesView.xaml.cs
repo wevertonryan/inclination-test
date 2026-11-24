@@ -154,7 +154,7 @@ public partial class ConfiguracoesView : ContentView
             {
                 AuthFullScreenOverlay.IsVisible = false;
                 UpdateCloudUi();
-                TriggerInitialSync();
+                await TriggerInitialSync();
                 return;
             }
 
@@ -179,28 +179,29 @@ public partial class ConfiguracoesView : ContentView
 
             AuthFullScreenOverlay.IsVisible = false;
             UpdateCloudUi();
-            TriggerInitialSync();
+            await TriggerInitialSync();
         }
     }
 
-    private void TriggerInitialSync()
+    private async Task TriggerInitialSync()
     {
-        _ = Task.Run(async () =>
+        try
         {
-            try
+            // Ao logar: baixa ensaios existentes na nuvem e sobe eventuais medições locais
+            await _cloudSync.PullFromCloudAsync(_repository);
+            if (_cloudSync.AutoSyncEnabled)
             {
-                // Ao logar: baixa ensaios existentes na nuvem e sobe eventuais medições locais
-                await _cloudSync.PullFromCloudAsync(_repository);
-                if (_cloudSync.AutoSyncEnabled)
-                {
-                    await _cloudSync.SyncAllPendingAsync(_repository);
-                }
-                MainThread.BeginInvokeOnMainThread(UpdateCloudUi);
+                await _cloudSync.SyncAllPendingAsync(_repository);
             }
-            catch
-            {
-            }
-        });
+            MainThread.BeginInvokeOnMainThread(UpdateCloudUi);
+        }
+        catch
+        {
+            await Application.Current.Windows[0].Page!.DisplayAlert(
+                "Erro de Sincronização",
+                "Houve um erro ao sincronizar os dados da nuvem para seu dispositivo!",
+                "Ok");
+        }
     }
 
     private void OnAutoSyncToggled(object? sender, ToggledEventArgs e)
