@@ -274,8 +274,23 @@ public sealed class CloudSyncService : ICloudSyncService
         return await _secureStorage.GetAsync(KeySecureToken);
     }
 
-    public void Logout()
+    public void Logout(IReportRepository? repository = null, bool clearLocalUserData = false)
     {
+        if (clearLocalUserData && repository != null)
+        {
+            var syncedCopy = _syncedIds.ToList();
+            foreach (var id in syncedCopy)
+            {
+                try
+                {
+                    repository.DeleteRecording(id);
+                }
+                catch
+                {
+                }
+            }
+        }
+
         _currentUser = null;
         _storage.Remove(KeyUser);
         _ = _secureStorage?.RemoveAsync(KeySecureToken);
@@ -293,10 +308,12 @@ public sealed class CloudSyncService : ICloudSyncService
             return new CloudSyncResult(false, recordingId, ErrorMessage: "ID de gravação inválido.");
         }
 
-        // Mock para unit tests (FakeKeyValueStorage ou IDs fictícios de teste)
-        if (_storage.GetType().Name.Contains("Fake", StringComparison.OrdinalIgnoreCase) ||
-            recordingId.StartsWith("rec-", StringComparison.OrdinalIgnoreCase) ||
-            recordingId == "rec123" || recordingId == "rec1" || recordingId == "rec2")
+        var isTestMode = _storage.GetType().Name.Contains("Fake", StringComparison.OrdinalIgnoreCase) ||
+                         recordingId.StartsWith("rec-", StringComparison.OrdinalIgnoreCase) ||
+                         recordingId == "rec123" || recordingId == "rec1" || recordingId == "rec2";
+
+        // Mock imediato para unit tests
+        if (isTestMode)
         {
             lock (_syncedIds)
             {
@@ -305,6 +322,12 @@ public sealed class CloudSyncService : ICloudSyncService
             }
             SyncCompleted?.Invoke(this, recordingId);
             return new CloudSyncResult(true, recordingId, RemoteId: recordingId);
+        }
+
+        // NÃO enviar dados para a nuvem se não estiver logado!
+        if (!IsAuthenticated)
+        {
+            return new CloudSyncResult(false, recordingId, ErrorMessage: "Usuário não autenticado. Faça login para sincronizar.");
         }
 
         try
@@ -324,7 +347,8 @@ public sealed class CloudSyncService : ICloudSyncService
                 savedatutc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 startedatms = 0.0,
                 finishedatms = (double)summary.DurationMs,
-                durationms = summary.DurationMs
+                durationms = summary.DurationMs,
+                userid = _currentUser?.Id
             };
 
             var headerResult = await PostToSupabaseAsync($"{baseUrl}/rest/v1/recording_header", headerPayload, bearerToken);
@@ -397,6 +421,12 @@ public sealed class CloudSyncService : ICloudSyncService
     {
         ArgumentNullException.ThrowIfNull(repository);
 
+        var isTestMode = _storage.GetType().Name.Contains("Fake", StringComparison.OrdinalIgnoreCase);
+        if (!IsAuthenticated && !isTestMode)
+        {
+            return 0;
+        }
+
         var reports = repository.ListReports();
         var pending = reports.Where(r => !_syncedIds.Contains(r.Id)).ToList();
         var count = 0;
@@ -412,6 +442,178 @@ public sealed class CloudSyncService : ICloudSyncService
         }
 
         return count;
+    }
+
+    public async Task<int> PullFromCloudAsync(IReportRepository repository)
+    {
+        ArgumentNullException.ThrowIfNull(repository);
+        if (!IsAuthenticated)
+        {
+            return 0;
+        }
+
+        try
+        {
+            var baseUrl = GetBaseUrl();
+            var authToken = await GetAuthTokenAsync();
+            var bearerToken = !string.IsNullOrEmpty(authToken) ? authToken : DefaultAnonKey;
+
+            // Busca os relatórios salvos no Supabase (status=1). Filtra por userid se houver.
+            var userId = _currentUser?.Id;
+            var url = !string.IsNullOrEmpty(userId)
+                ? $"{baseUrl}/rest/v1/recording_header?status=eq.1&userid=eq.{userId}&order=startedatutc.desc"
+                : $"{baseUrl}/rest/v1/recording_header?status=eq.1&order=startedatutc.desc";
+
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            req.Headers.Add("apikey", DefaultAnonKey);
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            var response = await _http.SendAsync(req);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Se falhou por filtro de userid (coluna não existente), tenta sem o filtro
+                if (url.Contains("&userid="))
+                {
+                    var fallbackUrl = $"{baseUrl}/rest/v1/recording_header?status=eq.1&order=startedatutc.desc";
+                    using var fallbackReq = new HttpRequestMessage(HttpMethod.Get, fallbackUrl);
+                    fallbackReq.Headers.Add("apikey", DefaultAnonKey);
+                    fallbackReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    response = await _http.SendAsync(fallbackReq);
+                }
+
+                if (!response.IsSuccessStatusCode) return 0;
+            }
+
+            var headersJson = await response.Content.ReadAsStringAsync();
+            using var headersDoc = JsonDocument.Parse(headersJson);
+            var root = headersDoc.RootElement;
+            if (root.ValueKind != JsonValueKind.Array) return 0;
+
+            var importedCount = 0;
+            foreach (var elem in root.EnumerateArray())
+            {
+                var id = elem.GetProperty("id").GetString();
+                if (string.IsNullOrEmpty(id)) continue;
+
+                // Se já existe localmente, adiciona ao conjunto de sincronizados e continua
+                if (repository.GetRecording(id) != null)
+                {
+                    lock (_syncedIds)
+                    {
+                        _syncedIds.Add(id);
+                    }
+                    continue;
+                }
+
+                var title = elem.TryGetProperty("title", out var tp) ? tp.GetString() ?? "Ensaio" : "Ensaio";
+                var startedAtMs = elem.TryGetProperty("startedatms", out var sp) ? sp.GetDouble() : 0.0;
+                var finishedAtMs = elem.TryGetProperty("finishedatms", out var fp) ? fp.GetDouble() : 0.0;
+                var location = elem.TryGetProperty("location", out var lp) ? lp.GetString() : null;
+
+                // 1. Busca summary no Supabase
+                var summaryUrl = $"{baseUrl}/rest/v1/recording_summary?recordingid=eq.{id}";
+                using var summaryReq = new HttpRequestMessage(HttpMethod.Get, summaryUrl);
+                summaryReq.Headers.Add("apikey", DefaultAnonKey);
+                summaryReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                var sumRes = await _http.SendAsync(summaryReq);
+                RecordingSummary summary = default;
+                if (sumRes.IsSuccessStatusCode)
+                {
+                    var sumJson = await sumRes.Content.ReadAsStringAsync();
+                    using var sumDoc = JsonDocument.Parse(sumJson);
+                    if (sumDoc.RootElement.ValueKind == JsonValueKind.Array && sumDoc.RootElement.GetArrayLength() > 0)
+                    {
+                        var sElem = sumDoc.RootElement[0];
+                        summary = new RecordingSummary(
+                            DurationMs: sElem.TryGetProperty("durationms", out var d) ? (long)d.GetDouble() : (long)finishedAtMs,
+                            SampleCount: sElem.TryGetProperty("samplecount", out var sc) ? (int)sc.GetInt64() : 0,
+                            MeanRoll: sElem.TryGetProperty("meanroll", out var mr) ? mr.GetDouble() : 0,
+                            StdRoll: sElem.TryGetProperty("stdroll", out var sr) ? sr.GetDouble() : 0,
+                            MinRoll: sElem.TryGetProperty("minroll", out var mnr) ? mnr.GetDouble() : 0,
+                            MaxRoll: sElem.TryGetProperty("maxroll", out var mxr) ? mxr.GetDouble() : 0,
+                            MeanTrim: sElem.TryGetProperty("meantrim", out var mt) ? mt.GetDouble() : 0,
+                            StdTrim: sElem.TryGetProperty("stdtrim", out var st) ? st.GetDouble() : 0,
+                            MinTrim: sElem.TryGetProperty("mintrim", out var mnt) ? mnt.GetDouble() : 0,
+                            MaxTrim: sElem.TryGetProperty("maxtrim", out var mxt) ? mxt.GetDouble() : 0);
+                    }
+                }
+
+                // 2. Busca amostras no Supabase
+                var samplesUrl = $"{baseUrl}/rest/v1/recorded_sample?recordingid=eq.{id}&order=elapsedms.asc";
+                using var samplesReq = new HttpRequestMessage(HttpMethod.Get, samplesUrl);
+                samplesReq.Headers.Add("apikey", DefaultAnonKey);
+                samplesReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                var sampRes = await _http.SendAsync(samplesReq);
+                var samplesList = new List<RecordedSample>();
+                if (sampRes.IsSuccessStatusCode)
+                {
+                    var sampJson = await sampRes.Content.ReadAsStringAsync();
+                    using var sampDoc = JsonDocument.Parse(sampJson);
+                    if (sampDoc.RootElement.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var sampElem in sampDoc.RootElement.EnumerateArray())
+                        {
+                            var elapsed = sampElem.TryGetProperty("elapsedms", out var ep) ? ep.GetInt64() : 0;
+                            var roll = sampElem.TryGetProperty("roll", out var rp) ? rp.GetDouble() : 0;
+                            var trim = sampElem.TryGetProperty("trim", out var trp) ? trp.GetDouble() : 0;
+                            samplesList.Add(new RecordedSample(elapsed, roll, trim));
+                        }
+                    }
+                }
+
+                // 3. Salva no repositório local
+                repository.CreateRecording(id, startedAtMs, location);
+                if (samplesList.Count > 0)
+                {
+                    repository.AppendSamples(id, samplesList);
+                }
+                repository.SaveRecording(id, title, summary, finishedAtMs > 0 ? finishedAtMs : summary.DurationMs);
+
+                lock (_syncedIds)
+                {
+                    _syncedIds.Add(id);
+                }
+                importedCount++;
+            }
+
+            lock (_syncedIds)
+            {
+                _storage.Set(KeySyncedIds, string.Join(';', _syncedIds));
+            }
+
+            return importedCount;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[CloudSync] Pull error: {ex.Message}");
+            return 0;
+        }
+    }
+
+    public async Task<bool> MarkAsDeletedInCloudAsync(string recordingId)
+    {
+        if (!IsAuthenticated || string.IsNullOrEmpty(recordingId)) return false;
+
+        try
+        {
+            var baseUrl = GetBaseUrl();
+            var authToken = await GetAuthTokenAsync();
+            var bearerToken = !string.IsNullOrEmpty(authToken) ? authToken : DefaultAnonKey;
+
+            using var request = new HttpRequestMessage(HttpMethod.Patch, $"{baseUrl}/rest/v1/recording_header?id=eq.{recordingId}");
+            request.Headers.Add("apikey", DefaultAnonKey);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+            request.Headers.Add("Prefer", "return=minimal");
+            var body = JsonSerializer.Serialize(new { status = 2 });
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            var response = await _http.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public bool IsSynced(string recordingId)

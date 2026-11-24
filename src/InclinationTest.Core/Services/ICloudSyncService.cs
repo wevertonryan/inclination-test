@@ -23,10 +23,12 @@ public interface ICloudSyncService
     Task<CloudAuthResult> LoginAsync(string email, string password);
     Task<CloudAuthResult> RegisterAsync(string email, string password, string name);
     Task<string?> GetAuthTokenAsync();
-    void Logout();
+    void Logout(IReportRepository? repository = null, bool clearLocalUserData = false);
 
     Task<CloudSyncResult> SyncRecordingAsync(string recordingId, string title, RecordingSummary summary, IReadOnlyList<RecordedSample> samples);
     Task<int> SyncAllPendingAsync(IReportRepository repository);
+    Task<int> PullFromCloudAsync(IReportRepository repository);
+    Task<bool> MarkAsDeletedInCloudAsync(string recordingId);
     bool IsSynced(string recordingId);
 
     event EventHandler<string>? SyncCompleted;

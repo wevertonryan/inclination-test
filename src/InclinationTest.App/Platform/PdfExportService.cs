@@ -58,24 +58,15 @@ public static class PdfExportService
     private static void GenerateCsv(string filePath, ReportItem report, IReadOnlyList<RecordedSample> samples)
     {
         using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
-        writer.WriteLine("# INCLINATION TEST — LAUDO DE TELEMETRIA NAVAL");
-        writer.WriteLine($"# Ensaio: {report.Title}");
-        writer.WriteLine($"# Data: {report.DateText}");
-        writer.WriteLine($"# Local: {report.LocationText}");
-        writer.WriteLine($"# Duracao: {report.DurationLongText}");
-        writer.WriteLine($"# Roll Abertura (max - min): {report.RollRangeText} | Media: {report.RollMeanText} | Desvio: {report.RollStdText}");
-        writer.WriteLine($"# Trim Abertura (max - min): {report.TrimRangeText} | Media: {report.TrimMeanText} | Desvio: {report.TrimStdText}");
-        writer.WriteLine();
-        writer.WriteLine("Tempo_s;Elapsed_ms;Roll_graus;Trim_graus");
+        writer.WriteLine("Elapsed_ms;Roll;Trim");
 
         if (samples != null)
         {
             foreach (var s in samples)
             {
-                var timeSec = (s.ElapsedMs / 1000.0).ToString("0.000", CultureInfo.InvariantCulture);
                 var rollStr = s.Roll.ToString("0.0000", CultureInfo.InvariantCulture);
                 var trimStr = s.Trim.ToString("0.0000", CultureInfo.InvariantCulture);
-                writer.WriteLine($"{timeSec};{s.ElapsedMs};{rollStr};{trimStr}");
+                writer.WriteLine($"{s.ElapsedMs};{rollStr};{trimStr}");
             }
         }
     }

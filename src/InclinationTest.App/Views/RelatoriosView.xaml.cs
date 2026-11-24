@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using InclinationTest.App.Components.Features;
 using InclinationTest.App.Platform;
+using InclinationTest.Core.Persistence;
 using InclinationTest.Core.Recording;
+using InclinationTest.Core.Services;
 using InclinationTest.Core.ViewModels;
 using Microsoft.Maui.ApplicationModel;
 using UraniumUI.Icons.MaterialSymbols;
@@ -12,15 +14,23 @@ public partial class RelatoriosView : ContentView
 {
     private readonly ReportsViewModel _viewModel;
     private readonly ReportChartView _chart = new();
+    private readonly ICloudSyncService _cloudSync;
+    private readonly IReportRepository _repository;
 
     private CancellationTokenSource? _toastCancellation;
 
-    public RelatoriosView(ReportsViewModel viewModel, RecordingWriter writer)
+    public RelatoriosView(
+        ReportsViewModel viewModel,
+        RecordingWriter writer,
+        ICloudSyncService cloudSync,
+        IReportRepository repository)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         BindingContext = viewModel;
+        _cloudSync = cloudSync;
+        _repository = repository;
 
         ChartHost.Children.Add(_chart);
 
@@ -132,6 +142,28 @@ public partial class RelatoriosView : ContentView
         RangeGauge.MaxValue = _viewModel.MaxValue;
     }
 
+    private async void OnSyncAllReportsTapped(object? sender, TappedEventArgs e)
+    {
+        if (!_cloudSync.IsAuthenticated)
+        {
+            ShowToast("Acesse a aba Conta para fazer login e sincronizar.", ToastKind.Info);
+            return;
+        }
+
+        try
+        {
+            ShowToast("Sincronizando com a nuvem Supabase...", ToastKind.Info);
+            var pulled = await _cloudSync.PullFromCloudAsync(_repository);
+            var pushed = await _cloudSync.SyncAllPendingAsync(_repository);
+            _viewModel.Refresh();
+            ShowToast($"Sincronizado! {pulled} baixados, {pushed} enviados.", ToastKind.Success);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Falha ao sincronizar: {ex.Message}", ToastKind.Error);
+        }
+    }
+
     private void OnDeleteTapped(object? sender, TappedEventArgs e)
     {
         HideOverlay(OptionsOverlay);
@@ -143,12 +175,18 @@ public partial class RelatoriosView : ContentView
 
     private void OnDeleteConfirmed(object? sender, TappedEventArgs e)
     {
+        var selectedId = _viewModel.Selected?.Id;
         var deleted = _viewModel.DeleteSelected();
         HideOverlay(DeleteOverlay);
 
         if (deleted is not null)
         {
             ShowToast($"“{deleted}” excluído.", ToastKind.Success);
+
+            if (!string.IsNullOrEmpty(selectedId) && _cloudSync.IsAuthenticated)
+            {
+                _ = _cloudSync.MarkAsDeletedInCloudAsync(selectedId);
+            }
         }
     }
 
