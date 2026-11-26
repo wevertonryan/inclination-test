@@ -4,4 +4,5 @@ public enum RecordingStatus
 {
     Recording,
     Saved,
+    Deleted,
 }

@@ -4,13 +4,15 @@ namespace InclinationTest.Core.Persistence;
 
 public interface IReportRepository
 {
-    void CreateRecording(string id, double startedAtMs, string? location = null);
+    void CreateRecording(string id, double startedAtMs, string? location = null, bool synced = false);
 
     void AppendSamples(string recordingId, IReadOnlyList<RecordedSample> samples);
 
     void SaveRecording(string recordingId, string title, RecordingSummary summary, double finishedAtMs);
 
     void DeleteRecording(string recordingId);
+
+    void UpdateSync(string recordingId);
 
     IReadOnlyList<RecordingHeader> ListReports();
 

@@ -10,7 +10,8 @@ public sealed record RecordingHeader(
     long DurationMs,
     RecordingStatus Status,
     RecordingSummary? Summary,
-    string? Location)
+    string? Location,
+    bool Synced = false)
 {
     /// <summary>
     /// Instante de parede em que a gravação começou. <see cref="StartedAtMs"/> vem do relógio

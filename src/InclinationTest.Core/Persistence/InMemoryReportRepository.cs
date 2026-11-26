@@ -7,7 +7,7 @@ public sealed class InMemoryReportRepository : IReportRepository
     private readonly Dictionary<string, RecordingHeader> _headers = new();
     private readonly Dictionary<string, SortedDictionary<long, RecordedSample>> _samples = new();
 
-    public void CreateRecording(string id, double startedAtMs, string? location = null)
+    public void CreateRecording(string id, double startedAtMs, string? location = null, bool synced = false)
     {
         if (_headers.ContainsKey(id))
         {
@@ -22,7 +22,8 @@ public sealed class InMemoryReportRepository : IReportRepository
             0,
             RecordingStatus.Recording,
             null,
-            location)
+            location,
+            synced)
         {
             StartedAtUtc = DateTimeOffset.UtcNow,
         };
@@ -64,6 +65,22 @@ public sealed class InMemoryReportRepository : IReportRepository
     {
         _headers.Remove(recordingId);
         _samples.Remove(recordingId);
+    }
+
+    public void UpdateSync(string recordingId)
+    {
+        if (!_headers.TryGetValue(recordingId, out var header))
+        {
+            throw new InvalidOperationException($"Recording '{recordingId}' does not exist.");
+        }
+
+        var saved = header with
+        {
+            Synced = true
+        };
+
+        _headers[recordingId] = saved;
+
     }
 
     public IReadOnlyList<RecordingHeader> ListReports()

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using InclinationTest.Core.Recording;
+using InclinationTest.Core.Services;
 
 namespace InclinationTest.Core.Persistence;
 
@@ -17,16 +18,22 @@ public sealed class FileReportRepository : IReportRepository
     private const string SamplesSuffix = ".csv";
 
     private readonly object _gate = new();
+    private readonly ICloudSyncService _cloudSync;
     private readonly IReportStorage _storage;
     private readonly Dictionary<string, RecordingHeader> _headers = new(StringComparer.Ordinal);
     private readonly Dictionary<string, HashSet<long>> _accepted = new(StringComparer.Ordinal);
 
     private bool _loaded;
 
-    public FileReportRepository(IReportStorage storage)
-        => _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+    public FileReportRepository(IReportStorage storage, ICloudSyncService cloudSync)
+    {
+        _cloudSync = cloudSync ?? throw new ArgumentNullException(nameof(cloudSync));
+        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
 
-    public void CreateRecording(string id, double startedAtMs, string? location = null)
+        _cloudSync.SyncCompleted += (_, recordingId) => UpdateSync(recordingId);
+    }
+
+    public void CreateRecording(string id, double startedAtMs, string? location = null, bool synced = false)
     {
         lock (_gate)
         {
@@ -45,7 +52,8 @@ public sealed class FileReportRepository : IReportRepository
                 0,
                 RecordingStatus.Recording,
                 null,
-                location)
+                location,
+                synced)
             {
                 StartedAtUtc = DateTimeOffset.UtcNow,
             };
@@ -136,6 +144,27 @@ public sealed class FileReportRepository : IReportRepository
 
             _storage.Delete(HeaderName(recordingId));
             _storage.Delete(SamplesName(recordingId));
+        }
+    }
+
+    public void UpdateSync(string recordingId)
+    {
+        lock (_gate)
+        {
+            EnsureLoaded();
+
+            if (!_headers.TryGetValue(recordingId, out var header))
+            {
+                throw new InvalidOperationException($"Recording '{recordingId}' does not exist.");
+            }
+
+            var saved = header with
+            {
+                Synced = true
+            };
+
+            _headers[recordingId] = saved;
+            _storage.WriteAllText(HeaderName(recordingId), HeaderFormat.Write(saved));
         }
     }
 

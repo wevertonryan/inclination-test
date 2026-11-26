@@ -504,6 +504,7 @@ public sealed class CloudSyncService : ICloudSyncService
                     lock (_syncedIds)
                     {
                         _syncedIds.Add(id);
+                        // Atualizar a sincronização local, que não deveria aparecer desincronizado, mas se aparecer já altera aqui
                     }
                     continue;
                 }
@@ -565,7 +566,7 @@ public sealed class CloudSyncService : ICloudSyncService
                 }
 
                 // 3. Salva no repositório local
-                repository.CreateRecording(id, startedAtMs, location);
+                repository.CreateRecording(id, startedAtMs, location, true);
                 if (samplesList.Count > 0)
                 {
                     repository.AppendSamples(id, samplesList);

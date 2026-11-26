@@ -12,7 +12,7 @@ namespace InclinationTest.Core.ViewModels;
 /// Lista as gravações salvas e carrega as amostras da que for aberta.
 /// Não conhece o MAUI: a view só precisa chamar <see cref="Refresh"/> e ligar as propriedades.
 /// </summary>
-public sealed class ReportsViewModel : ObservableObject
+public sealed partial class ReportsViewModel : ObservableObject
 {
     private readonly IReportRepository _repository;
     private readonly ObservableCollection<ReportItem> _reports = new();
@@ -441,7 +441,8 @@ public sealed class ReportsViewModel : ObservableObject
             duration,
             $"{date} · {duration} · {samples}",
             FormatAngle(summary.MeanRoll, summary.StdRoll),
-            FormatAngle(summary.MeanTrim, summary.StdTrim))
+            FormatAngle(summary.MeanTrim, summary.StdTrim),
+            header.Synced)
         {
             LocationText = string.IsNullOrWhiteSpace(header.Location) ? "—" : header.Location,
             DateOnlyText = dateOnly,

@@ -28,6 +28,7 @@ internal static class HeaderFormat
         builder.Append("location=").Append(header.Location is null ? string.Empty : Escape(header.Location)).Append('\n');
         builder.Append("startedAtUtc=").Append(Date(header.StartedAtUtc)).Append('\n');
         builder.Append("savedAtUtc=").Append(Date(header.SavedAtUtc)).Append('\n');
+        builder.Append("synced=").Append((bool)header.Synced).Append('\n');
 
         if (header.Summary is { } summary)
         {
@@ -76,7 +77,8 @@ internal static class HeaderFormat
             Long(values, "durationMs"),
             (RecordingStatus)(int)Long(values, "status"),
             ReadSummary(values),
-            Has(values, "location") ? Uri.UnescapeDataString(values["location"]) : null)
+            Has(values, "location") ? Uri.UnescapeDataString(values["location"]) : null,
+            Bool(values, "synced"))
         {
             StartedAtUtc = ReadDate(values, "startedAtUtc"),
             SavedAtUtc = ReadDate(values, "savedAtUtc"),
@@ -104,6 +106,10 @@ internal static class HeaderFormat
     private static string Text(IReadOnlyDictionary<string, string> values, string key)
         => values.TryGetValue(key, out var value) ? Uri.UnescapeDataString(value) : string.Empty;
 
+// Cuidado, como estou retornando um booleano, pode ser que eu acabe retornando um "false" que não é "false", já que tudo é "false", se der algum erro no processo ele vai retornar "false" sem aviso
+    private static bool Bool(IReadOnlyDictionary<string, string> values, string key)
+        => values.TryGetValue(key, out var value) ? ParseBool(value) : false;
+
     private static double Number(IReadOnlyDictionary<string, string> values, string key)
         => values.TryGetValue(key, out var value) ? ParseNumber(value) : 0;
 
@@ -125,6 +131,9 @@ internal static class HeaderFormat
 
     private static double ParseNumber(string value)
         => double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0;
+
+    private static bool ParseBool(string value)
+        => bool.TryParse(value, out var parsed) ? parsed : false;
 
     private static string Date(DateTimeOffset? value) => value is null ? string.Empty : value.Value.ToString("O", CultureInfo.InvariantCulture);
 }

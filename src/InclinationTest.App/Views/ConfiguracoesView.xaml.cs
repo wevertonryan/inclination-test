@@ -237,7 +237,7 @@ public partial class ConfiguracoesView : ContentView
 
         if (confirmed)
         {
-            _cloudSync.Logout(_repository, clearLocalUserData: false);
+            _cloudSync.Logout(_repository, clearLocalUserData: true);
             UpdateCloudUi();
         }
     }

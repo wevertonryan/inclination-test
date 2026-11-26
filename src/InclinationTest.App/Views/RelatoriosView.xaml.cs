@@ -38,13 +38,10 @@ public partial class RelatoriosView : ContentView
         viewModel.PropertyChanged += OnViewModelChanged;
         Loaded += OnLoaded;
 
-        _cloudSync.PullExecuted += this.Refresh;
+        _cloudSync.PullExecuted += _viewModel.Refresh;
     }
 
     private void OnLoaded(object? sender, EventArgs e) => _viewModel.Refresh();
-
-
-    private void Refresh() => _viewModel.Refresh();
 
     private void OnRecordingSaved(string recordingId)
         => MainThread.BeginInvokeOnMainThread(_viewModel.Refresh);

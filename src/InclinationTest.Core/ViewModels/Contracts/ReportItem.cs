@@ -8,7 +8,8 @@ public sealed record ReportItem(
     string DurationText,
     string MetaText,
     string RollText,
-    string TrimText)
+    string TrimText,
+    bool Synced)
 {
     public string LocationText { get; init; } = "—";
 
