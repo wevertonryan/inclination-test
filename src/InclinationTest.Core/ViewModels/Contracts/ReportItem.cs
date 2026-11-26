@@ -9,7 +9,8 @@ public sealed record ReportItem(
     string MetaText,
     string RollText,
     string TrimText,
-    bool Synced)
+    bool Synced,
+    bool NotSynced)
 {
     public string LocationText { get; init; } = "—";
 

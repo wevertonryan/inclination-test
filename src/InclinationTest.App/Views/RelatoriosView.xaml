@@ -234,7 +234,7 @@
                                             VerticalOptions="Start" />
                                     </Grid>
                                     <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
-                                        <!--<HorizontalStackLayout IsVisible="{Binding Synced}">
+                                        <HorizontalStackLayout IsVisible="{Binding Synced}">
                                             <Label
                                                 FontFamily="{StaticResource FontIcons}"
                                                 FontSize="18"
@@ -250,7 +250,7 @@
                                                 TextColor="{StaticResource Primary}"
                                                 VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <HorizontalStackLayout IsVisible="{Binding !Synced}">
+                                        <HorizontalStackLayout IsVisible="{Binding NotSynced}">
                                             <Label
                                                 FontFamily="{StaticResource FontIcons}"
                                                 FontSize="18"
@@ -265,28 +265,7 @@
                                                 Text="Não Sincronizado"
                                                 TextColor="{StaticResource OnSurfaceVariant}"
                                                 VerticalOptions="Center" />
-                                        </HorizontalStackLayout>-->
-                                        <Label
-                                            FontFamily="{StaticResource FontIcons}"
-                                            FontSize="18"
-                                            Text="{x:Static icons:MaterialOutlined.My_location}"
-                                            TextColor="{StaticResource Outline}"
-                                            VerticalOptions="Center" />
-                                        <Label
-                                            Grid.Column="1"
-                                            FontFamily="{StaticResource FontBody}"
-                                            FontSize="13"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding LocationText}"
-                                            TextColor="{StaticResource OnSurfaceVariant}"
-                                            VerticalOptions="Center" />
-                                        <Label
-                                            Grid.Column="2"
-                                            FontFamily="{StaticResource FontIcons}"
-                                            FontSize="20"
-                                            Text="{x:Static icons:MaterialOutlined.Chevron_right}"
-                                            TextColor="{StaticResource Outline}"
-                                            VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
                                     </Grid>
                                 </Grid>
                             </Border>

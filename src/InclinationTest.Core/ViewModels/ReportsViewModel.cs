@@ -442,7 +442,8 @@ public sealed partial class ReportsViewModel : ObservableObject
             $"{date} · {duration} · {samples}",
             FormatAngle(summary.MeanRoll, summary.StdRoll),
             FormatAngle(summary.MeanTrim, summary.StdTrim),
-            header.Synced)
+            header.Synced,
+            !header.Synced)
         {
             LocationText = string.IsNullOrWhiteSpace(header.Location) ? "—" : header.Location,
             DateOnlyText = dateOnly,
