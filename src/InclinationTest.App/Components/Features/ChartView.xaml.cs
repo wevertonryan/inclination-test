@@ -1,0 +1,197 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using InclinationTest.Core.ViewModels;
+using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.Measure;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
+
+namespace InclinationTest.App.Components.Features;
+
+public partial class ChartView : ContentView
+{
+    private const double ScaleFloor = 5;
+
+    private readonly ObservableCollection<ObservablePoint> _trim = new();
+    private readonly ObservableCollection<ObservablePoint> _roll = new();
+    private readonly Axis _xAxis;
+    private readonly Axis _yAxis;
+
+    private RecorderViewModel? _recorder;
+    private double _scale = ScaleFloor;
+    private long _lastRenderedMs = long.MinValue;
+
+    public ChartView()
+    {
+        InitializeComponent();
+
+        Chart.Series = new ISeries[]
+        {
+            CreateSeries(_trim, ThemeColor("ChartTrim", "#89ceff")),
+            CreateSeries(_roll, ThemeColor("ChartRoll", "#ffab32")),
+        };
+
+        _yAxis = new Axis
+        {
+            MinLimit = -ScaleFloor,
+            MaxLimit = ScaleFloor,
+            MinStep = ScaleFloor,
+            Labeler = value => $"{value:0}°",
+            TextSize = 9,
+            LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+            SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
+        };
+
+        _xAxis = new Axis
+        {
+            MinLimit = 0,
+            Labeler = FormatClock,
+            TextSize = 9,
+            LabelsPaint = new SolidColorPaint(ThemeColor("OnSurfaceVariant", "#bacac9")),
+            SeparatorsPaint = new SolidColorPaint(ThemeColor("SurfaceContainerHighest", "#2f353d"), 1),
+        };
+
+        Chart.XAxes = new[] { _xAxis };
+        Chart.YAxes = new[] { _yAxis };
+        Chart.LegendPosition = LegendPosition.Hidden;
+        Chart.TooltipPosition = TooltipPosition.Hidden;
+        Chart.AnimationsSpeed = TimeSpan.Zero;
+        Chart.EasingFunction = null;
+    }
+
+    protected override void OnBindingContextChanged()
+    {
+        base.OnBindingContextChanged();
+
+        if (_recorder is not null)
+        {
+            _recorder.PropertyChanged -= OnRecorderChanged;
+        }
+
+        _recorder = BindingContext as RecorderViewModel;
+
+        if (_recorder is not null)
+        {
+            _recorder.PropertyChanged += OnRecorderChanged;
+        }
+
+        Reset();
+        Sync();
+    }
+
+    private static LineSeries<ObservablePoint> CreateSeries(
+        ObservableCollection<ObservablePoint> values,
+        SKColor color)
+        => new()
+        {
+            Values = values,
+            Stroke = new SolidColorPaint(color, 2),
+            Fill = new SolidColorPaint(color.WithAlpha(20)),
+            Name = color == ThemeColor("ChartTrim", "#89ceff") ? "Trim" : "Roll",
+            GeometrySize = 0,
+            GeometryStroke = null,
+            GeometryFill = null,
+            LineSmoothness = 0,
+        };
+
+    private static string FormatClock(double seconds)
+    {
+        var total = (int)seconds;
+        return $"{total / 60}:{total % 60:00}";
+    }
+
+    private void OnRecorderChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(RecorderViewModel.SampleCount))
+        {
+            Sync();
+        }
+    }
+
+    private void Sync()
+    {
+        if (_recorder is null || _recorder.SampleCount == 0)
+        {
+            Reset();
+            return;
+        }
+
+        var added = false;
+
+        foreach (var sample in _recorder.Series)
+        {
+            if (sample.ElapsedMs <= _lastRenderedMs)
+            {
+                continue;
+            }
+
+            var x = sample.ElapsedMs / 1000.0;
+            _trim.Add(new ObservablePoint(x, sample.Trim));
+            _roll.Add(new ObservablePoint(x, sample.Roll));
+            _lastRenderedMs = sample.ElapsedMs;
+            added = true;
+        }
+
+        if (!added)
+        {
+            return;
+        }
+
+        while (_trim.Count > RecorderViewModel.DefaultSeriesCapacity)
+        {
+            _trim.RemoveAt(0);
+            _roll.RemoveAt(0);
+        }
+
+        UpdateScale();
+    }
+
+    private void Reset()
+    {
+        _trim.Clear();
+        _roll.Clear();
+        _lastRenderedMs = long.MinValue;
+        _scale = ScaleFloor;
+        _yAxis.MinLimit = -ScaleFloor;
+        _yAxis.MaxLimit = ScaleFloor;
+        _yAxis.MinStep = ScaleFloor;
+    }
+
+    private void UpdateScale()
+    {
+        double maxAbs = 0;
+
+        foreach (var sample in _recorder!.Series)
+        {
+            maxAbs = Math.Max(maxAbs, Math.Max(Math.Abs(sample.Trim), Math.Abs(sample.Roll)));
+        }
+
+        var scale = Math.Max(ScaleFloor, Math.Ceiling(maxAbs / ScaleFloor) * ScaleFloor);
+
+        if (scale == _scale)
+        {
+            return;
+        }
+
+        _scale = scale;
+        _yAxis.MinLimit = -scale;
+        _yAxis.MaxLimit = scale;
+        _yAxis.MinStep = scale <= 10 ? ScaleFloor : 10;
+    }
+
+    private static SKColor ThemeColor(string key, string fallback)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color)
+        {
+            return new SKColor(
+                (byte)(color.Red * 255),
+                (byte)(color.Green * 255),
+                (byte)(color.Blue * 255),
+                (byte)(color.Alpha * 255));
+        }
+
+        return SKColor.Parse(fallback);
+    }
+}

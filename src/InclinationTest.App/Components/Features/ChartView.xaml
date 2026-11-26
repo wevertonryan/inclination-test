@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.ChartView"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:icons="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+    BackgroundColor="Transparent">
+
+    <Border
+        BackgroundColor="{StaticResource SurfaceContainer}"
+        Padding="16,12,12,8"
+        StrokeThickness="0"
+        StrokeShape="RoundRectangle 12">
+        <Border.Shadow>
+            <Shadow
+                Brush="#66000000"
+                Offset="0,3"
+                Radius="8" />
+        </Border.Shadow>
+
+        <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
+                <Label
+                    FontFamily="{StaticResource FontIcons}"
+                    FontSize="18"
+                    Text="{x:Static icons:MaterialOutlined.Show_chart}"
+                    TextColor="{StaticResource Primary}"
+                    VerticalOptions="Center" />
+                <Label
+                    Grid.Column="1"
+                    FontFamily="{StaticResource FontDisplay}"
+                    FontSize="15"
+                    FontAttributes="Bold"
+                    LineBreakMode="TailTruncation"
+                    Text="Variação Angular Trim × Roll"
+                    TextColor="{StaticResource OnSurface}"
+                    VerticalOptions="Center" />
+                <HorizontalStackLayout
+                    Grid.Column="2"
+                    Spacing="8"
+                    VerticalOptions="Center">
+                    <Label
+                        FontFamily="{StaticResource FontMono}"
+                        FontSize="9"
+                        Text="TRIM"
+                        TextColor="{StaticResource ChartTrim}" />
+                    <Label
+                        FontFamily="{StaticResource FontMono}"
+                        FontSize="9"
+                        Text="ROLL"
+                        TextColor="{StaticResource ChartRoll}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <Border
+                Grid.Row="1"
+                Padding="8,6,4,2"
+                BackgroundColor="{StaticResource SurfaceContainerLow}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 8">
+                <lvc:CartesianChart
+                    x:Name="Chart"
+                    HeightRequest="132"
+                    BackgroundColor="Transparent" />
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="InclinationTest.App.Components.Features.RecordingBar"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:features="clr-namespace:InclinationTest.App.Components.Features">
+
+    <Grid
+        ColumnDefinitions="*,Auto,*"
+        HeightRequest="96"
+        Padding="24,10">
+
+        <Border
+            Grid.Column="0"
+            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+            HeightRequest="56"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="56">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCancel" />
+            </Border.GestureRecognizers>
+            <Label
+                x:Name="CancelIcon"
+                FontFamily="{StaticResource FontIcons}"
+                FontSize="26"
+                HorizontalOptions="Center"
+                TextColor="{StaticResource Error}"
+                VerticalOptions="Center" />
+        </Border>
+
+        <features:RecordButton
+            x:Name="Center"
+            Grid.Column="1"
+            Clicked="OnToggle"
+            Mode="{Binding Mode}"
+            VerticalOptions="Center" />
+
+        <Border
+            Grid.Column="2"
+            BackgroundColor="{StaticResource SurfaceContainerHigh}"
+            HeightRequest="56"
+            HorizontalOptions="Center"
+            StrokeShape="RoundRectangle 999"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            WidthRequest="56">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSave" />
+            </Border.GestureRecognizers>
+            <Label
+                x:Name="SaveIcon"
+                FontFamily="{StaticResource FontIcons}"
+                FontSize="26"
+                HorizontalOptions="Center"
+                TextColor="{StaticResource Primary}"
+                VerticalOptions="Center" />
+        </Border>
+    </Grid>
+</ContentView>

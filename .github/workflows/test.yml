@@ -1,0 +1,30 @@
+name: Testes
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'src/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - '.github/workflows/test.yml'
+
+jobs:
+  dotnet:
+    name: .NET + testes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - run: dotnet restore InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj
+      - run: dotnet build InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj --no-restore --configuration Release
+      - run: dotnet test InclinationTest.Core.Tests/InclinationTest.Core.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
